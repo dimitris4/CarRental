@@ -1,18 +1,15 @@
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import static java.sql.DriverManager.getConnection;
 
 
 public class AccessDB {
-
-    public static void main(String[] args) throws SQLException {
+    public void connectionAndQueryTest() {
         try {
             // 1. get a connection to database
-            Connection myConn = getConnection("jdbc:mysql://localhost:3306/ap", "dimitrios", "periergos77AS");
+            Connection myConn = getConnection("jdbc:mysql://localhost:3306/ap", "root", "periergos77AS");
 
             // 2. create a statement
             Statement myStmt = myConn.createStatement();
