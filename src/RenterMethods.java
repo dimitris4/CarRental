@@ -12,6 +12,7 @@ import static java.sql.DriverManager.getConnection;
 
 public class RenterMethods {
 
+    // i was testing the connection to the database...
     public void add() {
 
         try {
