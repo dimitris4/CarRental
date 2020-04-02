@@ -6,6 +6,7 @@ public class OurApp {
 
         RenterMethods rm = new RenterMethods();
         rm.add();
+        rm.displayRenters();
 
         /*//creating a controller object
         controller = new Controller();
