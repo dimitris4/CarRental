@@ -12,6 +12,10 @@ import static java.sql.DriverManager.getConnection;
 
 public class RenterMethods {
 
+    String url = "jdbc:mysql://localhost:3306/kailua";
+    String user = "dimk";
+    String password = "dimk1234!";
+
     // i was testing the connection to the database...
     public void add() {
 
@@ -36,8 +40,77 @@ public class RenterMethods {
 
     }
 
-    public void remove() {
+    /*public void remove() {
 
+        try {
+
+            Connection myConn = getConnection(url, user, password);
+
+            //displayRenters(myConn);
+
+            Statement myStmt = myConn.createStatement();
+
+            String sql = "DELETE FROM renter WHERE renter_id = 1";
+
+            int rowsAffected = myStmt.executeUpdate(sql);
+
+            System.out.println("Rows affected: " + rowsAffected);
+
+            System.out.println("Delete complete.");
+
+            myStmt.close();
+
+            myConn.close();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }*/
+
+    public void displayRenters() {
+
+        try {
+
+            Connection myConn = getConnection(url, user, password);
+
+            Statement myStmt = myConn.createStatement();
+
+            String sql = "SELECT first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, " +
+                    "CONCAT(street, \" \", building, \" \", floor, \" \", door, \" \", zip_code)\n" +
+                    "FROM renter JOIN address USING (addressID)";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+
+            if (rs != null) {
+
+                System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "First Name", "Last Name",
+                                 "Mobile Phone", "Email", "Driver License", "Since", "Address");
+
+                for (int i = 0; i < 210; i++) {
+
+                    System.out.print("-");
+
+                }
+
+                System.out.println();
+
+                while (rs.next()) {
+
+                    System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                            rs.getString(2), rs.getString(3), rs.getString(4),
+                            rs.getString(5), rs.getString(6), rs.getString(7));
+
+                }
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
     }
 
     public void updateDriverLicenceNumber(){
@@ -48,10 +121,6 @@ public class RenterMethods {
     }
 
     public void updateAddress() {
-
-    }
-
-    public void displayRenters() {
 
     }
 
