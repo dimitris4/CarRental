@@ -63,8 +63,6 @@ public class RenterMethods {
 
                 try {
 
-                   // myConn.setAutoCommit(true);
-
                     pst1 = myConn.prepareStatement(sql1);
 
                     pst2 = myConn.prepareStatement(sql2);
@@ -83,9 +81,11 @@ public class RenterMethods {
 
                 } catch (SQLException e) {
 
+                    e.printStackTrace();
+
                 }
 
-                //System.out.println("Delete complete.");
+                System.out.println("Delete complete.");
 
                 pst1.close();
 
