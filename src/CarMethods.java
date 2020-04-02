@@ -297,19 +297,19 @@ public class CarMethods {
     // ID 2 - Family
     // ID 3 - Sport
 
-    public void displayLuxuryCars() {
+    public void displayLuxuryCars() throws SQLException {
         displayCars("WHERE rental_typeID = 1");
     }
 
-    public void displayFamilyCars() {
+    public void displayFamilyCars() throws SQLException {
         displayCars("WHERE rental_typeID = 2");
     }
 
-    public void displaySportCars() {
+    public void displaySportCars() throws SQLException {
         displayCars("WHERE rental_typeID = 3");
     }
 
-    public void searchByRegistrationNumber(String registrationNumber) {
+    public void searchByRegistrationNumber(String registrationNumber) throws SQLException {
         displayCars("WHERE registration_number = " + registrationNumber);
     }
 
