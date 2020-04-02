@@ -139,17 +139,15 @@ public class RenterMethods {
             Connection myConn = getConnection(url, user, password);
 
             PreparedStatement updateDriverLicenseNumber = null;
-            PreparedStatement updateTelephone = null;
-            PreparedStatement updateAddress = null;
-
-
+            //PreparedStatement updateTelephone = null;
+            //PreparedStatement updateAddress = null;
 
             displayRentersUpdate(myConn);
 
-            System.out.print("Select the renter id: ");
+            System.out.print("\nSelect renter ID: ");
             int renter_id = input.nextInt();
 
-            System.out.println("[1] Driver License Number  [2] Telephone  [3] Address");
+            System.out.println("\n[1] Driver License Number     [2] Telephone     [3] Address");
             System.out.print("Select the field you want to update: ");
             int field = input.nextInt();
 
@@ -159,13 +157,25 @@ public class RenterMethods {
 
                     try {
 
-                        String updateDriverLicenseString = "";
+                        String updateDriverLicenseString = "UPDATE renter\n" +
+                                                           "SET driver_license_number = ?\n" +
+                                                           "WHERE renterID = ?;";
+
+                        System.out.print("Enter new driver license number: ");
+
+                        String newDriverLicenseNumber = input.next();
 
                         updateDriverLicenseNumber = myConn.prepareStatement(updateDriverLicenseString);
 
-                        updateDriverLicenseNumber.setInt(1, choice);
+                        updateDriverLicenseNumber.setString(1, newDriverLicenseNumber);
+
+                        updateDriverLicenseNumber.setInt(2, renter_id);
+
+                        updateDriverLicenseNumber.executeUpdate();
 
                         System.out.println("Update complete.");
+
+                        displayRentersUpdate(myConn);
 
                     } catch (SQLException e) {
 
@@ -175,7 +185,7 @@ public class RenterMethods {
 
                 case 2:
 
-                    try {
+                    /*try {
 
                         String updateTelephoneString = "";
 
@@ -189,11 +199,11 @@ public class RenterMethods {
 
                         e.printStackTrace();
 
-                    }
+                    }*/
 
                 case 3:
 
-                    try {
+                    /*try {
 
                         String updateAddressString = "";
 
@@ -207,21 +217,9 @@ public class RenterMethods {
 
                         e.printStackTrace();
 
-                    }
-
-                default:
-
-                    System.out.println("Invalid input.");
+                    }*/
 
             }
-
-
-
-
-
-
-
-
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -236,15 +234,36 @@ public class RenterMethods {
             Statement myStmt = myConn.createStatement();
 
             String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email, " +
-                                 "driver_license_number, since_data, CONCAT(street, building, floor, door, zip_code)" +
+                                 "driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', door, ' ', zip_code)" +
                          "FROM renter JOIN address USING (addressID)" +
                                      "JOIN phone_numbers USING (mobile_phone_number)";
 
             ResultSet rs = myStmt.executeQuery(sql);
 
+            System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+                    "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
+
+            for (int i = 0; i < 215; i++) {
+
+                System.out.print("-");
+
+            }
+
+            System.out.println();
+
+            while (rs.next()) {
+
+                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7),
+                        rs.getString(8), rs.getString(9));
+
+            }
+
         } catch (SQLException e) {
 
             e.printStackTrace();
+
         }
 
     }
