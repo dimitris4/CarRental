@@ -1,7 +1,6 @@
 public class ContractMethods {
 
     public void displayActiveContracts() {
-
     }
 
     public void displayOldContracts() {
@@ -21,7 +20,6 @@ public class ContractMethods {
     }
 
     public void searchContractsByRenterDriverLicense() {
-
     }
 
 }

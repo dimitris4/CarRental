@@ -17,17 +17,17 @@ public class RenterMethods {
 
         try {
             // 1. get a connection to database
-            Connection myConn = getConnection("jdbc:mysql://localhost:3306/ap", "root", "periergos77AS");
+            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua", "dimk", "dimk1234!");
 
             // 2. create a statement
             Statement myStmt = myConn.createStatement();
 
             // 3. execute SQL query
-            ResultSet myRs = myStmt.executeQuery("select * from invoices");
+            ResultSet myRs = myStmt.executeQuery("select * from brand");
 
             // 4. process the result set
             while (myRs.next()) {
-                System.out.println(myRs.getString("invoice_id"));
+                System.out.println(myRs.getString("name"));
             }
 
         } catch (SQLException exc) {
@@ -60,7 +60,6 @@ public class RenterMethods {
     }
 
     public void searchByRenterLastName(String lastName) {
-
     }
 
     /*public void sendMail(String recipient, String myMessage) {

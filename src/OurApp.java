@@ -3,10 +3,14 @@ public class OurApp {
     private static Controller controller;
 
     public static void main(String[] args) throws Exception {
-        //creating a controller object
+
+        RenterMethods rm = new RenterMethods();
+        rm.add();
+
+        /*//creating a controller object
         controller = new Controller();
         //Our first login menu is called
-        new Start();
+        new Start();*/
     }
 
     //a getter method returning the controller object

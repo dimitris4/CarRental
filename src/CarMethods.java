@@ -1,23 +1,18 @@
 public class CarMethods {
 
     public void add() {
-
     }
 
     public void remove() {
-
     }
 
-    public void displayAvailableCars() {
-
+    public void displayAvailableCarsWithinDateRange() {
     }
 
     public void displayUnavailableCars() {
-
     }
 
     public void displayFamilyCars() {
-
     }
 
     public void displaySportCars() {
@@ -29,8 +24,6 @@ public class CarMethods {
     }
 
     public void searchByRegistrationNumber(String registrationNumber) {
-
     }
-
 }
 
