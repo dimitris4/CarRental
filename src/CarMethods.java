@@ -129,9 +129,9 @@ public class CarMethods {
         ResultSet myRs = null;
         HashSet<Integer> models = new HashSet<>();
         if (brandID!=-1) {
-            myRs = getRs("SELECT m.modelID, CONCAT(m.name,\" \" ,b.name) AS \"Model\" FROM Model m JOIN ON Brand b WHERE m.brandID=b.brandID");
+            myRs = getRs("SELECT m.modelID, CONCAT(m.name,\" \" ,b.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID");
         } else {
-            myRs = getRs("SELECT modelID, CONCAT(name,\" \" ,b.name) AS \"Model\" FROM Model JOIN ON Brand b WHERE brandID=" + brandID);
+            myRs = getRs("SELECT modelID, CONCAT(name,\" \" ,b.name) FROM Model JOIN Brand b ON brandID=" + brandID);
         }
 
         if (myRs != null) {
@@ -164,6 +164,26 @@ public class CarMethods {
     }
 
     public void remove() {
+    }
+
+    public void displayCars() {
+        ResultSet myRs = getRs("SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
+                "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON" +
+                "c.rental_typeID = r.rental_typeID");
+        if (myRs != null) {
+            System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
+                    "Fuel Type", "Model", "Rental Type", "Description");
+            for (int i = 0; i < 210; i++) {
+                System.out.print("-");
+            }
+            System.out.println();
+            while (myRs.next()) {
+                System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),myRs.getString(2),
+                        myRs.getString(3),myRs.getString(4),myRs.getString(5),myRs.getString(6),
+                        myRs.getString(7));
+
+            }
+        }
     }
 
     public void displayAvailableCarsWithinDateRange() {
