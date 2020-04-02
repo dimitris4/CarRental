@@ -87,7 +87,11 @@ public class CarMethods {
             //are we doing the available part?
             String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + year + "-" + month + "-" + day + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', '" + true + ")";
             update(query);
+            cars.add(registration_number);
+        } else {
+            System.out.println("Addition cancelled.");
         }
+        System.out.println("Returning to the menu.");
     }
 
     public boolean dateCheck(int year, int month, int day){
@@ -180,13 +184,32 @@ public class CarMethods {
         }
     }
 
-    public void remove() {
+    public void deleteCar() throws SQLException{
+        displayCars(null);
+        System.out.println("Insert registration number of a car you want to delete: ");
+        String registration_number = scanner.next();
+        while (!cars.contains(registration_number) || registration_number.equals(0)){
+            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            registration_number = scanner.next();
+        }
+        if(confirmation("delete")==1){
+            update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
+            System.out.println("Car has been deleted from the database");
+            cars.remove(registration_number);
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
+        System.out.println("Returning to the menu.");
     }
 
-    public void displayCars() throws SQLException {
-        ResultSet myRs = getRs("SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
+    public void displayCars(String condition) throws SQLException {
+        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
                 "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON" +
-                "c.rental_typeID = r.rental_typeID");
+                "c.rental_typeID = r.rental_typeID";
+        if (condition!=null){
+            query.concat(" " + condition); //adds where clause for conditions
+        }
+        ResultSet myRs = getRs(query);
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
                     "Fuel Type", "Model", "Rental Type", "Description");
