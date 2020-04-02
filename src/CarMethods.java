@@ -9,21 +9,40 @@ import static java.sql.DriverManager.getConnection;
 public class CarMethods {
 
     private static Set<String> cars= new HashSet<>();
+    private static Set<String> brands= new HashSet<>();
+    private static Set<String> models= new HashSet<>();
+    private static Set<String> fuels= new HashSet<>();
     private static Scanner scanner = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
-    public void addCar() throws SQLException {
+    public CarMethods() throws SQLException {//populate hashsets
         ResultSet myRs = getRs("SELECT registration_number FROM Car");
         while(myRs.next()) {
             cars.add(myRs.getString("registration_number"));
         }
+        myRs = getRs("SELECT name FROM Brand");
+        while(myRs.next()) {
+            brands.add(myRs.getString("registration_number"));
+        }
+        myRs = getRs("SELECT name FROM Model");
+        while(myRs.next()) {
+            models.add(myRs.getString("registration_number"));
+        }
+        myRs = getRs("SELECT fuel_type FROM Fuel");
+        while(myRs.next()) {
+            fuels.add(myRs.getString("registration_number"));
+        }
+    }
+
+    public void addCar() throws SQLException {
+        ResultSet myRs = null;
         System.out.println("Registration number: ");
         String registration_number = scanner.next();
         while(cars.contains(registration_number) && !registration_number.matches("[a-zA-Z0-9]{10}")){
             System.out.println("Invalid registration number. Please try again: ");
             registration_number = scanner.next();
         }
-        System.out.println("First registration date (YYYY-MM-DD): ");
+        System.out.println("First registration date: ");
         System.out.println("Year: ");
         int year = scanner.nextInt();
         //first car created in 1885 (i think) so it can't be less than 1885
@@ -56,25 +75,67 @@ public class CarMethods {
         }
         int amount;
         amount = displayBrand();
+        System.out.println("Enter 0 to add new option");
         System.out.println("Brand (ID number): ");
         int brand = scanner.nextInt();
         while(brand<0 && brand>amount){
             System.out.println("Invalid value. Please try again: ");
             brand = scanner.nextInt();
         }
-        HashSet<Integer>models = displayModel(brand);
+        if (brand==0){
+            System.out.println("Brand name: ");
+            String brandName = scanner.next();
+            while (brandName.length()>12){
+                System.out.println("Wrong input. Try again (max length 12): ");
+                brandName = scanner.next();
+            }
+            if (!brands.contains(brandName)){
+                update("INSERT INTO Brand ('name') VALUES ('" + brandName +"')");
+                myRs = getRs("SELECT brandID FROM Brand WHERE name = '" + brandName + "'");
+                brand = myRs.getInt(1);
+            }
+        }
+        HashSet<Integer>brandModels = displayModel(brand);
+        System.out.println("Enter 0 to add new option");
         System.out.println("Model (ID number): ");
         int model = scanner.nextInt();
-        while(!models.contains(model)){
+        while(!models.contains(model) || model!=0){
             System.out.println("Invalid value. Please try again: ");
             model = scanner.nextInt();
         }
+        if (model==0){
+            System.out.println("Model name: ");
+            String modelName = scanner.next();
+            while (modelName.length()>12){
+                System.out.println("Wrong input. Try again (max length 12): ");
+                modelName = scanner.next();
+            }
+            if (!models.contains(modelName)){
+                update("INSERT INTO Model ('name','brandID') VALUES ('" + modelName +"', '" + brand +"')");
+                myRs = getRs("SELECT modelID FROM Model WHERE name = '" + modelName + "'");
+                model = myRs.getInt(1);
+            }
+        }
         amount = displayFuel();
+        System.out.println("Enter 0 to add new option");
         System.out.println("Fuel (ID number): ");
         int fuel = scanner.nextInt();
         while(fuel<0 && fuel>amount){
             System.out.println("Invalid value. Please try again: ");
             fuel = scanner.nextInt();
+        }
+        if (fuel==0){
+            System.out.println("Fuel type: ");
+            String fuelType = scanner.next();
+            while (fuelType.length()>11){
+                System.out.println("Wrong input. Try again (max length 11): ");
+                fuelType = scanner.next();
+            }
+            if (!brands.contains(fuelType)){
+                update("INSERT INTO Fuel ('fuel_type') VALUES ('" + fuelType +"')");
+                myRs = getRs("SELECT fuelID FROM Brand WHERE fuel_type = '" + fuelType + "'");
+                fuel = myRs.getInt(1);
+            }
         }
         displayType();
         System.out.println("Type (ID number): ");
