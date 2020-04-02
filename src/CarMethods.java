@@ -293,18 +293,24 @@ public class CarMethods {
     public void displayUnavailableCars() {
     }
 
+    //ID 1 - Luxury
+    // ID 2 - Family
+    // ID 3 - Sport
+
+    public void displayLuxuryCars() {
+        displayCars("WHERE rental_typeID = 1");
+    }
+
     public void displayFamilyCars() {
+        displayCars("WHERE rental_typeID = 2");
     }
 
     public void displaySportCars() {
-
-    }
-
-    public void displayLuxuryCars() {
-
+        displayCars("WHERE rental_typeID = 3");
     }
 
     public void searchByRegistrationNumber(String registrationNumber) {
+        displayCars("WHERE registration_number = " + registrationNumber);
     }
 
     public ResultSet getRs(String query) {
