@@ -15,29 +15,6 @@ public class RenterMethods {
     String password = "dimk1234!";
     Scanner input = new Scanner(System.in);
 
-    // i was testing the connection to the database...
-    public void add() {
-
-        try {
-            // 1. get a connection to database
-            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua", "dimk", "dimk1234!");
-
-            // 2. create a statement
-            Statement myStmt = myConn.createStatement();
-
-            // 3. execute SQL query
-            ResultSet myRs = myStmt.executeQuery("select * from brand");
-
-            // 4. process the result set
-            while (myRs.next()) {
-                System.out.println(myRs.getString("name"));
-            }
-
-        } catch (SQLException exc) {
-            exc.printStackTrace();
-        }
-
-    }
 
     public void remove() {
 
@@ -45,7 +22,7 @@ public class RenterMethods {
 
             Connection myConn = getConnection(url, user, password);
 
-            if (!displayRenters(myConn)) {
+            if (!displayRentersRemove(myConn)) {
 
                 return;
 
@@ -103,7 +80,7 @@ public class RenterMethods {
 
     }
 
-    public boolean displayRenters(Connection myConn) {
+    public boolean displayRentersRemove(Connection myConn) {
 
         try {
 
@@ -154,61 +131,130 @@ public class RenterMethods {
         return true;
     }
 
-    public void updateDriverLicenceNumber(){
+
+    public void update() {
+
+        try {
+
+            Connection myConn = getConnection(url, user, password);
+
+            PreparedStatement updateDriverLicenseNumber = null;
+            PreparedStatement updateTelephone = null;
+            PreparedStatement updateAddress = null;
+
+
+
+            displayRentersUpdate(myConn);
+
+            System.out.print("Select the renter id: ");
+            int renter_id = input.nextInt();
+
+            System.out.println("[1] Driver License Number  [2] Telephone  [3] Address");
+            System.out.print("Select the field you want to update: ");
+            int field = input.nextInt();
+
+            switch (field) {
+
+                case 1:
+
+                    try {
+
+                        String updateDriverLicenseString = "";
+
+                        updateDriverLicenseNumber = myConn.prepareStatement(updateDriverLicenseString);
+
+                        updateDriverLicenseNumber.setInt(1, choice);
+
+                        System.out.println("Update complete.");
+
+                    } catch (SQLException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                case 2:
+
+                    try {
+
+                        String updateTelephoneString = "";
+
+                        updateTelephone = myConn.prepareStatement(updateTelephoneString);
+
+                        updateTelephone.setInt(1, choice);
+
+                        System.out.println("Update complete.");
+
+                    } catch (SQLException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                case 3:
+
+                    try {
+
+                        String updateAddressString = "";
+
+                        updateAddress = myConn.prepareStatement(updateAddressString);
+
+                        updateAddress.setInt(1, );
+
+                        System.out.println("Update complete.");
+
+                    } catch (SQLException e) {
+
+                        e.printStackTrace();
+
+                    }
+
+                default:
+
+                    System.out.println("Invalid input.");
+
+            }
+
+
+
+
+
+
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void updateTelephone() {
+
+    private void displayRentersUpdate(Connection myConn) {
+
+        try {
+
+            Statement myStmt = myConn.createStatement();
+
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email, " +
+                                 "driver_license_number, since_data, CONCAT(street, building, floor, door, zip_code)" +
+                         "FROM renter JOIN address USING (addressID)" +
+                                     "JOIN phone_numbers USING (mobile_phone_number)";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
 
     }
 
-    public void updateAddress() {
 
-    }
 
     public void searchByDriverLicenseNumber(String driverLicenseNumber) {
-
     }
 
     public void searchByRenterLastName(String lastName) {
     }
-
-    /*public void sendMail(String recipient, String myMessage) {
-        public static void sendMail(String recipient, String myMessage) throws Exception{
-            System.out.println("Preparing to send contract to client...");
-            Properties properties = new Properties();
-
-            properties.put("mail.smtp.auth", "true");
-            properties.put("mail.smtp.starttls.enable", "true");
-            properties.put("mail.smtp.host", "smtp.gmail.com");
-            properties.put("mail.smtp.port", "587");
-
-            String myAccountEmail = "kailuacarrental@gmail.com";
-            String password = "kailua1234";
-
-            Session session = Session.getInstance(properties, new Authenticator(){
-                protected PasswordAuthentication getPasswordAuthentication(){
-                    return new PasswordAuthentication(myAccountEmail, password);
-                }
-            });
-
-            Message message = prepareMessage(session, myAccountEmail, recipient, myMessage);
-            Transport.send(message);
-            System.out.println("Contract sent!");
-        }
-
-        private static Message prepareMessage(Session session, String myAccountEmail, String recipient, String myMessage) {
-            try {
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(myAccountEmail));
-                message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient) );
-                message.setSubject("Kailua Car Rental Contract");
-                message.setText(myMessage);
-                return message;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }*/
 }
 
