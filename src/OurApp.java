@@ -5,7 +5,7 @@ public class OurApp {
     public static void main(String[] args) throws Exception {
 
         RenterMethods rm = new RenterMethods();
-        rm.displayRenters();
+        rm.remove();
 
         /*//creating a controller object
         controller = new Controller();

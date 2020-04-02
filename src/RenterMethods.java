@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Scanner;
 
 //import javax.mail.*;
 //import javax.mail.internet.InternetAddress;
@@ -15,6 +13,7 @@ public class RenterMethods {
     String url = "jdbc:mysql://localhost:3306/kailua";
     String user = "dimk";
     String password = "dimk1234!";
+    Scanner input = new Scanner(System.in);
 
     // i was testing the connection to the database...
     public void add() {
@@ -40,27 +39,37 @@ public class RenterMethods {
 
     }
 
-    /*public void remove() {
+    public void remove() {
 
         try {
 
             Connection myConn = getConnection(url, user, password);
 
-            //displayRenters(myConn);
+            if (!displayRenters(myConn)) {
 
-            Statement myStmt = myConn.createStatement();
+                return;
 
-            String sql = "DELETE FROM renter WHERE renter_id = 1";
+            } else {
 
-            int rowsAffected = myStmt.executeUpdate(sql);
+                PreparedStatement pst = myConn.prepareStatement("DELETE FROM renter WHERE renterID = ?");
 
-            System.out.println("Rows affected: " + rowsAffected);
+                System.out.print("Select the renter id: ");
 
-            System.out.println("Delete complete.");
+                int choice = input.nextInt();
 
-            myStmt.close();
+                pst.setInt(1, choice);
 
-            myConn.close();
+                int rowsAffected = pst.executeUpdate();
+
+                System.out.println("Rows affected: " + rowsAffected);
+
+                System.out.println("Delete complete.");
+
+                pst.close();
+
+                myConn.close();
+
+            }
 
         } catch (SQLException e) {
 
@@ -68,25 +77,30 @@ public class RenterMethods {
 
         }
 
-    }*/
+    }
 
-    public void displayRenters() {
+    public boolean displayRenters(Connection myConn) {
 
         try {
 
-            Connection myConn = getConnection(url, user, password);
-
             Statement myStmt = myConn.createStatement();
 
-            String sql = "SELECT first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, " +
-                    "CONCAT(street, \" \", building, \" \", floor, \" \", door, \" \", zip_code)\n" +
-                    "FROM renter JOIN address USING (addressID)";
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, " +
+                                 "CONCAT(street, \" \", building, \" \", floor, \" \", door, \" \", zip_code)\n" +
+                         "FROM renter JOIN address USING (addressID) " +
+                         "WHERE renterID NOT IN (SELECT renterID FROM contract)";
 
             ResultSet rs = myStmt.executeQuery(sql);
 
-            if (rs != null) {
+            if (!rs.next()) {
 
-                System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "First Name", "Last Name",
+                System.out.println("You cannot delete any renter, because they all have contracts at the moment.");
+
+                return false;
+
+            } else {
+
+                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
                                  "Mobile Phone", "Email", "Driver License", "Since", "Address");
 
                 for (int i = 0; i < 210; i++) {
@@ -99,11 +113,13 @@ public class RenterMethods {
 
                 while (rs.next()) {
 
-                    System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                    System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
                             rs.getString(2), rs.getString(3), rs.getString(4),
-                            rs.getString(5), rs.getString(6), rs.getString(7));
+                            rs.getString(5), rs.getString(6), rs.getString(7),
+                            rs.getString(8));
 
                 }
+
             }
 
         } catch (SQLException e) {
@@ -111,6 +127,8 @@ public class RenterMethods {
             e.printStackTrace();
 
         }
+
+        return true;
     }
 
     public void updateDriverLicenceNumber(){
