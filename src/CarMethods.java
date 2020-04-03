@@ -397,7 +397,22 @@ public class CarMethods {
     }
 
     public void editCar() throws SQLException {
-
+        displayCars(null);
+        System.out.println("Enter Registration Number of a car you want to edit or 0 to go back: ");
+        String registration_number = scanner.next();
+        while (!cars.contains(registration_number) || registration_number.equals(0)) {
+            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            registration_number = scanner.next();
+        }
+        String new_registration_number = "";
+        if (!registration_number.equals(0)) {
+            System.out.println("Insert new value for Registration Number: ");
+            new_registration_number = setRegistrationNumber();
+        }
+        update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
+        update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
+        cars.remove(registration_number);
+        cars.add(new_registration_number);
     }
 
     public ArrayList<Object> connect() {
