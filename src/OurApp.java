@@ -7,8 +7,8 @@ public class OurApp {
         RenterMethods rm = new RenterMethods();
 
         //rm.add();
-        rm.remove();
-        //rm.update();
+        //rm.remove();
+        rm.update();
 
         //rm.displayRenterTable();
         //rm.displayPhoneTable();

@@ -16,25 +16,53 @@ public class RenterMethods {
     String password = "dimk1234!";
     Scanner input = new Scanner(System.in);
 
-    public void displayRenterTable() {
+    private void displayRenters(Connection myConn) {
+
         try {
-            // 1. get a connection to database
-            Connection myConn = getConnection(url, user, password);
-            // 2. create a statement
+
             Statement myStmt = myConn.createStatement();
-            // 3. execute SQL query
-            ResultSet myRs = myStmt.executeQuery("select * from renter");
-            System.out.println();
-            // 4. process the result set
-            while (myRs.next()) {
-                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),
-                    myRs.getString(2), myRs.getString(3), myRs.getString(4),
-                    myRs.getString(5), myRs.getString(6), myRs.getString(7));
+
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
+                    "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
+                    "       door, ' ', zip, ' ', city, ' ', country.name)\n" +
+                    "FROM renter \n" +
+                    "\tJOIN address USING (addressID)\n" +
+                    "    JOIN zip USING (zipID)\n" +
+                    "    JOIN country USING (countryID)\n" +
+                    "    JOIN phone_numbers USING (renterID);";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+
+            System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+                    "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
+
+            for (int i = 0; i < 215; i++) {
+
+                System.out.print("-");
+
             }
-        } catch (SQLException exc) {
-            exc.printStackTrace();
+
+            System.out.println();
+
+            while (rs.next()) {
+
+                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7),
+                        rs.getString(8), rs.getString(9));
+
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
         }
+
     }
+
+
+
 
 
     public void add() {
@@ -262,7 +290,8 @@ public class RenterMethods {
 
             Statement myStmt = myConn.createStatement();
 
-            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, CONCAT(street, building, floor, door, zip, city, country.name)\n" +
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, email, driver_license_number, " +
+                    "since_data, CONCAT(street, ' ', building, ' ', floor, ' ', door, ' ', zip, ' ', city, ' ',country.name)\n" +
                     "FROM renter JOIN address USING (addressID)\n" +
                     "JOIN phone_numbers USING (renterID)" +
                     "JOIN zip USING (zipID)" +
@@ -320,9 +349,12 @@ public class RenterMethods {
             PreparedStatement updateDriverLicenseNumber = null;
             PreparedStatement updateMobilePhone = null;
             PreparedStatement updateHomePhone = null;
+            PreparedStatement safeUpdate = null;
             PreparedStatement updateAddress = null;
+            PreparedStatement updateZip = null;
+            PreparedStatement updateCountry = null;
 
-            displayRentersUpdate(myConn);
+            displayRenters(myConn);
 
             System.out.print("\nSelect renter ID: ");
             int renter_id = input.nextInt();
@@ -355,7 +387,7 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        displayRentersUpdate(myConn);
+                        displayRenters(myConn);
 
                     } catch (SQLException e) {
 
@@ -388,7 +420,7 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        displayRentersUpdate(myConn);
+                        displayRenters(myConn);
 
                     } catch (SQLException e) {
 
@@ -421,28 +453,25 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        //displayRentersUpdate(myConn);
+                        displayRenters(myConn);
 
                     } catch (SQLException e) {
 
                         e.printStackTrace();
 
                     }
+
                     break;
 
                 case 4:
 
                     try {
 
-                        String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?, " +
-                                "zip_code = ?, city = ?, country = ?  " +
-                                "WHERE addressID =  (SELECT addressID FROM renter WHERE renterID = ?)";
-
-                        System.out.print("Enter Street Name: ");
-                        String street = input.nextLine();
+                        System.out.print("Street Name: ");
+                        String street = input.next();
                         while(!street.matches("[a-zA-Z_]+")){
-                            System.out.println("Invalid Street Name. Try Again: ");
-                            street = input.nextLine();
+                            System.out.print("Invalid Street Name. Try Again: ");
+                            street = input.next();
                         }
 
                         System.out.print("Enter Street Number: ");
@@ -479,6 +508,23 @@ public class RenterMethods {
                             country = input.next();
                         }
 
+                        String safeUpadateString = "SET SQL_SAFE_UPDATES = 0";
+
+                        safeUpdate = myConn.prepareStatement(safeUpadateString);
+
+                        safeUpdate.execute();
+
+                        String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?" +
+                                "WHERE addressID IN (SELECT addressID FROM renter WHERE renterID = ?)";
+
+                        String updateZipString = "UPDATE zip SET zip = ?, city = ?" +
+                                "WHERE zipID IN " +
+                                "(SELECT zipID FROM address JOIN renter WHERE renterID = ?)";
+
+                        String updateCountryString = "UPDATE country SET country.name = ?" +
+                                "WHERE countryID IN " +
+                                "(SELECT countryID FROM zip JOIN address JOIN renter WHERE renterID = ?)";
+
                         updateAddress = myConn.prepareStatement(updateAddressString);
 
                         updateAddress.setString(1, street);
@@ -489,19 +535,33 @@ public class RenterMethods {
 
                         updateAddress.setString(4, door);
 
-                        updateAddress.setString(5, zip_code);
+                        updateAddress.setInt(5, renter_id);
 
-                        updateAddress.setString(6, city);
+                        updateZip = myConn.prepareStatement(updateZipString);
 
-                        updateAddress.setString(7, country);
+                        updateZip.setString(1, zip_code);
 
-                        updateMobilePhone.executeUpdate();
+                        updateZip.setString(2, city);
 
-                        myConn.close();
+                        updateZip.setInt(3, renter_id);
+
+                        updateCountry = myConn.prepareStatement(updateCountryString);
+
+                        updateCountry.setString(1, country);
+
+                        updateCountry.setInt(2, renter_id);
+
+                        updateAddress.executeUpdate();
+
+                        updateZip.executeUpdate();
+
+                        updateCountry.executeUpdate();
 
                         System.out.println("Update complete.");
 
-                        //displayRentersUpdate(myConn);
+                        displayRenters(myConn);
+
+                        myConn.close();
 
                     } catch (SQLException e) {
 
@@ -517,76 +577,6 @@ public class RenterMethods {
 
             e.printStackTrace();
 
-        }
-    }
-
-
-    private void displayRentersUpdate(Connection myConn) {
-
-        try {
-
-            Statement myStmt = myConn.createStatement();
-
-            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email, " +
-                                 "driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', door, ' ', zip_code)" +
-                         "FROM renter JOIN address USING (addressID)" +
-                                     "JOIN phone_numbers USING (renterID)";
-
-            ResultSet rs = myStmt.executeQuery(sql);
-
-            System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
-                    "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
-
-            for (int i = 0; i < 215; i++) {
-
-                System.out.print("-");
-
-            }
-
-            System.out.println();
-
-            while (rs.next()) {
-
-                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
-                        rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7),
-                        rs.getString(8), rs.getString(9));
-
-            }
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-        }
-
-    }
-
-
-    public void searchByDriverLicenseNumber(String driverLicenseNumber) {
-    }
-
-    public void searchByRenterLastName(String lastName) {
-    }
-
-    public void displayPhoneTable() {
-        try {
-            // 1. get a connection to database
-            Connection myConn = getConnection(url, user, password);
-            // 2. create a statement
-            Statement myStmt = myConn.createStatement();
-            // 3. execute SQL query
-            ResultSet myRs = myStmt.executeQuery("select * from phone_numbers");
-            System.out.println();
-            // 4. process the result set
-            while (myRs.next()) {
-
-                System.out.printf("%-15s %-25s\n", myRs.getString(1),
-                        myRs.getString(2));
-
-            }
-        } catch (SQLException exc) {
-            exc.printStackTrace();
         }
     }
 
