@@ -1,6 +1,6 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.Scanner;
 
 class Input {
@@ -50,5 +50,52 @@ class Input {
         in.nextLine();
         return Integer.parseInt(input);
     }
-    
+
+    public static String checkEmail() {
+        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        System.out.print("Email: ");
+        String email = in.next();
+        while (!email.matches(regex)) {
+            System.out.print("Invalid email. Please try again: ");
+            email = in.next();
+        }
+        return email;
+    }
+
+    public static String isCountryName() {
+
+        String[] countryCodes = Locale.getISOCountries();
+
+        ArrayList<String> countryNames = new ArrayList<String>();
+
+        for (String countryCode : countryCodes) {
+
+            Locale obj = new Locale("", countryCode);
+
+            countryNames.add(obj.getDisplayCountry().toLowerCase());
+
+        }
+
+        System.out.print("Country: ");
+        String string = in.next();
+
+        while (!countryNames.contains(string.toLowerCase())){
+            System.out.print("This country doesn't exist. Please try again: ");
+            string = in.next();
+        }
+
+        return string;
+
+        /*if (countryNames.contains(string.toLowerCase())) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }*/
+
+    }
+
 }
