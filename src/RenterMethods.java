@@ -586,13 +586,13 @@ public class RenterMethods {
 
     public int checkRenterID(Connection myConn) throws SQLException {
 
-        Statement maxRenterID = null;
-
-        int i = 0;
+        Statement maxRenterID = myConn.createStatement();
 
         String maxRenterIDString = "SELECT MAX(renterID) FROM renter;";
 
         ResultSet rs = maxRenterID.executeQuery(maxRenterIDString);
+
+        int i = 0;
 
         while (rs.next()) {
 
