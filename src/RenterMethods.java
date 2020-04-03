@@ -180,7 +180,7 @@ public class RenterMethods {
 
     }
 
-    /*public void remove() {
+    public void remove() {
 
         try {
 
@@ -197,10 +197,10 @@ public class RenterMethods {
                 PreparedStatement pst3 = null;
 
                 String sql1 = "DELETE FROM contract WHERE renterID = ?";
-                String sql2 = "DELETE FROM phone_numbers"
+                String sql2 = "DELETE FROM phone_numbers WHERE renterID = ?";
                 String sql3 = "DELETE FROM renter WHERE renterID = ?";
 
-                System.out.print("Select the renter id: ");
+                System.out.print("Select renter id: ");
 
                 int choice = input.nextInt();
 
@@ -210,17 +210,25 @@ public class RenterMethods {
 
                     pst2 = myConn.prepareStatement(sql2);
 
+                    pst3 = myConn.prepareStatement(sql3);
+
                     pst1.setInt(1, choice);
 
                     pst2.setInt(1, choice);
+
+                    pst3.setInt(1, choice);
 
                     int rowsAffected1 = pst1.executeUpdate();
 
                     int rowsAffected2 = pst2.executeUpdate();
 
+                    int rowsAffected3 = pst3.executeUpdate();
+
                     System.out.println("Rows affected: " + rowsAffected1);
 
                     System.out.println("Rows affected: " + rowsAffected2);
+
+                    System.out.println("Rows affected: " + rowsAffected3);
 
                 } catch (SQLException e) {
 
@@ -233,6 +241,8 @@ public class RenterMethods {
                 pst1.close();
 
                 pst2.close();
+
+                pst3.close();
 
                 myConn.close();
 
@@ -553,7 +563,6 @@ public class RenterMethods {
     }
 
 
-
     public void searchByDriverLicenseNumber(String driverLicenseNumber) {
     }
 
@@ -579,7 +588,7 @@ public class RenterMethods {
         } catch (SQLException exc) {
             exc.printStackTrace();
         }
-    }*/
+    }
 
 }
 
