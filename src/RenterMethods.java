@@ -16,9 +16,11 @@ public class RenterMethods {
     String password = "dimk1234!";
     Scanner input = new Scanner(System.in);
 
-    private void displayRenters(Connection myConn) {
+    public void displayRenters() {
 
         try {
+
+            Connection myConn = getConnection(url, user, password);
 
             Statement myStmt = myConn.createStatement();
 
@@ -60,9 +62,6 @@ public class RenterMethods {
         }
 
     }
-
-
-
 
 
     public void add() {
@@ -354,7 +353,7 @@ public class RenterMethods {
             PreparedStatement updateZip = null;
             PreparedStatement updateCountry = null;
 
-            displayRenters(myConn);
+            displayRenters();
 
             System.out.print("\nSelect renter ID: ");
             int renter_id = input.nextInt();
@@ -387,7 +386,7 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        displayRenters(myConn);
+                        displayRenters();
 
                     } catch (SQLException e) {
 
@@ -420,7 +419,7 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        displayRenters(myConn);
+                        displayRenters();
 
                     } catch (SQLException e) {
 
@@ -449,11 +448,11 @@ public class RenterMethods {
 
                         updateHomePhone.executeUpdate();
 
-                        myConn.close();
+                        //myConn.close();
 
                         System.out.println("Update complete.");
 
-                        displayRenters(myConn);
+                        displayRenters();
 
                     } catch (SQLException e) {
 
@@ -559,7 +558,7 @@ public class RenterMethods {
 
                         System.out.println("Update complete.");
 
-                        displayRenters(myConn);
+                        displayRenters();
 
                         myConn.close();
 
