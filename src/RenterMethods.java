@@ -508,8 +508,8 @@ public class RenterMethods {
 
                         System.out.print("Enter Country: ");
                         String country = input.next();
-                        while(!country.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
-                            System.out.println("Invalid Country. Try Again: ");
+                        while(!Input.isCountryName(country)) {
+                            System.out.println("Invalid country name. Try again: ");
                             country = input.next();
                         }
 
