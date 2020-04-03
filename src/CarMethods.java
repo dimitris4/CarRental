@@ -36,17 +36,17 @@ public class CarMethods {
         closeConnection(myConn,myStmt,myRs);
     }
 
-    public void addCar() throws SQLException {
-        ResultSet myRs = null;
-        ArrayList<Object> db = connect();
-        Connection myConn = (Connection) db.get(0);
-        Statement myStmt = (Statement) db.get(1);
+    public String setRegistrationNumber(){
         System.out.println("Registration number: ");
         String registration_number = scanner.next();
         while(cars.contains(registration_number) && !registration_number.matches("[a-zA-Z0-9]{10}")){
             System.out.println("Invalid registration number. Please try again: ");
             registration_number = scanner.next();
         }
+        return registration_number;
+    }
+
+    public String setFirstRegDate(){
         System.out.println("First registration date: ");
         System.out.println("Year: ");
         int year = scanner.nextInt();
@@ -59,8 +59,8 @@ public class CarMethods {
         System.out.println("Month: ");
         int month = scanner.nextInt();
         while(month<0 || month>12){
-                System.out.println("Invalid month value. Please insert value between 1 - 12: ");
-                month = scanner.nextInt();
+            System.out.println("Invalid month value. Please insert value between 1 - 12: ");
+            month = scanner.nextInt();
         }
         System.out.println("Day: ");
         int day = scanner.nextInt();
@@ -72,12 +72,20 @@ public class CarMethods {
             System.out.println("Invalid month value. Please insert value between 1 - " + (months.get(month-1)+leap) + ": ");
             day = scanner.nextInt();
         }
+        return year + "-" + month + "-" + day;
+    }
+
+    public int setOdometer(){
         System.out.println("Odometer (amount of km): ");
         int odometer = scanner.nextInt();
         while(odometer<0){
             System.out.println("Invalid value. Please try again: ");
             odometer = scanner.nextInt();
         }
+        return odometer;
+    }
+
+    public int setBrand(Connection myConn, ResultSet myRs) throws SQLException {
         int amount;
         amount = displayBrand();
         System.out.println("Enter 0 to add new option");
@@ -106,6 +114,10 @@ public class CarMethods {
                 brands.add(brandName);
             }
         }
+        return brand;
+    }
+
+    public int setModel(Connection myConn, ResultSet myRs, int brand) throws SQLException {
         HashSet<Integer>brandModels = displayModel(brand);
         System.out.println("Enter 0 to add new option");
         System.out.println("Model (ID number): ");
@@ -138,7 +150,11 @@ public class CarMethods {
                 models.add(modelName);
             }
         }
-        amount = displayFuel();
+        return model;
+    }
+
+    public int setFuel(Connection myConn, ResultSet myRs) throws SQLException {
+        int amount = displayFuel();
         System.out.println("Enter 0 to add new option");
         System.out.println("Fuel (ID number): ");
         int fuel = scanner.nextInt();
@@ -165,6 +181,10 @@ public class CarMethods {
                 fuels.add(fuelType);
             }
         }
+        return fuel;
+    }
+
+    public int setType() throws SQLException {
         displayType();
         System.out.println("Type (ID number): ");
         int type = scanner.nextInt();
@@ -172,9 +192,23 @@ public class CarMethods {
             System.out.println("Invalid value. Please try again: ");
             type = scanner.nextInt();
         }
+        return type;
+    }
+
+    public void addCar() throws SQLException {
+        ResultSet myRs = null;
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        String registration_number = setRegistrationNumber();
+        String firstRegDate = setFirstRegDate();
+        int odometer = setOdometer();
+        int brand = setBrand(myConn,myRs);
+        int model = setModel(myConn,myRs,brand);
+        int fuel = setFuel(myConn,myRs);
+        int type = setType();
         if (confirmation("add")==1){
-            //are we doing the available part?
-            String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + year + "-" + month + "-" + day + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', " + 1 + ")";
+            String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + firstRegDate + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', " + 1 + ")";
             update(query);
             cars.add(registration_number);
         } else {
@@ -360,6 +394,10 @@ public class CarMethods {
 
     public void searchByRegistrationNumber(String registrationNumber) throws SQLException {
         displayCars("WHERE registration_number = " + registrationNumber);
+    }
+
+    public void editCar() throws SQLException {
+
     }
 
     public ArrayList<Object> connect() {
