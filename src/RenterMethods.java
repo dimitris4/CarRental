@@ -44,10 +44,6 @@ public class RenterMethods {
 
             }
 
-            /*// 4. process the result set
-            while (rs.next()) {
-                System.out.println(rs.getString(rs.getString("name")));
-            }*/
             System.out.println();
 
             while (rs.next()) {
@@ -235,7 +231,7 @@ public class RenterMethods {
 
                 System.out.print("Select renter id: ");
 
-                int choice = input.nextInt();
+                int choice = Input.checkInt(1, checkRenterID(myConn));
 
                 try {
 
@@ -342,7 +338,10 @@ public class RenterMethods {
         }
 
         return true;
+
     }
+
+
 
 
     public void update() {
@@ -362,7 +361,7 @@ public class RenterMethods {
             displayRenters();
 
             System.out.print("\nSelect renter ID: ");
-            int renter_id = input.nextInt();
+            int renter_id = Input.checkInt(1, checkRenterID(myConn));
 
             System.out.println("\n[1] Driver License Number     [2] Mobile Phone     [3] Home Phone     [4] Address");
             System.out.print("Select the field you want to update: ");
@@ -454,11 +453,11 @@ public class RenterMethods {
 
                         updateHomePhone.executeUpdate();
 
-                        //myConn.close();
-
                         System.out.println("Update complete.");
 
                         displayRenters();
+
+                        myConn.close();
 
                     } catch (SQLException e) {
 
@@ -583,6 +582,26 @@ public class RenterMethods {
             e.printStackTrace();
 
         }
+    }
+
+    public int checkRenterID(Connection myConn) throws SQLException {
+
+        Statement maxRenterID = null;
+
+        int i = 0;
+
+        String maxRenterIDString = "SELECT MAX(renterID) FROM renter;";
+
+        ResultSet rs = maxRenterID.executeQuery(maxRenterIDString);
+
+        while (rs.next()) {
+
+             i = Integer.parseInt(rs.getString(1));
+
+        }
+
+        return i;
+
     }
 
 }
