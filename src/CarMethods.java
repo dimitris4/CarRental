@@ -1,4 +1,3 @@
-import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 
@@ -12,6 +11,7 @@ public class CarMethods {
     private static Set<String> fuels= new HashSet<>();
     private static Scanner scanner = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
+    private static ArrayList<CarInformation> carList = new ArrayList<CarInformation>();
 
     public CarMethods() throws SQLException {//populate hashsets
         ArrayList<Object> db = connect();
@@ -33,6 +33,18 @@ public class CarMethods {
         while(myRs.next()) {
             fuels.add(myRs.getString("fuel_type"));
         }
+        myRs = myStmt.executeQuery("SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, m.name, b.name, rt.name, rt.description, c.is_available " +
+                ", c.fuelID, c.modelID, c.brandID, c.rental_typeID FROM Car c JOIN " +
+                "Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN FUEL f ON c.fuelID = f.fuelID " +
+                "JOIN rental_types rt ON c.rental_typeID = rt.rental_typeID");
+        while(myRs.next()) {
+            carList.add(new CarInformation (myRs.getString(1),myRs.getString(2),myRs.getInt(3),myRs.getString(4),myRs.getString(5),
+                    myRs.getString(6),myRs.getString(7),myRs.getString(8),myRs.getInt(9),myRs.getInt(10),myRs.getInt(11),
+                    myRs.getInt(12),myRs.getInt(13)));
+        }
+        //for (CarInformation caaar: carList) {
+        //    System.out.println(caaar.toString());
+        //}
         closeConnection(myConn,myStmt,myRs);
     }
 
@@ -200,17 +212,19 @@ public class CarMethods {
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
         Statement myStmt = (Statement) db.get(1);
-        String registration_number = setRegistrationNumber();
-        String firstRegDate = setFirstRegDate();
-        int odometer = setOdometer();
-        int brand = setBrand(myConn,myRs);
-        int model = setModel(myConn,myRs,brand);
-        int fuel = setFuel(myConn,myRs);
-        int type = setType();
+        CarInformation car = new CarInformation();
+        car.setRegistration_number(setRegistrationNumber());
+        car.setFirst_registration(setFirstRegDate());
+        car.setOdometer(setOdometer());
+        car.setBrandID(setBrand(myConn,myRs));
+        car.setModelID(setModel(myConn,myRs,car.getBrandID()));
+        car.setFuelID(setFuel(myConn,myRs));
+        car.setTypeID(setType());
         if (confirmation("add")==1){
-            String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + firstRegDate + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', " + 1 + ")";
+            String query = "INSERT INTO Car VALUES ('" + car.getRegistration_number() + "', '" + car.getFirst_registration() + "', '"
+                    + car.getOdometer() + "', '" + car.getFuelID() + "', '" + car.getModelID() + "', '" + car.getBrandID() + "', '" + car.getTypeID() + "', " + 1 + ")";
             update(query);
-            cars.add(registration_number);
+            cars.add(car.getRegistration_number());
         } else {
             System.out.println("Addition cancelled.");
         }
@@ -335,6 +349,11 @@ public class CarMethods {
         if(confirmation("delete")==1){
             update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been deleted from the database");
+            for (int i=0;i< carList.size();i++) {
+                if (carList.get(i).getRegistration_number().equals(registration_number)){
+                    carList.remove(i);
+                }
+            }
             cars.remove(registration_number);
         } else {
             System.out.println("Deletion cancelled.");
@@ -411,6 +430,11 @@ public class CarMethods {
         }
         update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
         update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
+        for (CarInformation cari: carList) {
+            if (cari.getRegistration_number().equals(registration_number)){
+                cari.setRegistration_number(new_registration_number);
+            }
+        }
         cars.remove(registration_number);
         cars.add(new_registration_number);
     }
