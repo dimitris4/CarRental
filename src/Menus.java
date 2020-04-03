@@ -116,6 +116,8 @@ public class Menus {
         System.out.println("|   [0] Close Program            |");
         System.out.println("**********************************");
 
+        RenterMethods rm = new RenterMethods();
+
         boolean isTrue = true;
 
         while (isTrue) {
@@ -126,19 +128,19 @@ public class Menus {
             switch (selection) {
                 case "1":
                     //Main.getController().addRenter();
-                    rentersMenu();
+                    rm.add();
                     break;
                 case "2":
                     //Main.getController().editRenter();
-                    rentersMenu();
+                    rm.update();
                     break;
                 case "3":
                     //Main.getController().deleteRenter();
-                    rentersMenu();
+                    rm.remove();
                     break;
                 case "4":
                     //Main.getController().displayRenters();
-                    rentersMenu();
+                    rm.displayRenters();
                     break;
                 case "5":
                     System.out.println("\n");
