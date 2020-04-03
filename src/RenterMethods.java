@@ -97,8 +97,8 @@ public class RenterMethods {
             System.out.print("Invalid Phone number. Try Again: ");
             homePhone = console.nextLine();
         }
-        System.out.print("E-mail: ");
-        String email = console.nextLine();
+
+        String email = Input.checkEmail();
 
         System.out.print("Driver Licence Number: ");
         String licence = console.nextLine();

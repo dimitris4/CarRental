@@ -6,7 +6,7 @@ public class Controller {
     private static RenterMethods renterMethods;
     private static ContractMethods contractMethods;
 
-    public Controller() {
+    public Controller() throws SQLException {
         carMethods = new CarMethods();
         renterMethods = new RenterMethods();
         contractMethods = new ContractMethods();

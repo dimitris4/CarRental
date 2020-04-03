@@ -50,5 +50,16 @@ class Input {
         in.nextLine();
         return Integer.parseInt(input);
     }
+
+    public static String checkEmail() {
+        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        System.out.print("Email: ");
+        String email = in.next();
+        while (!email.matches(regex)) {
+            System.out.print("Invalid email. Please try again: ");
+            email = in.next();
+        }
+        return email;
+    }
     
 }

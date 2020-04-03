@@ -66,7 +66,7 @@ public class Menus {
             switch (selection) {
                 case 1:
                     //Main.getController().addRenter();
-                    cm.add();
+                    //cm.add();
                     pressAnyKey();
                     break;
                 case 2:
@@ -76,7 +76,7 @@ public class Menus {
                     break;
                 case 3:
                     //Main.getController().deleteRenter();
-                    cm.remove();
+                    //cm.remove();
                     pressAnyKey();
                     break;
                 case 4:
