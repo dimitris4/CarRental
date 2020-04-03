@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
 import java.util.*;
 
 import static java.sql.DriverManager.getConnection;
@@ -16,26 +14,33 @@ public class CarMethods {
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
     public CarMethods() throws SQLException {//populate hashsets
-        ResultSet myRs = getRs("SELECT registration_number FROM Car");
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        ResultSet myRs = myStmt.executeQuery("SELECT registration_number FROM Car");;
         while(myRs.next()) {
             cars.add(myRs.getString("registration_number"));
         }
-        myRs = getRs("SELECT name FROM Brand");
+        myRs = myStmt.executeQuery("SELECT name FROM Brand");
         while(myRs.next()) {
-            brands.add(myRs.getString("registration_number"));
+            brands.add(myRs.getString("name"));
         }
-        myRs = getRs("SELECT name FROM Model");
+        myRs = myStmt.executeQuery("SELECT name FROM Model");
         while(myRs.next()) {
-            models.add(myRs.getString("registration_number"));
+            models.add(myRs.getString("name"));
         }
-        myRs = getRs("SELECT fuel_type FROM Fuel");
+        myRs = myStmt.executeQuery("SELECT fuel_type FROM Fuel");
         while(myRs.next()) {
-            fuels.add(myRs.getString("registration_number"));
+            fuels.add(myRs.getString("fuel_type"));
         }
+        closeConnection(myConn,myStmt,myRs);
     }
 
     public void addCar() throws SQLException {
         ResultSet myRs = null;
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
         System.out.println("Registration number: ");
         String registration_number = scanner.next();
         while(cars.contains(registration_number) && !registration_number.matches("[a-zA-Z0-9]{10}")){
@@ -47,13 +52,13 @@ public class CarMethods {
         int year = scanner.nextInt();
         //first car created in 1885 (i think) so it can't be less than 1885
         // can't be higher than current year
-        while(year<1885 && year>Calendar.getInstance().get(Calendar.YEAR)){
+        while(year<1885 || year>Calendar.getInstance().get(Calendar.YEAR)){
             System.out.println("Invalid year value. Please insert value between 1885 -" + Calendar.getInstance().get(Calendar.YEAR) + ": ");
             year = scanner.nextInt();
         }
         System.out.println("Month: ");
         int month = scanner.nextInt();
-        while(month<0 && year>12){
+        while(month<0 || month>12){
                 System.out.println("Invalid month value. Please insert value between 1 - 12: ");
                 month = scanner.nextInt();
         }
@@ -64,7 +69,7 @@ public class CarMethods {
             if (year%4==0 && month==2){
                 leap++;
             }
-            System.out.println("Invalid month value. Please insert value between 1 - " + months.get(month-1)+leap + ": ");
+            System.out.println("Invalid month value. Please insert value between 1 - " + (months.get(month-1)+leap) + ": ");
             day = scanner.nextInt();
         }
         System.out.println("Odometer (amount of km): ");
@@ -90,16 +95,22 @@ public class CarMethods {
                 brandName = scanner.next();
             }
             if (!brands.contains(brandName)){
-                update("INSERT INTO Brand ('name') VALUES ('" + brandName +"')");
-                myRs = getRs("SELECT brandID FROM Brand WHERE name = '" + brandName + "'");
-                brand = myRs.getInt(1);
+                String query = "INSERT INTO Brand (name) VALUES (?)";
+                PreparedStatement pstmt = myConn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, brandName);
+                pstmt.executeUpdate();
+                myRs = pstmt.getGeneratedKeys();
+                if (myRs.next()){
+                    brand = myRs.getInt(1);
+                }
+                brands.add(brandName);
             }
         }
         HashSet<Integer>brandModels = displayModel(brand);
         System.out.println("Enter 0 to add new option");
         System.out.println("Model (ID number): ");
         int model = scanner.nextInt();
-        while(!models.contains(model) || model!=0){
+        while(!brandModels.contains(model) && model!=0){
             System.out.println("Invalid value. Please try again: ");
             model = scanner.nextInt();
         }
@@ -110,10 +121,21 @@ public class CarMethods {
                 System.out.println("Wrong input. Try again (max length 12): ");
                 modelName = scanner.next();
             }
-            if (!models.contains(modelName)){
-                update("INSERT INTO Model ('name','brandID') VALUES ('" + modelName +"', '" + brand +"')");
-                myRs = getRs("SELECT modelID FROM Model WHERE name = '" + modelName + "'");
-                model = myRs.getInt(1);
+            if (!models.contains(modelName)) {
+                String query = "INSERT INTO Model (name,brandID) VALUES (?,?)";
+                PreparedStatement pstmt = myConn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, modelName);
+                pstmt.setInt(2, brand);
+                pstmt.executeUpdate();
+                myRs = pstmt.getGeneratedKeys();
+                //myStmt.executeUpdate("INSERT INTO Model (name,brandID) VALUES ('" + modelName +"', '" + brand +"')", Statement.RETURN_GENERATED_KEYS);
+                //myRs = myStmt.getGeneratedKeys();
+                //update("INSERT INTO Model (name,brandID) VALUES ('" + modelName +"', '" + brand +"')");
+                //myRs = myStmt.executeQuery("SELECT modelID FROM Model WHERE name = '" + modelName + "'");
+                if (myRs.next()){
+                    model = myRs.getInt(1);
+                }
+                models.add(modelName);
             }
         }
         amount = displayFuel();
@@ -132,9 +154,15 @@ public class CarMethods {
                 fuelType = scanner.next();
             }
             if (!brands.contains(fuelType)){
-                update("INSERT INTO Fuel ('fuel_type') VALUES ('" + fuelType +"')");
-                myRs = getRs("SELECT fuelID FROM Brand WHERE fuel_type = '" + fuelType + "'");
-                fuel = myRs.getInt(1);
+                String query = "INSERT INTO Fuel (fuel_type) VALUES (?)";
+                PreparedStatement pstmt = myConn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                pstmt.setString(1, fuelType);
+                pstmt.executeUpdate();
+                myRs = pstmt.getGeneratedKeys();
+                if (myRs.next()){
+                    fuel = myRs.getInt(1);
+                }
+                fuels.add(fuelType);
             }
         }
         displayType();
@@ -146,21 +174,22 @@ public class CarMethods {
         }
         if (confirmation("add")==1){
             //are we doing the available part?
-            String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + year + "-" + month + "-" + day + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', '" + true + ")";
+            String query = "INSERT INTO Car VALUES ('" + registration_number + "', '" + year + "-" + month + "-" + day + "', '" + odometer + "', '" + fuel + "', '" + model + "', '" + brand + "', '" + type + "', " + 1 + ")";
             update(query);
             cars.add(registration_number);
         } else {
             System.out.println("Addition cancelled.");
         }
         System.out.println("Returning to the menu.");
+        closeConnection(myConn,myStmt,myRs);
     }
 
     public boolean dateCheck(int year, int month, int day){
-        return (day<0 && ((month!=2 || (month==2 && year%4==0) && day>months.get(month-1)) || (month==2 && year%4!=2 && day>months.get(month-1)+1)));
+        return (day<0 || ( month==2 && year%4==0 && day>29) || (((month==2 && year%4!=0) || (month!=2)) && day>months.get(month-1)));
     }
 
     public int confirmation(String method){//will change it to fit with other menus later, just for functionality now
-        System.out.println("Are you sure you want to " + method + "this car?");
+        System.out.println("Are you sure you want to " + method + " this car?");
         System.out.println("1. Yes");
         System.out.println("2. No");
         int output = scanner.nextInt();
@@ -172,7 +201,10 @@ public class CarMethods {
     }
 
     public int displayFuel() throws SQLException { //return amount of entries if needed
-        ResultSet myRs = getRs("SELECT * FROM Fuel");
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        ResultSet myRs = myStmt.executeQuery("SELECT * FROM Fuel");
         int count=0;
         if (myRs != null) {
             System.out.printf("%-25s %-25s\n", "Fuel ID", "Fuel Type");
@@ -186,11 +218,15 @@ public class CarMethods {
 
             }
         }
+        closeConnection(myConn,myStmt,myRs);
         return count;
     }
 
     public int displayBrand() throws SQLException {//return amount of entries if needed
-        ResultSet myRs = getRs("SELECT * FROM Brand");
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        ResultSet myRs = myStmt.executeQuery("SELECT * FROM Brand");
         int count=0;
         if (myRs != null) {
             System.out.printf("%-25s %-25s\n", "Brand ID", "Brand Name");
@@ -203,17 +239,21 @@ public class CarMethods {
             count++;
             }
         }
+        closeConnection(myConn,myStmt,myRs);
         return count;
     }
 
     // if brandID -1, display all models
     public HashSet<Integer> displayModel(int brandID) throws SQLException { //return set of ids, used when choosing model that fits with the brand
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
         ResultSet myRs = null;
         HashSet<Integer> models = new HashSet<>();
-        if (brandID!=-1) {
-            myRs = getRs("SELECT m.modelID, CONCAT(m.name,\" \" ,b.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID");
+        if (brandID==-1) {
+            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name,\" \" ,m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID");
         } else {
-            myRs = getRs("SELECT modelID, CONCAT(name,\" \" ,b.name) FROM Model JOIN Brand b ON brandID=" + brandID);
+            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name,\" \" ,m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID WHERE m.brandID =" + brandID);
         }
 
         if (myRs != null) {
@@ -227,11 +267,15 @@ public class CarMethods {
                 models.add(myRs.getInt(1));
             }
         }
+        closeConnection(myConn,myStmt,myRs);
         return models;
     }
 
     public void displayType() throws SQLException {
-        ResultSet myRs = getRs("SELECT * FROM rental_types");
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        ResultSet myRs = myStmt.executeQuery("SELECT * FROM rental_types");
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s\n", "Type ID", "Type Name", "Description");
             for (int i = 0; i < 210; i++) {
@@ -243,6 +287,7 @@ public class CarMethods {
 
             }
         }
+        closeConnection(myConn,myStmt,myRs);
     }
 
     public void deleteCar() throws SQLException{
@@ -264,13 +309,16 @@ public class CarMethods {
     }
 
     public void displayCars(String condition) throws SQLException {
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
         String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
-                "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON" +
+                "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON " +
                 "c.rental_typeID = r.rental_typeID";
         if (condition!=null){
-            query.concat(" " + condition); //adds where clause for conditions
+            query = query + " " + condition; //adds where clause for conditions
         }
-        ResultSet myRs = getRs(query);
+        ResultSet myRs = myStmt.executeQuery(query);
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
                     "Fuel Type", "Model", "Rental Type", "Description");
@@ -285,6 +333,7 @@ public class CarMethods {
 
             }
         }
+        closeConnection(myConn,myStmt,myRs);
     }
 
     public void displayAvailableCarsWithinDateRange() {
@@ -298,29 +347,27 @@ public class CarMethods {
     // ID 3 - Sport
 
     public void displayLuxuryCars() throws SQLException {
-        displayCars("WHERE rental_typeID = 1");
+        displayCars("WHERE c.rental_typeID = 1");
     }
 
     public void displayFamilyCars() throws SQLException {
-        displayCars("WHERE rental_typeID = 2");
+        displayCars("WHERE c.rental_typeID = 2");
     }
 
     public void displaySportCars() throws SQLException {
-        displayCars("WHERE rental_typeID = 3");
+        displayCars("WHERE c.rental_typeID = 3");
     }
 
     public void searchByRegistrationNumber(String registrationNumber) throws SQLException {
         displayCars("WHERE registration_number = " + registrationNumber);
     }
 
-    public ResultSet getRs(String query) {
+    public ArrayList<Object> connect() {
         try {
-            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua", "dimk", "dimk1234!");
+            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "dimk", "dimk1234!");
             Statement myStmt = myConn.createStatement();
-            ResultSet myRs = myStmt.executeQuery(query);
-            myStmt.close();
-            myConn.close();
-            return myRs;
+            ArrayList<Object> al = new ArrayList<>(Arrays.asList(myConn,myStmt));
+            return al;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -329,13 +376,23 @@ public class CarMethods {
 
     public void update(String query) {
         try {
-            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua", "dimk", "dimk1234!");
+            Connection myConn = getConnection("jdbc:mysql://localhost:3306/kailua?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "dimk", "dimk1234!");
             Statement myStmt = myConn.createStatement();
             myStmt.executeUpdate(query);
-            myStmt.close();
-            myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void closeConnection(Connection myConn, Statement myStmt, ResultSet myRs) throws SQLException {
+        if (myRs!=null) {
+            myRs.close();
+        }
+        if (myStmt!=null) {
+            myStmt.close();
+        }
+        if (myConn!=null) {
+            myConn.close();
         }
     }
 }
