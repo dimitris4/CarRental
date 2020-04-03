@@ -188,9 +188,10 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 4:
-                    //Main.getController().displayRenters();
-                    rm.displayRenters();
-                    pressAnyKey();
+                    OurApp.getController().displayActiveContracts();
+                    System.out.println();
+                    OurApp.getController().displayOldContracts();
+                    //contractsMenu();
                     break;
                 case 5:
                     System.out.println("\n");

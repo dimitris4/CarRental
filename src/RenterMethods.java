@@ -44,6 +44,10 @@ public class RenterMethods {
 
             }
 
+            /*// 4. process the result set
+            while (rs.next()) {
+                System.out.println(rs.getString(rs.getString("name")));
+            }*/
             System.out.println();
 
             while (rs.next()) {

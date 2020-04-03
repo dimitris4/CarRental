@@ -5,6 +5,9 @@ public class Start {
 
     public Start() throws Exception {
 
+        //Filling up the contracts ArrayList from the DB
+        OurApp.getController().initiateContractList();
+        //Printing the Logo
         AsciiArt.printLogo4();
 
         System.out.println("*************************** ***************");

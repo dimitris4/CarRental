@@ -8,6 +8,8 @@ public class CarType {
         this.description = description;
     }
 
+    public CarType(){}
+
     public String getName() {
         return name;
     }
