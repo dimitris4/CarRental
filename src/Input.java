@@ -38,13 +38,13 @@ class Input {
                     isValid = true;
                 } else {
                     isValid = false;
-                    System.out.println("The number isn't in our system, try another one: ");
+                    System.out.print("The number isn't in our system, try another one: ");
                     input = "";
                 }
             } else {
                 isValid = false;
                 in.next();
-                System.out.println("only numbers please, try again:");
+                System.out.print("only numbers please, try again: ");
             }
         }
         in.nextLine();

@@ -68,42 +68,50 @@ public class RenterMethods {
         }
         System.out.print("E-mail: ");
         String email = console.nextLine();
+
         System.out.print("Driver Licence Number: ");
         String licence = console.nextLine();
+
         System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
         Date sinceDate = Input.insertDateWithoutTime();
 
         System.out.println("\n**** CLIENT ADDRESS ****\n");
-        System.out.print("Enter Street Name: ");
-        String street = console.nextLine();
-        while(!street.matches("[a-zA-Z_]+")){
-            System.out.println("Invalid Street Name. Try Again: ");
-            street = console.nextLine();
+        System.out.print("Street Name: ");
+        String street = console.next();
+        while (!street.matches("[a-zA-Z_]+")) {
+            System.out.print("Invalid Street Name. Try Again: ");
+            street = console.next();
         }
-        System.out.print("Enter Street Number: ");
+
+        System.out.print("Street Number: ");
         int building = Input.checkInt(1,5000);
+
         System.out.print("Floor: ");
         int floor = Input.checkInt(0,200);
+
         System.out.print("Door (th/tv/mf/-): ");
         String door = console.next();
         while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
             System.out.println("Invalid Input. Try Again: ");
             door = console.next();
         }
+
         System.out.print("Zip code: ");
         String zip_code = console.next();
         while(!zip_code.matches("[0-9]+")){
             System.out.print("Invalid Input. Try Again: ");
             zip_code = console.next();
         }
+
         console.nextLine();
-        System.out.print("Enter City: ");
+        System.out.print("City: ");
         String city = console.nextLine();
         while(!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
             System.out.println("Invalid City. Try Again: ");
             city = console.nextLine();
         }
-        System.out.print("Enter Country: ");
+
+        System.out.print("Country: ");
         String country = console.next();
         while(!country.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
             System.out.println("Invalid Country. Try Again: ");
@@ -115,8 +123,14 @@ public class RenterMethods {
             Connection myConn = getConnection(url, user, password);
 
             //create insert statements
-            String queryAddress = "INSERT INTO address (street, building, floor, door, zip_code, city, country) " +
-                                  "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String queryCountry = "INSERT INTO country (name) " +
+                                  "VALUES (?)";
+
+            String queryZip = "INSERT INTO zip (zip, city, countryID) " +
+                              "VALUES (?, ?, LAST_INSERT_ID())";
+
+            String queryAddress = "INSERT INTO address (street, building, floor, door, zipID) " +
+                                  "VALUES (?, ?, ?, ?, LAST_INSERT_ID())";
 
             String queryRenter = "INSERT INTO renter (first_name, last_name, email, driver_license_number, since_data, " +
                                  "addressID)" + " VALUES (?, ?, ?, ?, ?, LAST_INSERT_ID())";
@@ -127,14 +141,20 @@ public class RenterMethods {
             //create insert PreparedStatement
             PreparedStatement preparedStmt;
 
+            preparedStmt = myConn.prepareStatement(queryCountry);
+            preparedStmt.setString(1, country);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryZip);
+            preparedStmt.setString(1, zip_code);
+            preparedStmt.setString(2, city);
+            preparedStmt.execute();
+
             preparedStmt = myConn.prepareStatement(queryAddress);
             preparedStmt.setString (1, street);
             preparedStmt.setInt (2, building);
             preparedStmt.setInt (3, floor);
             preparedStmt.setString (4, door);
-            preparedStmt.setString (5, zip_code);
-            preparedStmt.setString(6, city);
-            preparedStmt.setString(7, country);
             preparedStmt.execute();
 
             preparedStmt = myConn.prepareStatement(queryRenter);
@@ -160,7 +180,7 @@ public class RenterMethods {
 
     }
 
-    public void remove() {
+    /*public void remove() {
 
         try {
 
@@ -174,9 +194,11 @@ public class RenterMethods {
 
                 PreparedStatement pst1 = null;
                 PreparedStatement pst2 = null;
+                PreparedStatement pst3 = null;
 
                 String sql1 = "DELETE FROM contract WHERE renterID = ?";
-                String sql2 = "DELETE FROM renter WHERE renterID = ?";
+                String sql2 = "DELETE FROM phone_numbers"
+                String sql3 = "DELETE FROM renter WHERE renterID = ?";
 
                 System.out.print("Select the renter id: ");
 
@@ -230,8 +252,11 @@ public class RenterMethods {
 
             Statement myStmt = myConn.createStatement();
 
-            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, CONCAT(street, building, floor, door, zip_code)\n" +
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, email, driver_license_number, since_data, CONCAT(street, building, floor, door, zip, city, country.name)\n" +
                     "FROM renter JOIN address USING (addressID)\n" +
+                    "JOIN phone_numbers USING (renterID)" +
+                    "JOIN zip USING (zipID)" +
+                    "JOIN country USING (countryID)" +
                     "WHERE renterID NOT IN (SELECT renterID FROM contract WHERE CURRENT_DATE() BETWEEN contract.start_time AND contract.end_time);";
 
             ResultSet rs = myStmt.executeQuery(sql);
@@ -554,7 +579,7 @@ public class RenterMethods {
         } catch (SQLException exc) {
             exc.printStackTrace();
         }
-    }
+    }*/
 
 }
 
