@@ -5,8 +5,12 @@ public class OurApp {
     public static void main(String[] args) throws Exception {
 
         RenterMethods rm = new RenterMethods();
+
+        //rm.add();
         rm.update();
 
+        //rm.displayRenterTable();
+        //rm.displayPhoneTable();
         /*//creating a controller object
         controller = new Controller();
         //Our first login menu is called
