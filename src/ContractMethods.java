@@ -82,7 +82,7 @@ public class ContractMethods {
 
     public void displayOldContracts() {
         System.out.printf("%-20s%-20s%-40s%-60s%-20s%-20s%-20s\n", "Contract ID", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("*******************************************************************************************************************************///////////////////////////////////*************************");
+        System.out.println("********************************************************************************************************************************************************************************************");
 
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
 
