@@ -198,6 +198,8 @@ public class RenterMethods {
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
 
+            System.out.println("\n\nThe entry has been recorded.");
+
             //close connection
             myConn.close();
 

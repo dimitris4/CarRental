@@ -6,10 +6,10 @@ public class CarMethods {
     public void remove() {
     }
 
-    public void displayAvailableCarsWithinDateRange() {
+    public void displayCars() {
     }
 
-    public void displayUnavailableCars() {
+    public void update() {
     }
 
     public void displayFamilyCars() {
