@@ -27,7 +27,7 @@ public class RenterMethods {
 
             // 4. process the result set
             while (myRs.next()) {
-                System.out.println(myRs.getString("name"));
+                System.out.println(myRs.getString(myRs.getString("name")));
             }
 
         } catch (SQLException exc) {

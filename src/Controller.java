@@ -1,3 +1,5 @@
+import java.sql.SQLException;
+
 public class Controller {
 
     private static CarMethods carMethods;
@@ -10,5 +12,8 @@ public class Controller {
         contractMethods = new ContractMethods();
     }
 
+    public void initiateContractList() throws SQLException {contractMethods.initiateContractList();}
+    public void displayActiveContracts() throws SQLException {contractMethods.displayActiveContracts();}
+    public void displayOldContracts() throws SQLException {contractMethods.displayOldContracts();}
     //public void sendMail(String recipient, String myMessage) throws Exception { renterMethods.sendMail(recipient, myMessage); }
 }

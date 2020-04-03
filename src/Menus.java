@@ -189,7 +189,9 @@ public class Menus {
                     contractsMenu();
                     break;
                 case "4":
-                    //Main.getController().displayContracts();
+                    OurApp.getController().displayActiveContracts();
+                    System.out.println();
+                    OurApp.getController().displayOldContracts();
                     contractsMenu();
                     break;
                 case "5":
