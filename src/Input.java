@@ -3,6 +3,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
+import java.text.Collator;
+import java.util.*;
+
 class Input {
 
     static Scanner in = new Scanner(System.in);
@@ -38,13 +41,13 @@ class Input {
                     isValid = true;
                 } else {
                     isValid = false;
-                    System.out.print("The number isn't in our system, try another one: ");
+                    System.out.print("Invalid input. Please try again: ");
                     input = "";
                 }
             } else {
                 isValid = false;
                 in.next();
-                System.out.print("only numbers please, try again: ");
+                System.out.print("Invalid input. Please try again: ");
             }
         }
         in.nextLine();
@@ -61,5 +64,31 @@ class Input {
         }
         return email;
     }
-    
+
+    public static boolean isCountryName(String string) {
+
+        String[] countryCodes = Locale.getISOCountries();
+
+        ArrayList<String> countryNames = new ArrayList<String>();
+
+        for (String countryCode : countryCodes) {
+
+            Locale obj = new Locale("", countryCode);
+
+            countryNames.add(obj.getDisplayCountry().toLowerCase());
+
+        }
+
+        if (countryNames.contains(string.toLowerCase())) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
 }

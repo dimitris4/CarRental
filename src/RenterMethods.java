@@ -144,8 +144,8 @@ public class RenterMethods {
 
         System.out.print("Country: ");
         String country = console.next();
-        while(!country.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
-            System.out.println("Invalid Country. Try Again: ");
+        while(!Input.isCountryName(country)){
+            System.out.print("Invalid Country. Try Again: ");
             country = console.next();
         }
 
