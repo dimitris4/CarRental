@@ -71,7 +71,7 @@ public class Menus {
                     break;
                 case 2:
                     //Main.getController().editRenter();
-                    cm.update();
+                    //cm.update();
                     pressAnyKey();
                     break;
                 case 3:
@@ -81,7 +81,7 @@ public class Menus {
                     break;
                 case 4:
                     //Main.getController().displayRenters();
-                    cm.displayCars();
+                    //cm.displayCars();
                     pressAnyKey();
                     break;
                 case 5:
