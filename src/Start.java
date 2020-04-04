@@ -7,6 +7,10 @@ public class Start {
 
         //Filling up the contracts ArrayList from the DB
         OurApp.getController().initiateContractList();
+
+        // Filling up the renters ArrayList from DB
+        //OurApp.getController().initiateRenterList();
+
         //Printing the Logo
         AsciiArt.printLogo4();
 

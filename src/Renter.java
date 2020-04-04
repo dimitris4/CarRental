@@ -1,25 +1,29 @@
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Date;
 
 public class Renter {
+    private int renterID;
     private String first_name;
     private String last_name;
-    private ArrayList<Telephone> telephones;
-    private ArrayList<Address> addresses;
+    private Telephone telephone;
+    private Address address;
     private String email;
     private String driverLicenseNumber;
+    private Date sinceDate;
 
     public Renter() {
     }
 
-    public Renter(String first_name, String last_name, ArrayList<Telephone> telephones, ArrayList<Address> addresses, String email, String driverLicenseNumber) {
+    public Renter(int renterID, String first_name, String last_name, Telephone telephone, Address address, String email, String driverLicenseNumber, Date sinceDate) {
+        this.renterID = renterID;
         this.first_name = first_name;
         this.last_name = last_name;
-        this.telephones = telephones;
-        this.addresses = addresses;
+        this.telephone = telephone;
+        this.address = address;
         this.email = email;
         this.driverLicenseNumber = driverLicenseNumber;
+        this.sinceDate = sinceDate;
     }
 
     public String getFirst_name() {
@@ -30,8 +34,8 @@ public class Renter {
         return last_name;
     }
 
-    public ArrayList<Telephone> getTelephones() {
-        return telephones;
+    public Telephone getTelephone() {
+        return telephone;
     }
 
     public String getEmail() {
@@ -42,8 +46,16 @@ public class Renter {
         return driverLicenseNumber;
     }
 
-    public ArrayList<Address> getAddresses() {
-        return addresses;
+    public Address getAddress() {
+        return address;
+    }
+
+    public int getRenterID() {
+        return renterID;
+    }
+
+    public Date getSinceDate() {
+        return sinceDate;
     }
 
     public void setFirst_name(String first_name) {
@@ -62,23 +74,22 @@ public class Renter {
         this.driverLicenseNumber = driverLicenseNumber;
     }
 
-    public void setTelephones(ArrayList<Telephone> telephones) {
-        this.telephones = telephones;
+    public void setTelephones(Telephone telephone) {
+        this.telephone = telephone;
     }
 
-    public void setAddresses(ArrayList<Address> addresses) {
-        this.addresses = addresses;
+    public void setAddresses(Address addresses) {
+        this.address = addresses;
     }
+
+
 
     public String toString() {
-        return "Renter{" +
-                "first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", telephones=" + telephones +
-                ", addresses=" + addresses +
-                ", email='" + email + '\'' +
-                ", driverLicenseNumber='" + driverLicenseNumber + '\'' +
-                '}';
+        return String.format("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s", getRenterID(), getFirst_name(),
+                getLast_name(), getTelephone().getMobile_phone_number(), getTelephone().getHome_phone_number(),
+                getEmail(), getDriverLicenseNumber(), formatDate(getSinceDate()), getAddress().getStreetName() + " " +
+                getAddress().getBuilding() + " " + getAddress().getFloor() + " " + getAddress().getDoor() + " " +
+                getAddress().getZip() + " " + getAddress().getCity() + " " + getAddress().getCountry());
     }
 
     public boolean equals(Object o) {
@@ -87,5 +98,10 @@ public class Renter {
         Renter renter = (Renter) o;
         return last_name.equals(renter.last_name) &&
                 driverLicenseNumber.equals(renter.driverLicenseNumber);
+    }
+
+    public String formatDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        return sdf.format(date);
     }
 }

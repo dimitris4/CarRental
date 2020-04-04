@@ -5,7 +5,15 @@ import java.time.ZoneId;
 import static java.sql.DriverManager.getConnection;
 
 public class ContractMethods {
-    private static Database database = new Database();
+    private static Database database;
+
+    static {
+        try {
+            database = new Database();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void initiateContractList() throws SQLException {
         Connection myConn = dbConnect();

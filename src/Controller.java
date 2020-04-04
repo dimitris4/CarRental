@@ -15,5 +15,7 @@ public class Controller {
     public void initiateContractList() throws SQLException {contractMethods.initiateContractList();}
     public void displayActiveContracts() throws SQLException {contractMethods.displayActiveContracts();}
     public void displayOldContracts() throws SQLException {contractMethods.displayOldContracts();}
+
+
     //public void sendMail(String recipient, String myMessage) throws Exception { renterMethods.sendMail(recipient, myMessage); }
 }

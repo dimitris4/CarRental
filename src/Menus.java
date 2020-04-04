@@ -113,7 +113,9 @@ public class Menus {
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            RenterMethods rm = new RenterMethods();
+
+            System.out.print("Select Option: ");
 
             int selection = Input.checkInt(0, 5);
 
