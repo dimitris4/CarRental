@@ -127,7 +127,9 @@ public class RenterMethods {
 
         System.out.print("Select renter id: ");
 
-        int renterID = Input.checkInt(1, database.checkRenterID());
+        int max = database.checkRenterID();
+
+        int renterID = Input.checkInt(1, max);
 
         if (database.findRemovableRenters().size() == 0) {
 
@@ -185,7 +187,7 @@ public class RenterMethods {
                     street = input.next();
                 }
 
-                System.out.print("Enter Street Number: ");
+                System.out.print("Street Number: ");
                 int building = Input.checkInt(1,5000);
 
                 System.out.print("Floor: ");
@@ -205,14 +207,14 @@ public class RenterMethods {
                     zip_code = input.next();
                 }
 
-                System.out.print("Enter City: ");
+                System.out.print("City: ");
                 String city = input.nextLine();
                 while(!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
                     System.out.println("Invalid City. Try Again: ");
                     city = input.nextLine();
                 }
 
-                System.out.print("Enter Country: ");
+                System.out.print("Country: ");
                 String country = input.next();
                 while(!Input.isCountryName(country)) {
                     System.out.println("Invalid country name. Try again: ");

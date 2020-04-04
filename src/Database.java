@@ -31,7 +31,6 @@ public class Database {
     public ArrayList<Renter> loadRenters() {
         ArrayList<Renter> renters = new ArrayList<>();
         try {
-            Connection myConn = getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
                     "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
@@ -75,7 +74,6 @@ public class Database {
                           String fname, String lname, String email, String licence, Date sinceDate, String mobilePhone,
                           String homePhone) {
         try {
-            //create insert statements
             String queryCountry = "INSERT INTO country (name) " +
                     "VALUES (?)";
 
@@ -206,7 +204,7 @@ public class Database {
                     "JOIN phone_numbers USING (renterID)" +
                     "JOIN zip USING (zipID)" +
                     "JOIN country USING (countryID)" +
-                    "WHERE renterID NOT IN (SELECT renterID FROM contract WHERE CURRENT_DATE() BETWEEN contract.start_time AND contract.end_time);";
+                    "WHERE renterID NOT IN (SELECT renterID FROM contract WHERE CURRENT_DATE() BETWEEN contract.start_time AND contract.end_time)";
 
             ResultSet rs = myStmt.executeQuery(sql);
 
@@ -226,6 +224,7 @@ public class Database {
 
             e.printStackTrace();
         }
+        System.out.println(result);
         return result;
     }
 
@@ -244,6 +243,7 @@ public class Database {
             i = Integer.parseInt(rs.getString(1));
 
         }
+        //System.out.println(i);
         return i;
     }
 
