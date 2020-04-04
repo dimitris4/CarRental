@@ -1,8 +1,9 @@
 import java.sql.*;
+import java.sql.Date;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.time.Instant;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -49,7 +50,7 @@ public class Database {
                 String home_phone_number = rs.getString(5);
                 String email = rs.getString(6);
                 String driver_license_number = rs.getString(7);
-                Date since_data = new SimpleDateFormat("yyyy-mm-dd").parse(rs.getString(8));
+                java.util.Date since_data = new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(8));
                 String full_address = rs.getString(9);
                 String[] parts = full_address.split(" ");
                 String street = parts[0];
@@ -388,5 +389,219 @@ public class Database {
         myConn.close();
     }
 
+    public HashSet<Integer> populateZipIdHashSet() {
+
+        HashSet<Integer> zipIDs = new HashSet<Integer>();
+
+        try {
+            Statement myStmt = myConn.createStatement();
+            ResultSet myRs = myStmt.executeQuery("SELECT zipID FROM zip");;
+            while (myRs.next()) {
+            zipIDs.add(myRs.getInt("zipID"));
+            }
+        } catch (SQLException e) {
+        e.printStackTrace();
+        }
+
+        return zipIDs;
+
+    }
+
+    public HashSet<String> populateZipHashSet() {
+
+        HashSet<String> zips = new HashSet<>();
+
+        try {
+            Statement myStmt = myConn.createStatement();
+            ResultSet myRs = myStmt.executeQuery("SELECT zip FROM zip");;
+            while(myRs.next()) {
+                zips.add(myRs.getString("zip"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return zips;
+
+    }
+
+    public HashSet<String> populateCountriesHashSet() {
+
+        HashSet<String> countries = new HashSet<>();
+
+        try {
+            Statement myStmt = myConn.createStatement();
+            ResultSet myRs = myStmt.executeQuery("SELECT name FROM country");
+            while(myRs.next()) {
+                countries.add(myRs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return countries;
+
+    }
+
+    public void displayZip() {
+        Statement myStmt = null;
+        try {
+            myStmt = myConn.createStatement();
+            String sql = "SELECT zipID, zip, city, country.name\n" +
+                    "FROM zip\n" +
+                    "JOIN country USING (countryID)\n" +
+                    "ORDER BY zip;";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+
+            System.out.println();
+
+            System.out.printf("%-15s %-15s %-25s %-25s\n", "Zip ID", "Zip Code", "City", "Country");
+
+            for (int i = 0; i < 65; i++) {
+                System.out.print("-");
+            }
+
+            System.out.println();
+
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // insert renter with known zip code (tables affected: renter, phone_numbers, address)
+    public void addRenter(String fname, String lname, String mobilePhone, String homePhone, String email,
+                          String licence, Date sqlDate, String street, int building, int floor, String door,
+                          int zipID) {
+
+        try {
+
+            String query = "INSERT INTO address (street, building, floor, door, zipID) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            String queryRenter = "INSERT INTO renter (first_name, last_name, email, driver_license_number, since_data, " +
+                    "addressID)" + " VALUES (?, ?, ?, ?, ?, LAST_INSERT_ID())";
+
+            String queryPhoneNumbers = "INSERT INTO phone_numbers (renterID, mobile_phone_number, home_phone_number) " +
+                    "VALUES (LAST_INSERT_ID(), ?, ?)";
+
+            PreparedStatement preparedStmt;  //create insert statements
+            preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString(1, street);
+            preparedStmt.setInt(2, building);
+            preparedStmt.setInt(3, floor);
+            preparedStmt.setString(4, door);
+            preparedStmt.setInt(5, zipID);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryRenter);
+            preparedStmt.setString (1, fname);
+            preparedStmt.setString (2, lname);
+            preparedStmt.setString (3, email);
+            preparedStmt.setString (4, licence);
+            preparedStmt.setDate (5, sqlDate);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryPhoneNumbers);
+            preparedStmt.setString (1, mobilePhone);
+            preparedStmt.setString(2, homePhone);
+            preparedStmt.execute();
+
+            System.out.println("Added!!!!");
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+
+    public void addRenter(String zip_code, String city, String street, int building, int floor, String door,
+                          String fname, String lname, String email, String licence, Date sinceDate,
+                          String mobilePhone, String homePhone, int countryID) {
+
+        try {
+
+            String queryZip = "INSERT INTO zip (zip, city, countryID) " +
+                    "VALUES (?, ?, ?)";
+
+            String queryAddress = "INSERT INTO address (street, building, floor, door, zipID) " +
+                    "VALUES (?, ?, ?, ?, LAST_INSERT_ID())";
+
+            String queryRenter = "INSERT INTO renter (first_name, last_name, email, driver_license_number, since_data, " +
+                    "addressID)" + " VALUES (?, ?, ?, ?, ?, LAST_INSERT_ID())";
+
+            String queryPhoneNumbers = "INSERT INTO phone_numbers (renterID, mobile_phone_number, home_phone_number) " +
+                    "VALUES (LAST_INSERT_ID(), ?, ?)";
+
+            PreparedStatement preparedStmt;  //create insert statements
+
+            preparedStmt = myConn.prepareStatement(queryZip);
+            preparedStmt.setString(1, zip_code);
+            preparedStmt.setString(2, city);
+            preparedStmt.setInt(3, countryID);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryAddress);
+            preparedStmt.setString (1, street);
+            preparedStmt.setInt (2, building);
+            preparedStmt.setInt (3, floor);
+            preparedStmt.setString (4, door);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryRenter);
+            preparedStmt.setString (1, fname);
+            preparedStmt.setString (2, lname);
+            preparedStmt.setString (3, email);
+            preparedStmt.setString (4, licence);
+            preparedStmt.setDate (5, sinceDate);
+            preparedStmt.execute();
+
+            preparedStmt = myConn.prepareStatement(queryPhoneNumbers);
+            preparedStmt.setString (1, mobilePhone);
+            preparedStmt.setString(2, homePhone);
+            preparedStmt.execute();
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+
+    public int getCountryID(String country) {
+
+        int countryID = 0;
+
+        try {
+
+            PreparedStatement myStmt = (PreparedStatement) myConn.createStatement();
+
+            String sql = "SELECT countryID\n" +
+                    "FROM country\n" +
+                    "WHERE country.name = \"" + country + "\"\n" +
+                    "LIMIT 1;";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+            while (rs.next()) {
+                countryID = rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return countryID;
+    }
 
 }

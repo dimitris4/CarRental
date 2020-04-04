@@ -3,9 +3,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Scanner;
 
-import java.text.Collator;
-import java.util.*;
-
 class Input {
 
     static Scanner in = new Scanner(System.in);
@@ -57,19 +54,22 @@ class Input {
                 day = in.nextInt();
             }
         }
-        String date = year + "-" + month + "-" + day;
-        Date sdate;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String sdate =  day + "-" + month + "-" + year;
+        Date date;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         while (true) {
             try {
-                sdate = sdf.parse(date);
+                date = sdf.parse(sdate);
                 break;
             } catch (ParseException e) {
                 System.out.print("Date doesn't exist.");
             }
         }
-        return sdate;
+        return date;
     }
+
+
+
 
     public static boolean checkDate(int year, int month, int day){
         return (day<0 || ( month==2 && year%4==0 && day>29) || (((month==2 && year%4!=0) || (month!=2)) && day>months.get(month-1)));
@@ -127,7 +127,6 @@ class Input {
 
         }
 
-
         System.out.print("Country: ");
         String string = in.next();
 
@@ -138,10 +137,23 @@ class Input {
 
         return string;
 
-        /*if (countryNames.contains(string.toLowerCase())) {
-
-        }*/
-
     }
 
+    public static boolean isCountryName(String country) {
+
+        String[] countryCodes = Locale.getISOCountries();
+
+        ArrayList<String> countryNames = new ArrayList<String>();
+
+        for (String countryCode : countryCodes) {
+
+            Locale obj = new Locale("", countryCode);
+
+            countryNames.add(obj.getDisplayCountry().toLowerCase());
+
+        }
+
+        return  countryNames.contains(country.toLowerCase());
+
+    }
 }
