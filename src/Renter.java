@@ -12,8 +12,7 @@ public class Renter {
     private String driverLicenseNumber;
     private Date sinceDate;
 
-    public Renter() {
-    }
+    public Renter() { }
 
     public Renter(int renterID, String first_name, String last_name, Telephone telephone, Address address, String email, String driverLicenseNumber, Date sinceDate) {
         this.renterID = renterID;
@@ -81,6 +80,8 @@ public class Renter {
     public void setAddresses(Address addresses) {
         this.address = addresses;
     }
+
+    public void setSinceDate(Date sinceDate) {this.sinceDate = sinceDate; }
 
 
 

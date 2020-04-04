@@ -50,7 +50,7 @@ public class Database {
                 String home_phone_number = rs.getString(5);
                 String email = rs.getString(6);
                 String driver_license_number = rs.getString(7);
-                Date since_data = new SimpleDateFormat("yyyy-mm-dd").parse(rs.getString(8));
+                Date since_data = new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(8));
                 String full_address = rs.getString(9);
                 String[] parts = full_address.split(" ");
                 String street = parts[0];
