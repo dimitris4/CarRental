@@ -14,7 +14,7 @@ import java.util.Scanner;
 import static java.sql.DriverManager.getConnection;
 
 public class ContractMethods {
-    private static Database database = new Database();
+    private static Database database = Database.instance;
 
     public void initiateContractList() throws SQLException {
         Connection myConn = dbConnect();
@@ -203,6 +203,38 @@ public class ContractMethods {
         pst.executeUpdate();
         database.getContracts().clear();
         OurApp.getController().makeUnavailable2(registration_number);
+        OurApp.getController().initiateContractList();
+
+        for (Contract contract : database.getContracts()) {
+            if (contract.getCar().getRegistration_number().equals(registration_number) && contract.getStartDate().equals(stDate)) {
+
+                String myMessage = "This agreement is hereby made between " + contract.getRenter().getFirst_name() + " \n" +
+                        contract.getRenter().getLast_name() + " (hereafter referred to as \"the Renter\") and {John Kailua} (hereafter referred to as \"the Owner\"). \n" +
+                        "The Owner hereby agrees to rent the following vehicle to the Renter: {" + contract.getCar().getBrand().getName() + " " + contract.getCar().getModel().getName() + ", License Plate #" + contract.getCar().getRegistration_number() + "\n" +
+                        "The Renter will rent the car from " + contract.getStartDate() + " to " + contract.getEndDate() + ".\n" +
+                        "The Renter agrees to return the vehicle in its current condition (minus normal road wear-and-tear) to the Owner on the return date.\n" +
+                        "The Renter understands that the vehicle is for use only in Copenhagen and cannot be taken to other locations.\n" +
+                        "The Renter swears and attests that {he/she} has a legal, valid license to drive this type of vehicle in Denmark, and that there are no outstanding warrants against said license. \n" +
+                        "The Renter's driver's license is: {" + contract.getRenter().getDriverLicenseNumber() + "}. The Renter further swears and attests that {he/she} has insurance that will cover the operation of this vehicle.\n" +
+                        "The Renter agrees not to allow any other person to drive the vehicle, except for authorized drivers listed and approved here. \n" +
+                        "The Renter agrees to use the vehicle only for routine, legal purposes (personal or business). The Renter further agrees to follow all city, state, county, and government rules and restrictions regarding use and operation of the vehicle.\n" +
+                        "The Renter agrees to hold harmless, indemnify, and release the Owner for any damages, injuries, property loss, or death caused while the Renter operates this vehicle. The Renter will be held accountable for any damages or cleaning fees incurred while renting the vehicle.\n" +
+                        "The Renter has had the opportunity to inspect the vehicle before the renting term begins and confirms that it is in good operable condition.\n" +
+                        "The Owner swears and attests that the vehicle is in good working order and has no liens or encumbrances.\n" +
+                        "                                                                                                        \n" +
+                        "         " + contract.getRenter().getFirst_name() + " " + contract.getRenter().getLast_name() + "\n" +
+                        "            (Renter Signature)                                                                          \n" +
+                        "                                                                                                        \n" +
+                        "         John Kailua                                                                                        \n" +
+                        "     (Owner Signature)                                                                                   \n" +
+                        "                                                                                                         \n" +
+                        "      " + contract.getStartDate() + "                                                 \n" +
+                        "    (Date)                                                                                              \n";
+                OurApp.getController().sendMail(contract.getRenter().getEmail(), myMessage);
+                break;
+
+            }
+        }
     }
 
     public void endContract() throws SQLException{

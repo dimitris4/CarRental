@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 
 public class Database {
+    static final public Database instance = new Database();
 
-    private static ArrayList<Contract> contracts;
-    private static ArrayList<Integer> renterIDs;
+    private static ArrayList<Contract> contracts = new ArrayList<>();
+    private static ArrayList<Integer> renterIDs = new ArrayList<>();
 
     public Database(){
         contracts = new ArrayList<Contract>();

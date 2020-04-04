@@ -11,7 +11,7 @@ import static java.sql.DriverManager.getConnection;
 
 
 public class RenterMethods {
-    private static Database database = new Database();
+    private static Database database = Database.instance;
 
     String url = "jdbc:mysql://localhost:3306/kailua";
     String user = "dimk";
