@@ -1,6 +1,6 @@
 import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.Scanner;
 
 //import javax.mail.*;
 //import javax.mail.internet.InternetAddress;
@@ -15,6 +15,41 @@ public class RenterMethods {
     String user = "dimk";
     String password = "dimk1234!";
     Scanner input = new Scanner(System.in);
+    private static Set<Integer> zipIDs= new HashSet<>();
+    private static Set<String> zips= new HashSet<>();
+    private static Set<String> countries= new HashSet<>();
+
+
+    public RenterMethods() {//populate hashsets
+
+        try {
+
+            Connection myConn = getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+            ResultSet myRs = myStmt.executeQuery("SELECT zipID FROM zip");;
+            while(myRs.next()) {
+                zipIDs.add(myRs.getInt("zipID"));
+            }
+            myRs = myStmt.executeQuery("SELECT zip FROM zip");;
+            while(myRs.next()) {
+                zips.add(myRs.getString("zip"));
+            }
+            myRs = myStmt.executeQuery("SELECT name FROM country");
+            while(myRs.next()) {
+                countries.add(myRs.getString("name"));
+            }
+            myConn.close();
+            myRs.close();
+            myStmt.close();
+
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+    }
+
 
     public void displayRenters() {
 
@@ -67,8 +102,9 @@ public class RenterMethods {
 
     }
 
+    public void displayZip() {
 
-    public void add() {
+        try {
 
         // prompt for the user input
         Scanner console = new Scanner(System.in);
@@ -100,93 +136,245 @@ public class RenterMethods {
 
         String email = Input.checkEmail();
 
-        System.out.print("Driver Licence Number: ");
-        String licence = console.nextLine();
 
-        System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
-        Date sinceDate = Input.insertDateWithoutTime();
+            Statement myStmt = myConn.createStatement();
 
-        System.out.println("\n**** CLIENT ADDRESS ****\n");
-        System.out.print("Street Name: ");
-        String street = console.next();
-        while (!street.matches("[a-zA-Z_]+")) {
-            System.out.print("Invalid Street Name. Try Again: ");
-            street = console.next();
-        }
+            String sql = "SELECT zipID, zip, city, country.name\n" +
+                    "FROM zip\n" +
+                    "JOIN country USING (countryID)\n" +
+                    "ORDER BY zip;";
 
-        System.out.print("Street Number: ");
-        int building = Input.checkInt(1,5000);
+            ResultSet rs = myStmt.executeQuery(sql);
 
-        System.out.print("Floor: ");
-        int floor = Input.checkInt(0,200);
+            System.out.println();
 
-        System.out.print("Door (th/tv/mf/-): ");
-        String door = console.next();
-        while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
-            System.out.println("Invalid Input. Try Again: ");
-            door = console.next();
-        }
+            System.out.printf("%-15s %-15s %-25s %-25s\n", "Zip ID", "Zip Code", "City", "Country");
 
-        System.out.print("Zip code: ");
-        String zip_code = console.next();
-        while(!zip_code.matches("[0-9]+")){
-            System.out.print("Invalid Input. Try Again: ");
-            zip_code = console.next();
-        }
+            for (int i = 0; i < 65; i++) {
 
-        console.nextLine();
-        System.out.print("City: ");
-        String city = console.nextLine();
-        while(!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
-            System.out.println("Invalid City. Try Again: ");
-            city = console.nextLine();
-        }
+                System.out.print("-");
+
+            }
+
+            System.out.println();
+
+            while (rs.next()) {
+
+                System.out.printf("%-15s %-15s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4));
+
+            }
+
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
 
         System.out.print("Country: ");
         String country = console.next();
         while(!Input.isCountryName(country)){
             System.out.print("Invalid Country. Try Again: ");
             country = console.next();
+
         }
 
+    }
+
+    public void add() {
+
         try {
+
             //get a connection to database
             Connection myConn = getConnection(url, user, password);
 
-            //create insert statements
-            String queryCountry = "INSERT INTO country (name) " +
-                                  "VALUES (?)";
+            Statement myStmt = myConn.createStatement();
 
-            String queryZip = "INSERT INTO zip (zip, city, countryID) " +
-                              "VALUES (?, ?, LAST_INSERT_ID())";
+            //prompt for the user input
+            System.out.print("First name: ");
+            String fname = input.next();
+            while (!fname.matches("[a-zA-Z_]+")) {
+                System.out.print("Invalid First Name. Try Again: ");
+                fname = input.next();
+            }
+            fname = (fname.substring(0,1).toUpperCase() + fname.substring(1).toLowerCase());
 
-            String queryAddress = "INSERT INTO address (street, building, floor, door, zipID) " +
-                                  "VALUES (?, ?, ?, ?, LAST_INSERT_ID())";
+            System.out.print("Last name: ");
+            String lname = input.next();
+            while(!lname.matches("[a-zA-Z_]+")){
+                System.out.println("Invalid Last Name. Try Again: ");
+                lname = input.next();
+            }
+            lname = (lname.substring(0,1).toUpperCase() + lname.substring(1).toLowerCase());
+
+            System.out.print("Mobile Phone (start with country code): ");
+            String mobilePhone = input.next();
+            while(!mobilePhone.matches("[0-9]{6,12}$")){
+                System.out.print("Invalid Phone number (minimum 6 digits, maximum 12). Try Again: ");
+                mobilePhone = input.next();
+            }
+            input.nextLine();
+
+            System.out.print("Home Phone (start with country code) or [0] to skip: ");
+            String homePhone = input.nextLine();
+            while(!homePhone.equals("0") && !homePhone.matches("[0-9]{6,12}$")){
+                System.out.print("Invalid Phone number. Try Again: ");
+                homePhone = input.nextLine();
+            }
+            if (homePhone.equals("0")){ homePhone = null; }
+
+            String email = Input.checkEmail();
+
+            System.out.print("Driver Licence Number: ");
+            String licence = input.nextLine();
+
+            //System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
+            Date sinceDate = Input.setDate();
+
+            System.out.println("\n**** CLIENT ADDRESS ****\n");
+
+            System.out.print("Street Name: ");
+            String street = input.next();
+            while (!street.matches("[a-zA-Z_]+")) {
+                System.out.print("Invalid Street Name. Try Again: ");
+                street = input.next();
+            }
+            street = (street.substring(0,1).toUpperCase() + street.substring(1).toLowerCase());
+
+            System.out.print("Street Number: ");
+            int building = Input.checkInt(1,5000);
+
+            System.out.print("Floor: ");
+            int floor = Input.checkInt(0,200);
+
+            System.out.print("Door (th/tv/mf/-): ");
+            String door = input.next();
+            while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
+                System.out.println("Invalid Input. Try Again: ");
+                door = input.next();
+            }
+
+            displayZip();
+            System.out.println("\n[1] Select ZIP from the list     [2] Insert new one");
+            System.out.print("Select the option: ");
+            int field = Input.checkInt(1,2);
+            String zip_code = "";
+            int zipID;
+
+            switch (field) {
+
+                case 1:
+
+                    System.out.print("Type selected ZIP code ID: ");
+                    zipID = Input.checkInt(1,5000);
+                    while (!(zipIDs.contains(zipID))) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zipID = Input.checkInt(1,5000);
+                    }
+                    String query = "INSERT INTO address (street, building, floor, door, zipID) " +
+                            "VALUES (?, ?, ?, ?, ?)";
+
+                    PreparedStatement preparedStmt;  //create insert statements
+                    preparedStmt = myConn.prepareStatement(query);
+                    preparedStmt.setString(1, street);
+                    preparedStmt.setInt(2, building);
+                    preparedStmt.setInt(3, floor);
+                    preparedStmt.setString(4, door);
+                    preparedStmt.setInt(5, zipID);
+                    preparedStmt.execute();
+                    break;
+
+                case 2:
+
+                    System.out.print("Type new zip code: ");
+                    zip_code = input.next();
+                    while (!zip_code.matches("[0-9]+")) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zip_code = input.next();
+                    }
+                    input.nextLine();
+
+                    System.out.print("City: ");
+                    String city = input.nextLine();
+                    while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
+                        System.out.println("Invalid City. Try Again: ");
+                        city = input.nextLine();
+                    }
+                    int countryID = 0;
+
+                    String country = Input.isCountryName();
+                    if (!countries.contains(country)) {
+                        String queryCountry = "INSERT INTO country (name) " +
+                            "VALUES (?)";
+
+                        String queryZip = "INSERT INTO zip (zip, city, countryID) " +
+                                "VALUES (?, ?, LAST_INSERT_ID())";
+
+                        String queryAddress = "INSERT INTO address (street, building, floor, door, zipID) " +
+                                "VALUES (?, ?, ?, ?, LAST_INSERT_ID())";
+
+                        preparedStmt = myConn.prepareStatement(queryCountry);
+                        preparedStmt.setString(1, country);
+                        preparedStmt.execute();
+
+                        preparedStmt = myConn.prepareStatement(queryZip);
+                        preparedStmt.setString(1, zip_code);
+                        preparedStmt.setString(2, city);
+                        preparedStmt.execute();
+
+                        preparedStmt = myConn.prepareStatement(queryAddress);
+                        preparedStmt.setString (1, street);
+                        preparedStmt.setInt (2, building);
+                        preparedStmt.setInt (3, floor);
+                        preparedStmt.setString (4, door);
+                        preparedStmt.execute();
+
+
+                    } else {
+                        String sql = "SELECT countryID\n" +
+                                "FROM country\n" +
+                                "WHERE country.name = \"" + country + "\"\n" +
+                                "LIMIT 1;";
+
+                        ResultSet rs = myStmt.executeQuery(sql);
+                        while (rs.next()) {
+                            countryID = rs.getInt(1);
+                        }
+
+                        String queryZip = "INSERT INTO zip (zip, city, countryID) " +
+                                "VALUES (?, ?, ?)";
+
+                        String queryAddress = "INSERT INTO address (street, building, floor, door, zipID) " +
+                                "VALUES (?, ?, ?, ?, LAST_INSERT_ID())";
+
+                        preparedStmt = myConn.prepareStatement(queryZip);
+                        preparedStmt.setString(1, zip_code);
+                        preparedStmt.setString(2, city);
+                        preparedStmt.setInt(3, countryID);
+                        preparedStmt.execute();
+
+                        preparedStmt = myConn.prepareStatement(queryAddress);
+                        preparedStmt.setString (1, street);
+                        preparedStmt.setInt (2, building);
+                        preparedStmt.setInt (3, floor);
+                        preparedStmt.setString (4, door);
+                        preparedStmt.execute();
+
+                    }
+
+                    break;
+
+                default:
+                    break;
+
+            }
+
+            PreparedStatement preparedStmt;  //create left insert statements
 
             String queryRenter = "INSERT INTO renter (first_name, last_name, email, driver_license_number, since_data, " +
                                  "addressID)" + " VALUES (?, ?, ?, ?, ?, LAST_INSERT_ID())";
 
             String queryPhoneNumbers = "INSERT INTO phone_numbers (renterID, mobile_phone_number, home_phone_number) " +
                     "VALUES (LAST_INSERT_ID(), ?, ?)";
-
-            //create insert PreparedStatement
-            PreparedStatement preparedStmt;
-
-            preparedStmt = myConn.prepareStatement(queryCountry);
-            preparedStmt.setString(1, country);
-            preparedStmt.execute();
-
-            preparedStmt = myConn.prepareStatement(queryZip);
-            preparedStmt.setString(1, zip_code);
-            preparedStmt.setString(2, city);
-            preparedStmt.execute();
-
-            preparedStmt = myConn.prepareStatement(queryAddress);
-            preparedStmt.setString (1, street);
-            preparedStmt.setInt (2, building);
-            preparedStmt.setInt (3, floor);
-            preparedStmt.setString (4, door);
-            preparedStmt.execute();
 
             preparedStmt = myConn.prepareStatement(queryRenter);
             preparedStmt.setString (1, fname);
@@ -206,6 +394,7 @@ public class RenterMethods {
 
             //close connection
             myConn.close();
+            myStmt.close();
 
         } catch (SQLException exc) {
             exc.printStackTrace();

@@ -1,6 +1,6 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.Scanner;
 
 import java.text.Collator;
@@ -9,6 +9,7 @@ import java.util.*;
 class Input {
 
     static Scanner in = new Scanner(System.in);
+    private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
     public static Date insertDateWithoutTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -21,12 +22,57 @@ class Input {
                 sdf = new SimpleDateFormat("dd-MM-yyyy");
                 break;
             } catch (ParseException e) {
-                System.out.print("Day must have the following format (dd-mm-yyyy): ");
+                System.out.print("Date must have the following format (dd-mm-yyyy): ");
                 str = console.nextLine();
                 continue;
             }
         }
         return date;
+    }
+
+    public static Date setDate(){
+        System.out.println("Driver since (please type the date): ");
+        System.out.print("Year (yyyy): ");
+        // we don't rent cars to drivers who got their licence before 1940 ;)
+        // can't be higher than current year
+        int year = checkInt(1940, Calendar.getInstance().get(Calendar.YEAR));
+        System.out.print("Month (numeric): ");
+        int month = checkInt(1, 12);
+        while(year == Calendar.getInstance().get(Calendar.YEAR) && month>Calendar.getInstance().get(Calendar.MONTH)){
+            System.out.print("Invalid month value. Latest possible: " + Calendar.getInstance().get(Calendar.MONTH) +"."+ Calendar.getInstance().get(Calendar.YEAR) +": ");
+            month = in.nextInt();
+        }
+        System.out.print("Day (numeric): ");
+        int day = checkInt(1, 31);
+        while(checkDate(year,month,day)){
+            int leap=0;
+            if (year%4==0 && month==2){
+                leap++;
+            }
+            System.out.print("Invalid day value. Please insert value between 1 - " + (months.get(month-1)+leap) + ": ");
+            day = in.nextInt();
+            while (year == Calendar.getInstance().get(Calendar.YEAR) && month>Calendar.getInstance().get(Calendar.MONTH) && day>Calendar.getInstance().get(Calendar.DAY_OF_MONTH)){
+                System.out.print("Invalid day value. Latest possible: " + Calendar.getInstance().get(Calendar.MONTH) +"."+ Calendar.getInstance().get(Calendar.YEAR) +"."+
+                        Calendar.getInstance().get(Calendar.DAY_OF_MONTH) +": ");
+                day = in.nextInt();
+            }
+        }
+        String date = year + "-" + month + "-" + day;
+        Date sdate;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        while (true) {
+            try {
+                sdate = sdf.parse(date);
+                break;
+            } catch (ParseException e) {
+                System.out.print("Date doesn't exist.");
+            }
+        }
+        return sdate;
+    }
+
+    public static boolean checkDate(int year, int month, int day){
+        return (day<0 || ( month==2 && year%4==0 && day>29) || (((month==2 && year%4!=0) || (month!=2)) && day>months.get(month-1)));
     }
 
     public static int checkInt(int min, int max) {
@@ -48,6 +94,7 @@ class Input {
                 isValid = false;
                 in.next();
                 System.out.print("Invalid input. Please try again: ");
+
             }
         }
         in.nextLine();
@@ -65,7 +112,8 @@ class Input {
         return email;
     }
 
-    public static boolean isCountryName(String string) {
+
+    public static String isCountryName() {
 
         String[] countryCodes = Locale.getISOCountries();
 
@@ -79,15 +127,20 @@ class Input {
 
         }
 
-        if (countryNames.contains(string.toLowerCase())) {
 
-            return true;
+        System.out.print("Country: ");
+        String string = in.next();
 
-        } else {
-
-            return false;
-
+        while (!countryNames.contains(string.toLowerCase())){
+            System.out.print("This country doesn't exist. Please try again: ");
+            string = in.next();
         }
+
+        return string;
+
+        /*if (countryNames.contains(string.toLowerCase())) {
+
+        }*/
 
     }
 
