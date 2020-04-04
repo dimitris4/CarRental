@@ -113,13 +113,12 @@ public class ContractMethods {
         Connection myConn = null;
         try {
             // 1. get a connection to database
-            myConn = getConnection("jdbc:mysql://localhost:3306/kailua", "dimk", "dimk1234!");
+            myConn = getConnection("jdbc:mysql://localhost:3306/kailua?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "dimk", "dimk1234!");
         } catch (SQLException exc) {
             exc.printStackTrace();
         }
         return myConn;
     }
-
 
 
 }

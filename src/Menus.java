@@ -65,23 +65,19 @@ public class Menus {
 
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    //cm.add();
+                    OurApp.getController().addCar();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    cm.update();
+                    OurApp.getController().editCar();
                     pressAnyKey();
                     break;
                 case 3:
-                    //Main.getController().deleteRenter();
-                    //cm.remove();
+                    OurApp.getController().deleteCar();
                     pressAnyKey();
                     break;
                 case 4:
-                    //Main.getController().displayRenters();
-                    cm.displayCars();
+                    OurApp.getController().displayCars();
                     pressAnyKey();
                     break;
                 case 5:

@@ -7,6 +7,8 @@ public class Start {
 
         //Filling up the contracts ArrayList from the DB
         OurApp.getController().initiateContractList();
+        //Filling up the cars ArrayList from the DB
+        OurApp.getController().initiateCarList();
         //Printing the Logo
         AsciiArt.printLogo4();
 
