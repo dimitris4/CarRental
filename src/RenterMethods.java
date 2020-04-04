@@ -145,6 +145,7 @@ public class RenterMethods {
     public void add() {
 
         try {
+
             //get a connection to database
             Connection myConn = getConnection(url, user, password);
 
@@ -157,6 +158,7 @@ public class RenterMethods {
                 System.out.print("Invalid First Name. Try Again: ");
                 fname = input.next();
             }
+            fname = (fname.substring(0,1).toUpperCase() + fname.substring(1).toLowerCase());
 
             System.out.print("Last name: ");
             String lname = input.next();
@@ -164,18 +166,19 @@ public class RenterMethods {
                 System.out.println("Invalid Last Name. Try Again: ");
                 lname = input.next();
             }
+            lname = (lname.substring(0,1).toUpperCase() + lname.substring(1).toLowerCase());
 
             System.out.print("Mobile Phone (start with country code): ");
             String mobilePhone = input.next();
             while(!mobilePhone.matches("[0-9]{6,12}$")){
-                System.out.print("Invalid Phone number. Try Again: ");
+                System.out.print("Invalid Phone number (minimum 6 digits, maximum 12). Try Again: ");
                 mobilePhone = input.next();
             }
             input.nextLine();
 
             System.out.print("Home Phone (start with country code) or [0] to skip: ");
             String homePhone = input.nextLine();
-            while(!homePhone.matches("[0-9]{6,12}$")){
+            while(!homePhone.equals("0") && !homePhone.matches("[0-9]{6,12}$")){
                 System.out.print("Invalid Phone number. Try Again: ");
                 homePhone = input.nextLine();
             }
@@ -186,8 +189,8 @@ public class RenterMethods {
             System.out.print("Driver Licence Number: ");
             String licence = input.nextLine();
 
-            System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
-            Date sinceDate = Input.insertDateWithoutTime();
+            //System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
+            Date sinceDate = Input.setDate();
 
             System.out.println("\n**** CLIENT ADDRESS ****\n");
 
@@ -197,6 +200,7 @@ public class RenterMethods {
                 System.out.print("Invalid Street Name. Try Again: ");
                 street = input.next();
             }
+            street = (street.substring(0,1).toUpperCase() + street.substring(1).toLowerCase());
 
             System.out.print("Street Number: ");
             int building = Input.checkInt(1,5000);
@@ -214,7 +218,7 @@ public class RenterMethods {
             displayZip();
             System.out.println("\n[1] Select ZIP from the list     [2] Insert new one");
             System.out.print("Select the option: ");
-            int field = input.nextInt();
+            int field = Input.checkInt(1,2);
             String zip_code = "";
             int zipID;
 
@@ -222,11 +226,11 @@ public class RenterMethods {
 
                 case 1:
 
-                    System.out.print("Type selected zip code ID: ");
-                    zipID = input.nextInt();
+                    System.out.print("Type selected ZIP code ID: ");
+                    zipID = Input.checkInt(1,5000);
                     while (!(zipIDs.contains(zipID))) {
                         System.out.print("Invalid Input. Try Again: ");
-                        zipID = input.nextInt();
+                        zipID = Input.checkInt(1,5000);
                     }
                     String query = "INSERT INTO address (street, building, floor, door, zipID) " +
                             "VALUES (?, ?, ?, ?, ?)";
@@ -259,9 +263,6 @@ public class RenterMethods {
                     }
                     int countryID = 0;
 
-                    //System.out.print("Country: ");
-                    //String country = input.next();
-                    //country = Input.isCountryName(country);
                     String country = Input.isCountryName();
                     if (!countries.contains(country)) {
                         String queryCountry = "INSERT INTO country (name) " +
