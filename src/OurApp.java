@@ -4,6 +4,7 @@ public class OurApp {
 
     public static void main(String[] args) throws Exception {
 
+        controller = new Controller();
 
 
         //creating a controller object
@@ -16,4 +17,5 @@ public class OurApp {
     public static Controller getController() {
         return controller;
     }
+
 }

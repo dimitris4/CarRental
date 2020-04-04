@@ -76,6 +76,6 @@ public class Contract {
     }
 
     public String toString() {
-        return String.format("%-20d%-20s%-40s%-60s%-20s%-20s%-20s", this.contractID, this.car.getRegistration_number(), this.car.getBrand().getName() + " " + this.car.getModel().getName(), this.renter.getFirst_name() + " " + this.renter.getLast_name(), this.renter.getDriverLicenseNumber(), this.startDate, this.endDate);
+        return String.format("%-20d%-20s%-20s%-40s%-40s%-20s%-20s%-20s", this.contractID, this.car.getType().getName(), this.car.getRegistration_number(), this.car.getBrand().getName() + " " + this.car.getModel().getName(), this.renter.getFirst_name() + " " + this.renter.getLast_name(), this.renter.getDriverLicenseNumber(), this.startDate, this.endDate);
     }
 }
