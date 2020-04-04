@@ -137,7 +137,7 @@ public class RenterMethods {
                     System.out.print("Invalid Input. Try Again: ");
                     zip_code = input.next();
                 }
-                
+
                 input.nextLine();
 
                 System.out.print("City: ");
