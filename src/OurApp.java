@@ -4,14 +4,10 @@ public class OurApp {
 
     public static void main(String[] args) throws Exception {
 
-        RenterMethods rm = new RenterMethods();
-        rm.displayZip();
-        rm.displayRenters();
-        rm.add();
 
-        //controller = new Controller();
+        controller = new Controller();
 
-        //new Start();
+        new Start();
     }
 
     //a getter method returning the controller object
