@@ -8,6 +8,7 @@ class Input {
     static Scanner in = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
+
     public static Date insertDateWithoutTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         Scanner console = new Scanner(System.in);
@@ -26,6 +27,8 @@ class Input {
         }
         return date;
     }
+
+
 
     public static Date setDate(){
         System.out.println("Driver since (please type the date): ");
@@ -54,20 +57,19 @@ class Input {
                 day = in.nextInt();
             }
         }
-        String sdate =  day + "-" + month + "-" + year;
-        Date date;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String date = year + "-" + month + "-" + day;
+        Date sdate;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         while (true) {
             try {
-                date = sdf.parse(sdate);
+                sdate = sdf.parse(date);
                 break;
             } catch (ParseException e) {
                 System.out.print("Date doesn't exist.");
             }
         }
-        return date;
+        return sdate;
     }
-
 
 
 
@@ -154,6 +156,7 @@ class Input {
         }
 
         return  countryNames.contains(country.toLowerCase());
-
     }
+
+
 }

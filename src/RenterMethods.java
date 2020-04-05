@@ -1,7 +1,6 @@
 import java.sql.*;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.*;
+import java.util.Date;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -10,18 +9,16 @@ public class RenterMethods {
 
     Scanner input = new Scanner(System.in);
     Database database = new Database();
-    ArrayList<Renter> renters = new ArrayList<>();
-    private static Set<Integer> zipIDs= new HashSet<>();
-    private static Set<String> zips= new HashSet<>();
-    private static Set<String> countries= new HashSet<>();
+    ArrayList<Renter> renters;
+    private static Set<String> zips;
+    private static Set<String> countries;
 
 
     // the list and sets are initialized
     public RenterMethods() throws SQLException {
         renters = database.loadRenters();
-        zipIDs = database.populateZipIdHashSet();
-        zips = database.populateZipHashSet();
-        countries = database.populateCountriesHashSet();
+        zips = database.loadZips();
+        countries = database.loadCountries();
     }
 
 
@@ -37,144 +34,180 @@ public class RenterMethods {
         }
     }
 
+    public void displayZip() {
+        List<String> list = new ArrayList<>();
+        list.addAll(zips);
+        Collections.sort(list);
+
+        System.out.println("\nZip Codes in our Database");
+        for (int i = 0; i < 25; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+        for (String zip : list) {
+            System.out.println(zip);
+        }
+    }
+
 
 
     public void add() {
 
-        System.out.print("First name: ");
-        String fname = input.next();
-        while (!fname.matches("[a-zA-Z_]+")) {
-            System.out.print("Invalid First Name. Try Again: ");
-            fname = input.next();
-        }
-        fname = (fname.substring(0,1).toUpperCase() + fname.substring(1).toLowerCase());
+            Renter renter = new Renter();
 
-        System.out.print("Last name: ");
-        String lname = input.next();
-        while(!lname.matches("[a-zA-Z_]+")){
-            System.out.println("Invalid Last Name. Try Again: ");
-            lname = input.next();
-        }
-        lname = (lname.substring(0,1).toUpperCase() + lname.substring(1).toLowerCase());
+            //prompt for the user input
+            System.out.print("First name: ");
+            String fname = input.next();
+            while (!fname.matches("[a-zA-Z_]+")) {
+                System.out.print("Invalid First Name. Try Again: ");
+                fname = input.next();
+            }
+            renter.setFirst_name(fname.substring(0,1).toUpperCase() + fname.substring(1).toLowerCase());
 
-        System.out.print("Mobile Phone (start with country code): ");
-        String mobilePhone = input.next();
-        while(!mobilePhone.matches("[0-9]{6,12}$")){
-            System.out.print("Invalid Phone number (minimum 6 digits, maximum 12). Try Again: ");
-            mobilePhone = input.next();
-        }
-        input.nextLine();
+            System.out.print("Last name: ");
+            String lname = input.next();
+            while(!lname.matches("[a-zA-Z_]+")){
+                System.out.println("Invalid Last Name. Try Again: ");
+                lname = input.next();
+            }
+            renter.setLast_name(lname.substring(0,1).toUpperCase() + lname.substring(1).toLowerCase());
 
-        System.out.print("Home Phone (start with country code) or [0] to skip: ");
-        String homePhone = input.nextLine();
-        while(!homePhone.equals("0") && !homePhone.matches("[0-9]{6,12}$")){
-            System.out.print("Invalid Phone number. Try Again: ");
-            homePhone = input.nextLine();
-        }
-        if (homePhone.equals("0")){ homePhone = null; }
+            System.out.print("Mobile Phone (start with country code): ");
+            String mobilePhone = input.next();
+            while(!mobilePhone.matches("[0-9]{6,12}$")){
+                System.out.print("Invalid Phone number (minimum 6 digits, maximum 12). Try Again: ");
+                mobilePhone = input.next();
+            }
+            input.nextLine();
 
-        String email = Input.checkEmail();
+            System.out.print("Home Phone (start with country code) or [0] to skip: ");
+            String homePhone = input.nextLine();
+            while(!homePhone.equals("0") && !homePhone.matches("[0-9]{6,12}$")){
+                System.out.print("Invalid Phone number. Try Again: ");
+                homePhone = input.nextLine();
+            }
+            if (homePhone.equals("0")){ homePhone = null; }
+            Telephone tel = new Telephone(mobilePhone, homePhone);
+            renter.setTelephones(tel);
 
-        System.out.print("Driver Licence Number: ");
-        String licence = input.nextLine();
+            String email = "";
+            email = Input.checkEmail();
+            renter.setEmail(email);
 
-        //System.out.print("Driver since (please type the date) dd-mm-yyyy: ");
-        java.util.Date sinceDate = Input.setDate();
-        java.sql.Date sqlDate = new java.sql.Date(sinceDate.getTime());
+            System.out.print("Driver Licence Number: ");
+            String licence = "";
+            licence = input.nextLine();
+            renter.setDriverLicenseNumber(licence);
 
-        System.out.println("\n**** CLIENT ADDRESS ****\n");
+            // the object gets java Date and the database gets sql Date type
+            Date sinceDate = Input.setDate();
+            renter.setSinceDate(sinceDate);
 
-        System.out.print("Street Name: ");
-        String street = input.next();
-        while (!street.matches("[a-zA-Z_]+")) {
-            System.out.print("Invalid Street Name. Try Again: ");
-            street = input.next();
-        }
+            java.sql.Date sqlDate = new java.sql.Date(sinceDate.getTime());
 
-        street = (street.substring(0,1).toUpperCase() + street.substring(1).toLowerCase());
 
-        System.out.print("Street Number: ");
-        int building = Input.checkInt(1,5000);
+            System.out.println("\n**** CLIENT ADDRESS ****\n");
 
-        System.out.print("Floor: ");
-        int floor = Input.checkInt(0,200);
+            System.out.print("Street Name: ");
+            String street = input.next();
+            while (!street.matches("[a-zA-Z_]+")) {
+                System.out.print("Invalid Street Name. Try Again: ");
+                street = input.next();
+            }
+            street = (street.substring(0,1).toUpperCase() + street.substring(1).toLowerCase());
 
-        System.out.print("Door (th/tv/mf/-): ");
-        String door = input.next();
-        while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
-            System.out.println("Invalid Input. Try Again: ");
-            door = input.next();
-        }
+            System.out.print("Street Number: ");
+            int building = Input.checkInt(1,5000);
 
-        database.displayZip();
-        System.out.println("\n[1] Select ZIP from the list     [2] Insert new one");
-        System.out.print("Select the option: ");
-        int field = Input.checkInt(1,2);
-        String zip_code = "";
-        int zipID;
+            System.out.print("Floor: ");
+            int floor = Input.checkInt(0,200);
 
-        switch (field) {
+            System.out.print("Door (th/tv/mf/-): ");
+            String door = input.next();
+            while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
+                System.out.println("Invalid Input. Try Again: ");
+                door = input.next();
+            }
 
-            case 1: // known zip code
+            displayZip();
+            System.out.println("\n[1] Select ZIP from the list     [2] Insert new one");
+            System.out.print("Select the option: ");
+            int field = Input.checkInt(1,2);
+            String zip_code = "";
+            //int zipID;
+            String city = "";
+            String country = "";
 
-                System.out.print("Type selected ZIP code ID: ");
-                zipID = Input.checkInt(1,5000);
-                while (!(zipIDs.contains(zipID))) {
-                    System.out.print("Invalid Input. Try Again: ");
-                    zipID = Input.checkInt(1,5000);
-                }
+            switch (field) {
 
-                // insert renter with known zip code (tables affected: renter, phone_numbers, address)
-                database.addRenter(fname, lname, mobilePhone, homePhone, email, licence, sqlDate, street, building,
-                                   floor, door, zipID);
-                break;
+                case 1: // known zip code...
 
-            case 2: // unknown zip code...
-
-                System.out.print("Type new zip code: ");
-                zip_code = input.next();
-                while (!zip_code.matches("[0-9]+")) {
-                    System.out.print("Invalid Input. Try Again: ");
+                    System.out.print("Type selected ZIP: ");
                     zip_code = input.next();
-                }
+                    while (!zip_code.matches("[0-9]+") || !zips.contains(zip_code)) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zip_code = input.next();
+                    }
 
-                input.nextLine();
+                    int zipID = database.getZipID(zip_code);
 
-                System.out.print("City: ");
-                String city = input.nextLine();
-                while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
-                    System.out.println("Invalid City. Try Again: ");
+                    ArrayList<String> arrayList = database.getCityCountryName(zip_code);
+                    city = arrayList.get(0);
+                    country = arrayList.get(1);
+
+                    // insert renter with known zip code (tables affected: renter, phone_numbers, address)
+                    database.addRenter(fname, lname, mobilePhone, homePhone, email, licence, sqlDate, street, building,
+                                       floor, door, zipID);
+                    break;
+
+                case 2: // unknown zip code...
+
+                    System.out.print("Type new zip code: ");
+                    zip_code = input.next();
+                    while (!zip_code.matches("[0-9]+")) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zip_code = input.next();
+                    }
+                    input.nextLine();
+
+                    System.out.print("City: ");
                     city = input.nextLine();
-                }
+                    while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
+                        System.out.println("Invalid City. Try Again: ");
+                        city = input.nextLine();
+                    }
 
-                String country = Input.isCountryName();
+                    country = Input.isCountryName();
 
-                if (!countries.contains(country)) { // if country is unknown
+                    if (!countries.contains(country)) { // if country is unknown
 
-                    // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
-                    database.addRenter(country, zip_code, city, street, building, floor, door, fname, lname, email,
-                                       licence, sqlDate, mobilePhone, homePhone);
+                        // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
+                        database.addRenter(country, zip_code, city, street, building, floor, door, fname, lname, email,
+                                           licence, sqlDate, mobilePhone, homePhone);
 
-                } else { // if country is known, then we get country id
+                    } else { // if country is known, then we get country id
 
-                    int countryID = database.getCountryID(country);
+                        int countryID = database.getCountryID(country);
 
-                    // insert renter with unknown zip code and known country (tables affected: renter, phone_numbers, address, zip)
-                    database.addRenter(zip_code, city, street, building, floor, door, fname, lname, email, licence,
-                                       sqlDate, mobilePhone, homePhone, countryID);
+                        // insert renter with unknown zip code and known country (tables affected: renter, phone_numbers, address, zip)
+                        database.addRenter(zip_code, city, street, building, floor, door, fname, lname, email, licence,
+                                           sqlDate, mobilePhone, homePhone, countryID);
 
-                }
+                    }
 
-                break;
+                    break;
 
-            default:
+                default:
 
-                break;
+                    break;
 
-        }
+            }
+
+        Address address = new Address(street, building, floor, door, zip_code, city, country);
+        renter.setAddresses(address);
+        renters.add(renter);
 
     }  // end of add method
-
 
 
     public void remove() throws SQLException {
@@ -276,6 +309,7 @@ public class RenterMethods {
                     System.out.println("Invalid country name. Try again: ");
                     country = input.next();
                 }
+
                 database.updateAddress(street, building, floor, door, renter_id, zip_code, city, country);
                 //displayRenters();
                 break;

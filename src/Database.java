@@ -12,8 +12,6 @@ public class Database {
     String url = "jdbc:mysql://localhost:3306/kailua";
     String user = "dimk";
     String password = "dimk1234!";
-    Connection myConn = getConnection(url, user, password);
-
 
     // @Ilias: move them to the contract methods
     private static ArrayList<Contract> contracts;
@@ -32,6 +30,7 @@ public class Database {
     public ArrayList<Renter> loadRenters() {
         ArrayList<Renter> renters = new ArrayList<>();
         try {
+            Connection myConn = getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
                     "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
@@ -65,6 +64,7 @@ public class Database {
                 Renter renter = new Renter(renterID, first_name, last_name, telephone, address, email, driver_license_number, since_data);
                 renters.add(renter);
             }
+            myConn.close();
         } catch (SQLException | ParseException e) {
             e.printStackTrace();
         }
@@ -75,6 +75,8 @@ public class Database {
                           String fname, String lname, String email, String licence, Date sinceDate, String mobilePhone,
                           String homePhone) {
         try {
+            Connection myConn = getConnection(url, user, password);
+
             String queryCountry = "INSERT INTO country (name) " +
                     "VALUES (?)";
 
@@ -125,7 +127,6 @@ public class Database {
 
             System.out.println("\n\nThe entry has been recorded.");
 
-            //close connection
             myConn.close();
 
         } catch (SQLException exc) {
@@ -135,6 +136,8 @@ public class Database {
 
     public void removeRenter(int renterID) {
         try {
+            Connection myConn = getConnection(url, user, password);
+
             PreparedStatement pst1 = null;
             PreparedStatement pst2 = null;
             PreparedStatement pst3 = null;
@@ -197,6 +200,7 @@ public class Database {
         ArrayList<Integer> result = new ArrayList<>();
 
         try {
+            Connection myConn = getConnection(url, user, password);
 
             Statement myStmt = myConn.createStatement();
 
@@ -220,6 +224,7 @@ public class Database {
                     result.add(renterID);
                 }
             }
+            myConn.close();
 
         } catch (SQLException e) {
 
@@ -229,28 +234,37 @@ public class Database {
         return result;
     }
 
-    public int checkRenterID() throws SQLException {
-
-        Statement maxRenterID = myConn.createStatement();
-
-        String maxRenterIDString = "SELECT MAX(renterID) FROM renter;";
-
-        ResultSet rs = maxRenterID.executeQuery(maxRenterIDString);
+    public int checkRenterID() {
 
         int i = 0;
 
-        while (rs.next()) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            Statement maxRenterID = myConn.createStatement();
 
-            i = Integer.parseInt(rs.getString(1));
+            String maxRenterIDString = "SELECT MAX(renterID) FROM renter;";
 
+            ResultSet rs = maxRenterID.executeQuery(maxRenterIDString);
+
+            while (rs.next()) {
+
+                i = Integer.parseInt(rs.getString(1));
+
+            }
+
+            myConn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        //System.out.println(i);
+
         return i;
     }
 
     public void updateLicense(String newDriverLicenseNumber, int renter_id) {
 
         try {
+            Connection myConn = getConnection(url, user, password);
 
             PreparedStatement updateDriverLicenseNumber = null;
 
@@ -268,6 +282,8 @@ public class Database {
 
             System.out.println("Update complete.");
 
+            myConn.close();
+
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -277,6 +293,8 @@ public class Database {
 
     public void updateMobilePhone(String newMobilePhone, int renter_id) {
         try {
+            Connection myConn = getConnection(url, user, password);
+
             PreparedStatement updateMobilePhone = null;
             String updateMobilePhoneString = "UPDATE phone_numbers \n" +
                     "SET mobile_phone_number = ?" +
@@ -302,6 +320,8 @@ public class Database {
 
     public void updateHomePhone(String newHomePhone, int renter_id) {
         try {
+            Connection myConn = getConnection(url, user, password);
+
             PreparedStatement updateHomePhone = null;
 
             String updateHomePhoneString = "UPDATE phone_numbers \n" +
@@ -328,6 +348,8 @@ public class Database {
 
     public void updateAddress(String street, int building, int floor, String door, int renter_id,
                               String zip_code, String city, String country) throws SQLException {
+
+        Connection myConn = getConnection(url, user, password);
 
         PreparedStatement safeUpdate = null;
 
@@ -389,34 +411,20 @@ public class Database {
         myConn.close();
     }
 
-    public HashSet<Integer> populateZipIdHashSet() {
 
-        HashSet<Integer> zipIDs = new HashSet<Integer>();
-
-        try {
-            Statement myStmt = myConn.createStatement();
-            ResultSet myRs = myStmt.executeQuery("SELECT zipID FROM zip");;
-            while (myRs.next()) {
-            zipIDs.add(myRs.getInt("zipID"));
-            }
-        } catch (SQLException e) {
-        e.printStackTrace();
-        }
-
-        return zipIDs;
-
-    }
-
-    public HashSet<String> populateZipHashSet() {
+    public HashSet<String> loadZips() {
 
         HashSet<String> zips = new HashSet<>();
 
         try {
+            Connection myConn = getConnection(url, user, password);
+
             Statement myStmt = myConn.createStatement();
             ResultSet myRs = myStmt.executeQuery("SELECT zip FROM zip");;
             while(myRs.next()) {
                 zips.add(myRs.getString("zip"));
             }
+            myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -425,16 +433,22 @@ public class Database {
 
     }
 
-    public HashSet<String> populateCountriesHashSet() {
+    public HashSet<String> loadCountries() {
 
         HashSet<String> countries = new HashSet<>();
 
         try {
+            Connection myConn = getConnection(url, user, password);
+
             Statement myStmt = myConn.createStatement();
             ResultSet myRs = myStmt.executeQuery("SELECT name FROM country");
             while(myRs.next()) {
                 countries.add(myRs.getString("name"));
             }
+
+            myRs.close();
+            myStmt.close();
+            myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -443,35 +457,6 @@ public class Database {
 
     }
 
-    public void displayZip() {
-        Statement myStmt = null;
-        try {
-            myStmt = myConn.createStatement();
-            String sql = "SELECT zipID, zip, city, country.name\n" +
-                    "FROM zip\n" +
-                    "JOIN country USING (countryID)\n" +
-                    "ORDER BY zip;";
-
-            ResultSet rs = myStmt.executeQuery(sql);
-
-            System.out.println();
-
-            System.out.printf("%-15s %-15s %-25s %-25s\n", "Zip ID", "Zip Code", "City", "Country");
-
-            for (int i = 0; i < 65; i++) {
-                System.out.print("-");
-            }
-
-            System.out.println();
-
-            while (rs.next()) {
-                System.out.printf("%-15s %-15s %-25s %-25s\n", rs.getString(1),
-                        rs.getString(2), rs.getString(3), rs.getString(4));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     // insert renter with known zip code (tables affected: renter, phone_numbers, address)
     public void addRenter(String fname, String lname, String mobilePhone, String homePhone, String email,
@@ -479,6 +464,7 @@ public class Database {
                           int zipID) {
 
         try {
+            Connection myConn = getConnection(url, user, password);
 
             String query = "INSERT INTO address (street, building, floor, door, zipID) " +
                     "VALUES (?, ?, ?, ?, ?)";
@@ -511,8 +497,7 @@ public class Database {
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
 
-            System.out.println("Added!!!!");
-
+            myConn.close();
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -528,6 +513,7 @@ public class Database {
                           String mobilePhone, String homePhone, int countryID) {
 
         try {
+            Connection myConn = getConnection(url, user, password);
 
             String queryZip = "INSERT INTO zip (zip, city, countryID) " +
                     "VALUES (?, ?, ?)";
@@ -569,6 +555,8 @@ public class Database {
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
 
+            myConn.close();
+
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -584,6 +572,7 @@ public class Database {
         int countryID = 0;
 
         try {
+            Connection myConn = getConnection(url, user, password);
 
             PreparedStatement myStmt = (PreparedStatement) myConn.createStatement();
 
@@ -596,12 +585,58 @@ public class Database {
             while (rs.next()) {
                 countryID = rs.getInt(1);
             }
-
+            myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return countryID;
     }
+
+    public ArrayList<String> getCityCountryName(String zip_code) {
+        ArrayList<String> result = new ArrayList<String>();
+        try {
+            Connection myConn = getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+            String sql = "SELECT city, country.name\n" +
+                    "FROM country\n" +
+                    "JOIN zip USING (countryID)\n" +
+                    "WHERE zip = \"" + zip_code + "\"\n" +
+                    "LIMIT 1;";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+            while (rs.next()) {
+                result.add(rs.getString("city"));
+                result.add(rs.getString("name"));
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public int getZipID(String zip_code) {
+        int result = 0;
+        try {
+            Connection myConn = getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+            String sql = "SELECT zipID\n" +
+                    "FROM zip\n" +
+                    "WHERE zip = \"" + zip_code + "\"\n" +
+                    "LIMIT 1;";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+            while (rs.next()) {
+                result = rs.getInt("zipID");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
 }
