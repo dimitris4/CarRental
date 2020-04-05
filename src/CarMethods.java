@@ -433,7 +433,7 @@ public class CarMethods {
             "JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON c.rental_typeID = r.rental_typeID" +
                 //where not(end date>start date   start date<end date) so car is available at that time (according to contracts)
                 // NOT IN - to select also cars without contract
-            " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT IN (SELECT car_registration_number FROM contract))";
+            " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT IN (SELECT car_registration_number FROM contract)) && c.is_available = 1";
         ResultSet myRs = myStmt.executeQuery(query);
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
@@ -466,7 +466,7 @@ public class CarMethods {
             registration_number = scanner.next();
         }
         if(confirmation("make unavailable")==1){
-            update("UPDATE Car SET is_available=0 WHERE car_registration_number = '" + registration_number + "'");
+            update("UPDATE Car SET is_available=0 WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been made unavailable");
             for (int i=0;i< database.getCarList().size();i++) {
                 if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
@@ -477,7 +477,28 @@ public class CarMethods {
             System.out.println("Operation Cancelled.");
         }
         System.out.println("Returning to the menu.");
+    }
 
+    public void makeAvailable() throws SQLException {
+        HashSet<String> carRegNo = displayCars("WHERE is_available = 0");
+        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        String registration_number = scanner.next();
+        while (!carRegNo.contains(registration_number) || registration_number.equals("0")){
+            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            registration_number = scanner.next();
+        }
+        if(confirmation("make available")==1){
+            update("UPDATE Car SET is_available=1 WHERE registration_number = '" + registration_number + "'");
+            System.out.println("Car has been made unavailable");
+            for (int i=0;i< database.getCarList().size();i++) {
+                if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
+                    database.getCarList().get(i).setAvailable(true);
+                }
+            }
+        } else {
+            System.out.println("Operation Cancelled.");
+        }
+        System.out.println("Returning to the menu.");
     }
 
     //ID 1 - Luxury

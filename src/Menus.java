@@ -58,7 +58,9 @@ public class Menus {
             System.out.println("|   [2] Edit Car                 |");
             System.out.println("|   [3] Delete Car               |");
             System.out.println("|   [4] Display Cars             |");
-            System.out.println("|   [5] Return To Main Menu      |");
+            System.out.println("|   [5] Make Available           |");
+            System.out.println("|   [6] Make Unavailable         |");
+            System.out.println("|   [7] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
@@ -66,7 +68,7 @@ public class Menus {
 
             System.out.print("Select Option: ");
 
-            int selection = Input.checkInt(0, 5);
+            int selection = Input.checkInt(0, 7);
 
             switch (selection) {
                 case 1:
@@ -92,6 +94,14 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 5:
+                    OurApp.getController().makeAvailable();
+                    pressAnyKey();
+                    break;
+                case 6:
+                    OurApp.getController().makeUnavailable();
+                    pressAnyKey();
+                    break;
+                case 7:
                     System.out.println("\n");
                     Thread.sleep(300);
                     mainMenu();

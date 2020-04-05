@@ -22,5 +22,7 @@ public class Controller {
     public void deleteCar() throws SQLException {carMethods.deleteCar();}
     public void editCar() throws SQLException {carMethods.editCar();}
     public void displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {carMethods.displayAvailableCarsWithinDateRange(startDate,endDate);}
+    public void makeUnavailable() throws SQLException {carMethods.makeUnavailable();}
+    public void makeAvailable() throws SQLException {carMethods.makeAvailable();}
     //public void sendMail(String recipient, String myMessage) throws Exception { renterMethods.sendMail(recipient, myMessage); }
 }
