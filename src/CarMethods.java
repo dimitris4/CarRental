@@ -5,7 +5,7 @@ import static java.sql.DriverManager.getConnection;
 
 public class CarMethods {
 
-    private static Database database = new Database();
+    private static Database database = Database.instance;
     private static Set<String> cars= new HashSet<>();
     private static Set<String> brands= new HashSet<>();
     private static Set<String> models= new HashSet<>();
@@ -476,7 +476,6 @@ public class CarMethods {
         //update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
         update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
         //change registration number in contracts
-        Database database = new Database();
         for (int i = 0; i < database.getContracts().size(); i++){
             if(database.getContracts().get(i).getCar().getRegistration_number().equals(registration_number)){
                 database.getContracts().get(i).getCar().setRegistration_number(new_registration_number);
