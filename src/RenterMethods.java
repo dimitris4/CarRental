@@ -212,32 +212,23 @@ public class RenterMethods {
 
     public void remove() throws SQLException {
 
-        System.out.println("The program allows you to delete only renters who do not have any contract at the moment.");
-
+        displayRenters();
+        System.out.println("\n*The program allows you to delete only renters who do not have any contract at the moment.*");
         System.out.print("Select renter id: ");
 
         int max = database.checkRenterID();
-
         int renterID = Input.checkInt(1, max);
 
         if (database.findRemovableRenters().size() == 0) {
-
             System.out.println("All renters have contracts. You cannot delete any.");
-
             return;
-
         }
 
         if (database.findRemovableRenters().contains(renterID)) {
-
             database.removeRenter(renterID);
-
         } else {
-
             System.out.println("The renter you selected cannot be deleted.");
-
         }
-
     }
 
 
@@ -285,28 +276,28 @@ public class RenterMethods {
                 System.out.print("Door (th/tv/mf/-): ");
                 String door = input.next();
                 while(!door.matches("(^(th)?|(tv)?|(mf)?|(-)?(\\s)?$)")){
-                    System.out.println("Invalid Input. Try Again: ");
+                    System.out.print("Invalid input. Try Again: ");
                     door = input.next();
                 }
 
                 System.out.print("Zip code: ");
                 String zip_code = input.next();
                 while(!zip_code.matches("[0-9]+")){
-                    System.out.print("Invalid Input. Try Again: ");
+                    System.out.print("Invalid input. Try again: ");
                     zip_code = input.next();
                 }
 
                 System.out.print("City: ");
-                String city = input.nextLine();
+                String city = input.next();
                 while(!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
-                    System.out.println("Invalid City. Try Again: ");
-                    city = input.nextLine();
+                    System.out.print("Invalid input. Try Again: ");
+                    city = input.next();
                 }
 
                 System.out.print("Country: ");
                 String country = input.next();
                 while(!Input.isCountryName(country)) {
-                    System.out.println("Invalid country name. Try again: ");
+                    System.out.println("Invalid input. Try again: ");
                     country = input.next();
                 }
 

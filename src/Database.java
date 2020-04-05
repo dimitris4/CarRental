@@ -201,7 +201,6 @@ public class Database {
 
         try {
             Connection myConn = getConnection(url, user, password);
-
             Statement myStmt = myConn.createStatement();
 
             String sql = "SELECT renterID\n" +
@@ -212,13 +211,9 @@ public class Database {
                     "WHERE renterID NOT IN (SELECT renterID FROM contract WHERE CURRENT_DATE() BETWEEN contract.start_time AND contract.end_time)";
 
             ResultSet rs = myStmt.executeQuery(sql);
-
             if (!rs.next()) {
-
                 return result;
-
             } else {
-
                 while (rs.next()) {
                     int renterID = Integer.parseInt(rs.getString(1));
                     result.add(renterID);
@@ -227,10 +222,9 @@ public class Database {
             myConn.close();
 
         } catch (SQLException e) {
-
             e.printStackTrace();
         }
-        System.out.println(result);
+        //System.out.println(result);
         return result;
     }
 
@@ -363,16 +357,21 @@ public class Database {
         PreparedStatement updateZip = null;
         PreparedStatement updateCountry = null;
 
-        String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?" +
-                "WHERE addressID IN (SELECT addressID FROM renter WHERE renterID = ?)";
+        String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
+                "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
 
-        String updateZipString = "UPDATE zip SET zip = ?, city = ?" +
-                "WHERE zipID IN " +
-                "(SELECT zipID FROM address JOIN renter WHERE renterID = ?)";
+        String updateZipString = "UPDATE zip SET zip = ?, city = ?\n" +
+                "WHERE zipID = \n" +
+                "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
 
-        String updateCountryString = "UPDATE country SET country.name = ?" +
-                "WHERE countryID IN " +
-                "(SELECT countryID FROM zip JOIN address JOIN renter WHERE renterID = ?)";
+        String updateCountryString = "UPDATE country SET NAME = ?\n" +
+                "WHERE countryID = (\n" +
+                "  SELECT countryID FROM (\n" +
+                "    SELECT countryID FROM country JOIN zip USING (countryID) \n" +
+                "    JOIN address USING (zipID)\n" +
+                "\tJOIN renter USING (addressID) WHERE renterID = ?\n" +
+                "  ) as t\n" +
+                ");";
 
         updateAddress = myConn.prepareStatement(updateAddressString);
 
