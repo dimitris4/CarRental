@@ -1,4 +1,5 @@
 import java.sql.SQLException;
+import java.util.Date;
 
 public class Controller {
 
@@ -20,5 +21,6 @@ public class Controller {
     public void addCar() throws SQLException {carMethods.addCar();}
     public void deleteCar() throws SQLException {carMethods.deleteCar();}
     public void editCar() throws SQLException {carMethods.editCar();}
+    public void displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {carMethods.displayAvailableCarsWithinDateRange(startDate,endDate);}
     //public void sendMail(String recipient, String myMessage) throws Exception { renterMethods.sendMail(recipient, myMessage); }
 }

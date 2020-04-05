@@ -1,3 +1,8 @@
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Menus {
@@ -77,6 +82,12 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 4:
+                    //String end = "2020-01-31";
+                    //String start = "2020-02-03";
+                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+                    //Date endDate = dateFormat.parse(end);
+                    //Date startDate = dateFormat.parse(start);
+                    //OurApp.getController().displayAvailableCarsWithinDateRange(startDate,endDate);
                     OurApp.getController().displayCars();
                     pressAnyKey();
                     break;
@@ -163,24 +174,22 @@ public class Menus {
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            System.out.print("Select Option: ");
 
             int selection = Input.checkInt(0, 5);
 
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    rm.add();
+                    //OurApp.getController().addContract();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    rm.update();
+                   // OurApp.getController().editContract();
                     pressAnyKey();
                     break;
                 case 3:
                     //Main.getController().deleteRenter();
-                    rm.remove();
+                   // cm.remove();
                     pressAnyKey();
                     break;
                 case 4:

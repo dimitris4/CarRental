@@ -1,5 +1,8 @@
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -410,7 +413,44 @@ public class CarMethods {
         return carRegNo;
     }
 
-    public void displayAvailableCarsWithinDateRange() {
+    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
+        if (startDate.compareTo(endDate) < 0){ //reverse the order if start>end
+            Date tempDate = startDate;
+            startDate = endDate;
+            endDate = tempDate;
+        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        String sDate = dateFormat.format(startDate);
+        String eDate = dateFormat.format(endDate);
+        HashSet<String> availableCars =new HashSet<>();
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
+            "FROM Car c " +
+            "LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " + //select all cars even without contract
+            "JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID " +
+            "JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON c.rental_typeID = r.rental_typeID" +
+                //where not(end date>start date   start date<end date) so car is available at that time (according to contracts)
+                // NOT IN - to select also cars without contract
+            " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT IN (SELECT car_registration_number FROM contract))";
+        ResultSet myRs = myStmt.executeQuery(query);
+        if (myRs != null) {
+            System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
+                    "Fuel Type", "Model", "Rental Type", "Description");
+            for (int i = 0; i < 210; i++) {
+                System.out.print("-");
+            }
+            System.out.println();
+            while (myRs.next()) {
+                System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),myRs.getString(2),
+                        myRs.getString(3),myRs.getString(4),myRs.getString(5),myRs.getString(6),
+                        myRs.getString(7));
+                availableCars.add(myRs.getString(1));
+            }
+        }
+        closeConnection(myConn,myStmt,myRs);
+        return availableCars;
     }
 
     public void displayUnavailableCars() throws SQLException{
