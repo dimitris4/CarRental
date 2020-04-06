@@ -1,5 +1,6 @@
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashSet;
 
 public class Controller {
 
@@ -21,9 +22,24 @@ public class Controller {
     public void addCar() throws SQLException {carMethods.addCar();}
     public void deleteCar() throws SQLException {carMethods.deleteCar();}
     public void editCar() throws SQLException {carMethods.editCar();}
-    public void displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {carMethods.displayAvailableCarsWithinDateRange(startDate,endDate);}
+    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
+        return carMethods.displayAvailableCarsWithinDateRange(startDate,endDate);
+    }
     public void makeUnavailable() throws SQLException {carMethods.makeUnavailable();}
     public void makeAvailable() throws SQLException {carMethods.makeAvailable();}
+
+    public void makeUnavailable(String registration_number) throws SQLException {
+        carMethods.makeUnavailable(registration_number);
+    }
+
+    public void sendMail(String recipient, String myMessage) throws Exception { contractMethods.sendMail(recipient, myMessage); }
+
+    public void searchContractByStartDate() {contractMethods.searchContractsByStartDate();}
+    public void searchContractByEndDate() {contractMethods.searchContractsByEndDate();}
+    public void searchContractsByRegNo() {contractMethods.searchContractsByRegNo();}
+    public void deleteContract() throws SQLException {contractMethods.deleteContract();}
+    public void addContract() throws Exception {contractMethods.addContract();}
+    public void endContract() throws SQLException{contractMethods.endContract();}
 
 
     //public void sendMail(String recipient, String myMessage) throws Exception { renterMethods.sendMail(recipient, myMessage); }

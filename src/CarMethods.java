@@ -321,9 +321,9 @@ public class CarMethods {
         ResultSet myRs;
         HashSet<Integer> models = new HashSet<>();
         if (brandID==-1) {
-            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name,\" \" ,m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID");
+            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name, ' ', m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID");
         } else {
-            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name,\" \" ,m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID WHERE m.brandID =" + brandID);
+            myRs = myStmt.executeQuery("SELECT m.modelID, CONCAT(b.name, ' ', m.name) FROM Model m JOIN Brand b ON m.brandID=b.brandID WHERE m.brandID =" + brandID);
         }
 
         if (myRs != null) {
@@ -388,8 +388,10 @@ public class CarMethods {
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
         Statement myStmt = (Statement) db.get(1);
-        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
-                "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON " +
+        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name, ' '," +
+                " m.name), r.name, r.description " +
+                "FROM Car c JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID JOIN Fuel f " +
+                "ON c.fuelID = f.fuelID JOIN rental_types r ON " +
                 "c.rental_typeID = r.rental_typeID";
         if (condition!=null){
             query = query + " " + condition; //adds where clause for conditions
@@ -426,14 +428,18 @@ public class CarMethods {
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
         Statement myStmt = (Statement) db.get(1);
-        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name,\" \",m.name), r.name, r.description " +
+        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name, ' '," +
+                " m.name), r.name, r.description " +
                 "FROM Car c " +
-                "LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " + //select all cars even without contract
+                "LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " + //select all cars even
+                // without contract
                 "JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID " +
                 "JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON c.rental_typeID = r.rental_typeID" +
-                //where not(end date>start date   start date<end date) so car is available at that time (according to contracts)
+                //where not(end date>start date   start date<end date) so car is available at that time (according to
+                // contracts)
                 // NOT IN - to select also cars without contract
-                " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT IN (SELECT car_registration_number FROM contract)) && c.is_available = 1";
+                " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT " +
+                "IN (SELECT car_registration_number FROM contract)) && c.is_available = 1";
         ResultSet myRs = myStmt.executeQuery(query);
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
@@ -499,6 +505,17 @@ public class CarMethods {
             System.out.println("Operation Cancelled.");
         }
         System.out.println("Returning to the menu.");
+    }
+
+    public void makeUnavailable(String registration_number) throws SQLException {
+        if(confirmation("make unavailable")==1){
+            update("UPDATE Car SET is_available = 0 WHERE registration_number = '" + registration_number + "'");
+            for (int i=0; i<database.getCarList().size(); i++) {
+                if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
+                    database.getCarList().get(i).setAvailable(false);
+                }
+            }
+        }
     }
 
     //ID 1 - Luxury

@@ -1,6 +1,9 @@
 //import javax.mail.*;
 //import javax.mail.internet.InternetAddress;
 //import javax.mail.internet.MimeMessage;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -174,14 +177,6 @@ public class ContractMethods {
             }
         }
 
-        HashSet<String> carRegNo = OurApp.getController().displayCars(" WHERE is_available = 1");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
-        String registration_number = input.next();
-        while (!carRegNo.contains(registration_number) || registration_number.equals(0)) {
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
-            registration_number = input.next();
-        }
-
         System.out.print("Enter start date: ");
         String startDate = input.next();
         Date stDate = Date.valueOf(startDate);
@@ -189,6 +184,14 @@ public class ContractMethods {
         System.out.print("Enter end date: ");
         String endDate = input.next();
         Date eDate = Date.valueOf(endDate);
+
+        HashSet<String> carRegNo = OurApp.getController().displayAvailableCarsWithinDateRange(stDate, eDate);
+        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        String registration_number = input.next();
+        while (!carRegNo.contains(registration_number) || registration_number.equals(0)) {
+            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            registration_number = input.next();
+        }
 
         System.out.print("Enter max Km: ");
         int maxKm = Input.checkInt(1, 500);
@@ -205,7 +208,7 @@ public class ContractMethods {
         pst.setInt(6, actualKm);
         pst.executeUpdate();
         database.getContracts().clear();
-        OurApp.getController().makeUnavailable2(registration_number);
+        OurApp.getController().makeUnavailable(registration_number);
         OurApp.getController().initiateContractList();
 
         for (Contract contract : database.getContracts()) {
@@ -324,7 +327,7 @@ public class ContractMethods {
         return myConn;
     }
 
-    /*public static void sendMail(String recipient, String myMessage) throws Exception{
+    public static void sendMail(String recipient, String myMessage) throws Exception{
         System.out.println("Preparing to send contract to client...");
         Properties properties = new Properties();
 
@@ -359,7 +362,7 @@ public class ContractMethods {
             e.printStackTrace();
         }
         return null;
-    }*/
+    }
 
 
 }

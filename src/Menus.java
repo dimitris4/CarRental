@@ -173,7 +173,7 @@ public class Menus {
             System.out.println("|           CONTRACTS            |");
             System.out.println("**********************************");
             System.out.println("|   [1] Add Contract             |");
-            System.out.println("|   [2] Edit Contract            |");
+            System.out.println("|   [2] End Contract             |");
             System.out.println("|   [3] Delete Contract          |");
             System.out.println("|   [4] Display Contracts        |");
             System.out.println("|   [5] Return To Main Menu      |");
@@ -187,24 +187,22 @@ public class Menus {
             switch (selection) {
                 case 1:
                     //Main.getController().addRenter();
-                    rm.add();
+                    OurApp.getController().addContract();
                     pressAnyKey();
+                    OurApp.getController().initiateContractList();
                     break;
                 case 2:
                     //Main.getController().editRenter();
-                    rm.update();
+                    OurApp.getController().endContract();
                     pressAnyKey();
                     break;
                 case 3:
                     //Main.getController().deleteRenter();
-                    rm.remove();
+                    OurApp.getController().deleteContract();
                     pressAnyKey();
                     break;
                 case 4:
-                    OurApp.getController().displayActiveContracts();
-                    System.out.println();
-                    OurApp.getController().displayOldContracts();
-                    //contractsMenu();
+                    displayContractMenu();
                     break;
                 case 5:
                     System.out.println("\n");
@@ -215,6 +213,65 @@ public class Menus {
                     System.exit(0);
                     break;
 
+            }
+        }
+    }
+
+    public void displayContractMenu() throws Exception {
+        while (true) {
+            System.out.println("*****************************************");
+            System.out.println("|           DISPLAY CONTRACTS           |");
+            System.out.println("*****************************************");
+            System.out.println("|   [1] Display Active Contracts        |");
+            System.out.println("|   [2] Display Old Contracts           |");
+            System.out.println("|   [3] Search Contracts By Start Date  |");
+            System.out.println("|   [4] Search Contracts By End Date    |");
+            System.out.println("|   [5] Search Contracts By Reg. No     |");
+            System.out.println("|   [6] Return To Contract Menu         |");
+            System.out.println("|   [7] Return To Main Menu             |");
+            System.out.println("|   [0] Close Program                   |");
+            System.out.println("*****************************************");
+            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            int selection = Input.checkInt(0, 7);
+            switch (selection) {
+                case 1:
+                    OurApp.getController().displayActiveContracts();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 2:
+                    OurApp.getController().displayOldContracts();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 3:
+                    OurApp.getController().searchContractByStartDate();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 4:
+                    OurApp.getController().searchContractByEndDate();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 5:
+                    OurApp.getController().searchContractsByRegNo();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 6:
+                    System.out.println("\n");
+                    Thread.sleep(300);
+                    contractMenu();
+                    break;
+                case 7:
+                    System.out.println("\n");
+                    Thread.sleep(300);
+                    mainMenu();
+                    break;
+                case 0:
+                    System.exit(0);
+                    break;
             }
         }
     }

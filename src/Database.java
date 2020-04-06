@@ -559,11 +559,11 @@ public class Database {
         try {
             Connection myConn = getConnection(url, user, password);
 
-            PreparedStatement myStmt = (PreparedStatement) myConn.createStatement();
+            Statement myStmt = myConn.createStatement();
 
             String sql = "SELECT countryID\n" +
                     "FROM country\n" +
-                    "WHERE country.name = \"" + country + "\"\n" +
+                    "WHERE country.name = '" + country + "'\n" +
                     "LIMIT 1;";
 
             ResultSet rs = myStmt.executeQuery(sql);
@@ -586,7 +586,7 @@ public class Database {
             String sql = "SELECT city, country.name\n" +
                     "FROM country\n" +
                     "JOIN zip USING (countryID)\n" +
-                    "WHERE zip = \"" + zip_code + "\"\n" +
+                    "WHERE zip = '" + zip_code + "'\n" +
                     "LIMIT 1;";
 
             ResultSet rs = myStmt.executeQuery(sql);
@@ -608,7 +608,7 @@ public class Database {
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT zipID\n" +
                     "FROM zip\n" +
-                    "WHERE zip = \"" + zip_code + "\"\n" +
+                    "WHERE zip = '" + zip_code + "'\n" +
                     "LIMIT 1;";
 
             ResultSet rs = myStmt.executeQuery(sql);
