@@ -4,43 +4,38 @@ public class Menus {
 
     Scanner scanner = new Scanner(System.in);
 
-    //accessing the Main Menu
     public void mainMenu() throws Exception {
 
-        //a delay time is added after certain operations
-        System.out.println("***************************");
-        System.out.println("|        ΜΑΙΝ MENU        |");
-        System.out.println("***************************");
-        System.out.println("|    Select Operation:    |");
-        System.out.println("|   [1] Cars              |");
-        System.out.println("|   [2] Renters           |");
-        System.out.println("|   [3] Contracts         |");
-        System.out.println("|   [0] Close Program     |");
-        System.out.println("***************************\n");
+        while (true) {
 
-        boolean isWorking = true;
-        while (isWorking) {
-            System.out.print("Select Option: ");
-            String answer = scanner.next();
-            Thread.sleep(300);
-            switch (answer) {
-                case "1":
+            System.out.println("**********************************");
+            System.out.println("|           MAIN MENU            |");
+            System.out.println("**********************************");
+            System.out.println("|   [1] Cars                     |");
+            System.out.println("|   [2] Renters                  |");
+            System.out.println("|   [3] Contracts                |");
+            System.out.println("|   [0] Close Program            |");
+            System.out.println("**********************************");
+
+            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+
+            int selection = Input.checkInt(0, 3);
+
+            switch (selection) {
+                case 1:
                     carMenu();
                     break;
-                case "2":
-                    rentersMenu();
+                case 2:
+                    renterMenu();
                     break;
-                case "3":
-                    contractsMenu();
+                case 3:
+                    contractMenu();
+                    pressAnyKey();
                     break;
-                case "0":
-                    System.out.println("System closing");
-                    Thread.sleep(1000);
+                case 0:
                     System.exit(0);
                     break;
-                default:
-                    System.out.println("Choice must be a value between \"0\" and \"3\".\n");
-                    break;
+
             }
         }
     }
@@ -48,163 +43,242 @@ public class Menus {
 
     //accessing the Car Menu
     public void carMenu() throws Exception {
-        System.out.println("**********************************");
-        System.out.println("|             CARS               |");
-        System.out.println("**********************************");
-        System.out.println("|   [1] Add Car                  |");
-        System.out.println("|   [2] Edit Car                 |");
-        System.out.println("|   [3] Delete Car               |");
-        System.out.println("|   [4] Make Car Unavailable     |");
-        System.out.println("|   [5] Display Cars             |");
-        System.out.println("|   [6] Return To Previous Menu  |");
-        System.out.println("|   [0] Close Program            |");
-        System.out.println("**********************************");
+        while (true) {
+            System.out.println("**********************************");
+            System.out.println("|             CARS               |");
+            System.out.println("**********************************");
+            System.out.println("|   [1] Add Car                  |");
+            System.out.println("|   [2] Edit Car                 |");
+            System.out.println("|   [3] Delete Car               |");
+            System.out.println("|   [4] Display Cars             |");
+            System.out.println("|   [5] Make Available           |");
+            System.out.println("|   [6] Make Unavailable         |");
+            System.out.println("|   [7] Return To Main Menu      |");
+            System.out.println("|   [0] Close Program            |");
+            System.out.println("**********************************");
 
-        boolean isTrue = true;
+            CarMethods cm = new CarMethods();
 
-        while (isTrue) {
             System.out.print("Select Option: ");
 
-            String selection = scanner.next();
+            int selection = Input.checkInt(0, 7);
 
             switch (selection) {
-                case "1":
-                    //Main.getController().addCar();
-                    carMenu();
+                case 1:
+                    OurApp.getController().addCar();
+                    pressAnyKey();
                     break;
-                case "2":
-                    //Main.getController().editCar();
-                    carMenu();
+                case 2:
+                    OurApp.getController().editCar();
+                    pressAnyKey();
                     break;
-                case "3":
-                    //Main.getController().deleteCar();
-                    carMenu();
+                case 3:
+                    OurApp.getController().deleteCar();
+                    pressAnyKey();
                     break;
-                case "4":
-                    //Main.getController().makeUnav();
-                    carMenu();
+                case 4:
+                    //String end = "2020-01-31";
+                    //String start = "2020-02-03";
+                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+                    //Date endDate = dateFormat.parse(end);
+                    //Date startDate = dateFormat.parse(start);
+                    //OurApp.getController().displayAvailableCarsWithinDateRange(startDate,endDate);
+                    OurApp.getController().displayCars();
+                    pressAnyKey();
                     break;
-                case "5":
-                    //Main.getController().displayCars();
-                    carMenu();
+                case 5:
+                    OurApp.getController().makeAvailable();
+                    pressAnyKey();
                     break;
-                case "6":
+                case 6:
+                    OurApp.getController().makeUnavailable();
+                    pressAnyKey();
+                    break;
+                case 7:
                     System.out.println("\n");
                     Thread.sleep(300);
                     mainMenu();
                     break;
-                case "0":
+                case 0:
                     System.exit(0);
                     break;
-                default:
-                    System.out.println("Choice must be a value between \"0\" and \"6\".\n");
-                    break;
+
             }
         }
     }
 
+
     //accessing the Renters Menu
-    public void rentersMenu() throws Exception {
-        System.out.println("**********************************");
-        System.out.println("|            RENTERS             |");
-        System.out.println("**********************************");
-        System.out.println("|   [1] Add Renter               |");
-        System.out.println("|   [2] Edit Renter              |");
-        System.out.println("|   [3] Delete Renter            |");
-        System.out.println("|   [4] Display Renters          |");
-        System.out.println("|   [5] Return To Previous Menu  |");
-        System.out.println("|   [0] Close Program            |");
-        System.out.println("**********************************");
+    public void renterMenu() throws Exception {
 
-        boolean isTrue = true;
+        while (true) {
 
-        while (isTrue) {
+            System.out.println("**********************************");
+            System.out.println("|            RENTERS             |");
+            System.out.println("**********************************");
+            System.out.println("|   [1] Add Renter               |");
+            System.out.println("|   [2] Edit Renter              |");
+            System.out.println("|   [3] Delete Renter            |");
+            System.out.println("|   [4] Display Renters          |");
+            System.out.println("|   [5] Return To Main Menu      |");
+            System.out.println("|   [0] Close Program            |");
+            System.out.println("**********************************");
+
+            RenterMethods rm = new RenterMethods();
+
             System.out.print("Select Option: ");
 
-            String selection = scanner.next();
+            int selection = Input.checkInt(0, 5);
 
             switch (selection) {
-                case "1":
+                case 1:
                     //Main.getController().addRenter();
-                    rentersMenu();
+                    rm.add();
+                    pressAnyKey();
                     break;
-                case "2":
+                case 2:
                     //Main.getController().editRenter();
-                    rentersMenu();
+                    rm.update();
+                    pressAnyKey();
                     break;
-                case "3":
+                case 3:
                     //Main.getController().deleteRenter();
-                    rentersMenu();
+                    rm.remove();
+                    pressAnyKey();
                     break;
-                case "4":
+                case 4:
                     //Main.getController().displayRenters();
-                    rentersMenu();
+                    rm.displayRenters();
+                    pressAnyKey();
                     break;
-                case "5":
+                case 5:
                     System.out.println("\n");
                     Thread.sleep(300);
                     mainMenu();
                     break;
-                case "0":
+                case 0:
                     System.exit(0);
                     break;
-                default:
-                    System.out.println("Choice must be a value between \"0\" and \"5\".\n");
-                    break;
+
             }
         }
     }
 
     //accessing the Contracts Menu
-    public void contractsMenu() throws Exception {
-        System.out.println("**********************************");
-        System.out.println("|           CONTRACTS            |");
-        System.out.println("**********************************");
-        System.out.println("|   [1] New Contract             |");
-        System.out.println("|   [2] End Contract             |");
-        System.out.println("|   [3] Edit Contract            |");
-        System.out.println("|   [4] Display Contracts        |");
-        System.out.println("|   [5] Return To Previous Menu  |");
-        System.out.println("|   [0] Close Program            |");
-        System.out.println("**********************************");
+    public void contractMenu() throws Exception {
 
-        boolean isTrue = true;
+        while (true) {
 
-        while (isTrue) {
-            System.out.print("Select Option: ");
+            System.out.println("**********************************");
+            System.out.println("|           CONTRACTS            |");
+            System.out.println("**********************************");
+            System.out.println("|   [1] Add Contract             |");
+            System.out.println("|   [2] End Contract             |");
+            System.out.println("|   [3] Delete Contract          |");
+            System.out.println("|   [4] Display Contracts        |");
+            System.out.println("|   [5] Return To Main Menu      |");
+            System.out.println("|   [0] Close Program            |");
+            System.out.println("**********************************");
 
-            String selection = scanner.next();
+            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+
+            int selection = Input.checkInt(0, 5);
 
             switch (selection) {
-                case "1":
-                    //Main.getController().newContract();
-                    contractsMenu();
+                case 1:
+                    //Main.getController().addRenter();
+                    OurApp.getController().addContract();
+                    pressAnyKey();
                     break;
-                case "2":
-                    //Main.getController().endContract();
-                    contractsMenu();
+                case 2:
+                    //Main.getController().editRenter();
+                    OurApp.getController().endContract();
+                    pressAnyKey();
                     break;
-                case "3":
-                    //Main.getController().editContract();
-                    contractsMenu();
+                case 3:
+                    //Main.getController().deleteRenter();
+                    OurApp.getController().deleteContract();
+                    pressAnyKey();
                     break;
-                case "4":
-                    //Main.getController().displayContracts();
-                    contractsMenu();
+                case 4:
+                    displayContractMenu();
                     break;
-                case "5":
+                case 5:
                     System.out.println("\n");
                     Thread.sleep(300);
                     mainMenu();
                     break;
-                case "0":
+                case 0:
                     System.exit(0);
                     break;
-                default:
-                    System.out.println("Choice must be a value between \"0\" and \"5\".\n");
+
+            }
+        }
+    }
+
+    public void displayContractMenu() throws Exception {
+        while (true) {
+            System.out.println("*****************************************");
+            System.out.println("|           DISPLAY CONTRACTS           |");
+            System.out.println("*****************************************");
+            System.out.println("|   [1] Display Active Contracts        |");
+            System.out.println("|   [2] Display Old Contracts           |");
+            System.out.println("|   [3] Search Contracts By Start Date  |");
+            System.out.println("|   [4] Search Contracts By End Date    |");
+            System.out.println("|   [5] Search Contracts By Reg. No     |");
+            System.out.println("|   [6] Return To Contract Menu         |");
+            System.out.println("|   [7] Return To Main Menu             |");
+            System.out.println("|   [0] Close Program                   |");
+            System.out.println("*****************************************");
+            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            int selection = Input.checkInt(0, 7);
+            switch (selection) {
+                case 1:
+                    OurApp.getController().displayActiveContracts();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 2:
+                    OurApp.getController().displayOldContracts();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 3:
+                    OurApp.getController().searchContractByStartDate();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 4:
+                    OurApp.getController().searchContractByEndDate();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 5:
+                    OurApp.getController().searchContractsByRegNo();
+                    pressAnyKey();
+                    displayContractMenu();
+                    break;
+                case 6:
+                    System.out.println("\n");
+                    Thread.sleep(300);
+                    contractMenu();
+                    break;
+                case 7:
+                    System.out.println("\n");
+                    Thread.sleep(300);
+                    mainMenu();
+                    break;
+                case 0:
+                    System.exit(0);
                     break;
             }
         }
+    }
+
+    void pressAnyKey() {
+        System.out.println("Press any key to continue: ");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
     }
 
 }
