@@ -222,13 +222,9 @@ public class Database {
                     "WHERE renterID NOT IN (SELECT renterID FROM contract WHERE CURRENT_DATE() BETWEEN contract.start_time AND contract.end_time)";
 
             ResultSet rs = myStmt.executeQuery(sql);
-            if (!rs.next()) {
-                return result;
-            } else {
-                while (rs.next()) {
-                    int renterID = Integer.parseInt(rs.getString(1));
-                    result.add(renterID);
-                }
+            while (rs.next()) {
+                int renterID = Integer.parseInt(rs.getString(1));
+                result.add(renterID);
             }
             myConn.close();
 
