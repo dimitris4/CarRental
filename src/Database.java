@@ -15,11 +15,8 @@ public class Database {
 
     // Ilias (ContractMethods)
 
-    static final public Database instance = new Database();
-
     private static ArrayList<Contract> contracts = new ArrayList<>();
     private static ArrayList<CarInformation> carList = new ArrayList<>();
-    private static ArrayList<Contract> contracts = new ArrayList<>();
     private static ArrayList<Integer> renterIDs = new ArrayList<>();
 
     public Database(){
@@ -614,29 +611,6 @@ public class Database {
             ResultSet rs = myStmt.executeQuery(sql);
             while (rs.next()) {
                 result = rs.getInt("zipID");
-            }
-            myConn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    public ArrayList<Integer> getRenterIDs() {
-
-        ArrayList<Integer> result = new ArrayList<>();
-
-        try {
-            Connection myConn = getConnection(url, user, password);
-            Statement myStmt = myConn.createStatement();
-
-            String sql = "SELECT renterID\n" +
-                    "FROM renter";
-
-            ResultSet rs = myStmt.executeQuery(sql);
-            while (rs.next()) {
-                int renterID = Integer.parseInt(rs.getString(1));
-                result.add(renterID);
             }
             myConn.close();
         } catch (SQLException e) {

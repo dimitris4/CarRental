@@ -6,6 +6,7 @@ public class Start {
     public Start() throws Exception {
         //Filling up the contracts ArrayList from the DB
         OurApp.getController().initiateContractList();
+        OurApp.getController().fillRenterIDs();
 
         // Filling up the renters ArrayList from DB
         //OurApp.getController().initiateRenterList();
