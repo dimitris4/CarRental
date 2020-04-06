@@ -22,11 +22,10 @@ public class Controller {
     public void addCar() throws SQLException {carMethods.addCar();}
     public void deleteCar() throws SQLException {carMethods.deleteCar();}
     public void editCar() throws SQLException {carMethods.editCar();}
-    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
-        return carMethods.displayAvailableCarsWithinDateRange(startDate,endDate);
-    }
+    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException { return carMethods.displayAvailableCarsWithinDateRange(startDate,endDate); }
     public void makeUnavailable() throws SQLException {carMethods.makeUnavailable();}
     public void makeAvailable() throws SQLException {carMethods.makeAvailable();}
+    public void fillRenterIDs() throws SQLException {contractMethods.fillRenterIDs();}
 
     public void makeUnavailable(String registration_number) throws SQLException {
         carMethods.makeUnavailable(registration_number);

@@ -79,6 +79,43 @@ public class ContractMethods {
         myConn.close();
     }
 
+    public void fillRenterIDs() {
+
+        try {
+
+            Connection myConn = dbConnect();
+
+            Statement myStmt = myConn.createStatement();
+
+            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
+                    "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
+                    "       door, ' ', zip, ' ', city, ' ', country.name)\n" +
+                    "FROM renter \n" +
+                    "\tJOIN address USING (addressID)\n" +
+                    "    JOIN zip USING (zipID)\n" +
+                    "    JOIN country USING (countryID)\n" +
+                    "    JOIN phone_numbers USING (renterID);";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+
+            while (rs.next()) {
+
+                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7),
+                        rs.getString(8), rs.getString(9));
+
+                database.getRenterIDs().add(Integer.parseInt(rs.getString(1)));
+            }
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
     public void displayActiveContracts(){
 
         System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");

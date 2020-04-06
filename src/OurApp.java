@@ -3,7 +3,8 @@ public class OurApp {
     private static Controller controller;
 
     public static void main(String[] args) throws Exception {
-        controller = new Controller();
+
+
         //creating a controller object
         controller = new Controller();
         //Our first login menu is called

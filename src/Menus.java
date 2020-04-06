@@ -189,7 +189,6 @@ public class Menus {
                     //Main.getController().addRenter();
                     OurApp.getController().addContract();
                     pressAnyKey();
-                    OurApp.getController().initiateContractList();
                     break;
                 case 2:
                     //Main.getController().editRenter();

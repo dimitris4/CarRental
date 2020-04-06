@@ -1,11 +1,12 @@
 import java.sql.*;
-import java.util.*;
-import java.util.Date;
-
-import static java.sql.DriverManager.getConnection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+import java.util.Set;
 
 
 public class RenterMethods {
+
 
     Scanner input = new Scanner(System.in);
     private static Database database = Database.instance;
@@ -35,7 +36,7 @@ public class RenterMethods {
     }
 
     public void displayZip() {
-        List<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<String>();
         list.addAll(zips);
         Collections.sort(list);
 
@@ -100,7 +101,7 @@ public class RenterMethods {
             renter.setDriverLicenseNumber(licence);
 
             // the object gets java Date and the database gets sql Date type
-            Date sinceDate = Input.setDate();
+            java.util.Date sinceDate = Input.setDate();
             renter.setSinceDate(sinceDate);
 
             java.sql.Date sqlDate = new java.sql.Date(sinceDate.getTime());
@@ -352,6 +353,7 @@ public class RenterMethods {
             break;
         }
     }
+
 
 }
 

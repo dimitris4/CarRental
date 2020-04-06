@@ -6,6 +6,9 @@
 *.exe
 *.o
 *.so
+# test
+.idea
+*.iml
 
 # Packages #
 ############
