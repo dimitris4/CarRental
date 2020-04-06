@@ -57,7 +57,7 @@ public class CarMethods {
     public String setRegistrationNumber(){
         System.out.println("Registration number: ");
         String registration_number = scanner.next();
-        while(cars.contains(registration_number) && !registration_number.matches("[a-zA-Z0-9]{10}")){
+        while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]")){
             System.out.println("Invalid registration number. Please try again: ");
             registration_number = scanner.next();
         }
@@ -360,15 +360,19 @@ public class CarMethods {
         closeConnection(myConn,myStmt,myRs);
     }
 
+    public boolean inRNor0(String registration_number){
+        return cars.contains(registration_number) || registration_number.equals("0");
+    }
+
     public void deleteCar() throws SQLException{
         displayCars(null);
         System.out.println("Insert registration number of a car you want to delete: ");
         String registration_number = scanner.next();
-        while (!cars.contains(registration_number) || registration_number.equals("0")){
+        while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(confirmation("delete")==1){
+        if(cars.contains(registration_number) && confirmation("delete")==1){
             update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been deleted from the database");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -467,11 +471,12 @@ public class CarMethods {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 1");
         System.out.println("Insert registration number of a car you want to set as unavailable: ");
         String registration_number = scanner.next();
-        while (!carRegNo.contains(registration_number) || registration_number.equals("0")){
+        while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
+            System.out.println(registration_number);
         }
-        if(confirmation("make unavailable")==1){
+        if(cars.contains(registration_number) && confirmation("make unavailable")==1){
             update("UPDATE Car SET is_available=0 WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been made unavailable");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -489,11 +494,11 @@ public class CarMethods {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 0");
         System.out.println("Insert registration number of a car you want to set as unavailable: ");
         String registration_number = scanner.next();
-        while (!carRegNo.contains(registration_number) || registration_number.equals("0")){
+        while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(confirmation("make available")==1){
+        if(cars.contains(registration_number) && confirmation("make available")==1){
             update("UPDATE Car SET is_available=1 WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been made unavailable");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -542,7 +547,7 @@ public class CarMethods {
         displayCars(null);
         System.out.println("Enter Registration Number of a car you want to edit or 0 to go back: ");
         String registration_number = scanner.next();
-        while (!cars.contains(registration_number) || registration_number.equals("0")) {
+        while (!inRNor0(registration_number)) {
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
@@ -550,22 +555,23 @@ public class CarMethods {
         if (!registration_number.equals("0")) {
             System.out.println("Insert new value for Registration Number: ");
             new_registration_number = setRegistrationNumber();
-        }
-        //update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
-        update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
-        //change registration number in contracts
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getCar().getRegistration_number().equals(registration_number)){
-                database.getContracts().get(i).getCar().setRegistration_number(new_registration_number);
+
+            //update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
+            update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
+            //change registration number in contracts
+            for (int i = 0; i < database.getContracts().size(); i++) {
+                if (database.getContracts().get(i).getCar().getRegistration_number().equals(registration_number)) {
+                    database.getContracts().get(i).getCar().setRegistration_number(new_registration_number);
+                }
             }
-        }
-        for (CarInformation cari: database.getCarList()) {
-            if (cari.getRegistration_number().equals(registration_number)){
-                cari.setRegistration_number(new_registration_number);
+            for (CarInformation cari : database.getCarList()) {
+                if (cari.getRegistration_number().equals(registration_number)) {
+                    cari.setRegistration_number(new_registration_number);
+                }
             }
+            cars.remove(registration_number);
+            cars.add(new_registration_number);
         }
-        cars.remove(registration_number);
-        cars.add(new_registration_number);
     }
 
     public ArrayList<Object> connect() {
