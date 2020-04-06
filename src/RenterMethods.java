@@ -8,7 +8,7 @@ import static java.sql.DriverManager.getConnection;
 public class RenterMethods {
 
     Scanner input = new Scanner(System.in);
-    Database database = new Database();
+    private static Database database = Database.instance;
     ArrayList<Renter> renters;
     private static Set<String> zips;
     private static Set<String> countries;
@@ -214,18 +214,21 @@ public class RenterMethods {
 
         displayRenters();
         System.out.println("\n*The program allows you to delete only renters who do not have any contract at the moment.*");
-        System.out.print("Select renter id: ");
 
-        int max = database.checkRenterID();
-        int renterID = Input.checkInt(1, max);
+        System.out.print("Select renter ID: ");
+        int renter_id = Input.checkInt(1,999999999);
+        while (!database.getRenterIDs().contains(renter_id)) {
+            System.out.print("Invalid ID. Try again: ");
+            renter_id = Input.checkInt(1,999999999);
+        }
 
         if (database.findRemovableRenters().size() == 0) {
             System.out.println("All renters have contracts. You cannot delete any.");
             return;
         }
 
-        if (database.findRemovableRenters().contains(renterID)) {
-            database.removeRenter(renterID);
+        if (database.findRemovableRenters().contains(renter_id)) {
+            database.removeRenter(renter_id);
         } else {
             System.out.println("The renter you selected cannot be deleted.");
         }
@@ -234,9 +237,16 @@ public class RenterMethods {
 
 
     public void update() throws SQLException {
+
         displayRenters();
+
         System.out.print("\nSelect renter ID: ");
-        int renter_id = Input.checkInt(1, database.checkRenterID());
+        int renter_id = Input.checkInt(1,999999999);
+        while (!database.getRenterIDs().contains(renter_id)) {
+            System.out.print("Invalid ID. Try again: ");
+            renter_id = Input.checkInt(1,999999999);
+        }
+
         System.out.println("\n[1] Driver License Number     [2] Mobile Phone     [3] Home Phone     [4] Address");
         System.out.print("Select the field you want to update: ");
         int field = Input.checkInt(1,4);

@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.sql.Date;
 import java.text.ParseException;
-import java.time.Instant;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -13,11 +12,17 @@ public class Database {
     String user = "dimk";
     String password = "dimk1234!";
 
-    // @Ilias: move them to the contract methods
-    private static ArrayList<Contract> contracts;
-    public Database() throws SQLException {
+    // Ilias (ContractMethods)
+
+    static final public Database instance = new Database();
+
+    private static ArrayList<Contract> contracts = new ArrayList<>();
+    private static ArrayList<CarInformation> carList = new ArrayList<>();
+
+    public Database(){
         contracts = new ArrayList<Contract>();
     }
+
     public ArrayList<Contract> getContracts() {
         return contracts;
     }
@@ -25,7 +30,13 @@ public class Database {
         this.contracts = contracts;
     }
 
+    public ArrayList<CarInformation> getCarList(){return carList;}
+    public void setCarList(ArrayList<CarInformation> carList){this.carList = carList;}
 
+
+
+
+    // Karolina, Dimitrios (RenterMethods)
 
     public ArrayList<Renter> loadRenters() {
         ArrayList<Renter> renters = new ArrayList<>();
@@ -228,32 +239,7 @@ public class Database {
         return result;
     }
 
-    public int checkRenterID() {
 
-        int i = 0;
-
-        try {
-            Connection myConn = getConnection(url, user, password);
-            Statement maxRenterID = myConn.createStatement();
-
-            String maxRenterIDString = "SELECT MAX(renterID) FROM renter;";
-
-            ResultSet rs = maxRenterID.executeQuery(maxRenterIDString);
-
-            while (rs.next()) {
-
-                i = Integer.parseInt(rs.getString(1));
-
-            }
-
-            myConn.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return i;
-    }
 
     public void updateLicense(String newDriverLicenseNumber, int renter_id) {
 
@@ -636,6 +622,27 @@ public class Database {
         return result;
     }
 
+    public ArrayList<Integer> getRenterIDs() {
 
+        ArrayList<Integer> result = new ArrayList<>();
+
+        try {
+            Connection myConn = getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+
+            String sql = "SELECT renterID\n" +
+                    "FROM renter";
+
+            ResultSet rs = myStmt.executeQuery(sql);
+            while (rs.next()) {
+                int renterID = Integer.parseInt(rs.getString(1));
+                result.add(renterID);
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
 }
