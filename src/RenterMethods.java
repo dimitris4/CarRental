@@ -289,34 +289,68 @@ public class RenterMethods {
                     System.out.print("Invalid input. Try Again: ");
                     door = input.next();
                 }
+                // update the address table
 
-                System.out.print("Zip code: ");
-                String zip_code = input.next();
-                while(!zip_code.matches("[0-9]+")){
-                    System.out.print("Invalid input. Try again: ");
+                displayZip();
+                System.out.println("\n[1] Select ZIP from the list     [2] Insert new one");
+                System.out.print("Select the option: ");
+                int choice = Input.checkInt(1,2);
+                String zip_code = "";
+                String city = "";
+                String country = "";
+
+                if (choice == 1) {
+
+                    // known zip code...
+                    System.out.print("Type selected ZIP: ");
                     zip_code = input.next();
-                }
+                    while (!zip_code.matches("[0-9]+") || !zips.contains(zip_code)) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zip_code = input.next();
+                    }
 
-                System.out.print("City: ");
-                String city = input.next();
-                while(!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")){
-                    System.out.print("Invalid input. Try Again: ");
-                    city = input.next();
-                }
+                    int zipID = database.getZipID(zip_code);
 
-                System.out.print("Country: ");
-                String country = input.next();
-                while(!Input.isCountryName(country)) {
-                    System.out.println("Invalid input. Try again: ");
-                    country = input.next();
-                }
+                    // update the address table only!!!
+                    database.updateAddress(street, building, floor, door, zipID, renter_id);
 
-                database.updateAddress(street, building, floor, door, renter_id, zip_code, city, country);
-                //displayRenters();
-                break;
+                } else {
+
+                    // unknown zip code...
+                    System.out.print("Type new zip code: ");
+                    zip_code = input.next();
+                    while (!zip_code.matches("[0-9]+")) {
+                        System.out.print("Invalid Input. Try Again: ");
+                        zip_code = input.next();
+                    }
+                    input.nextLine();
+
+                    System.out.print("City: ");
+                    city = input.nextLine();
+                    while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
+                        System.out.println("Invalid City. Try Again: ");
+                        city = input.nextLine();
+                    }
+
+                    country = Input.isCountryName();
+
+                    if (!countries.contains(country)) { // if country is unknown
+
+                        // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
+                        database.updateAddressZipCountry(street, building, floor, door, zip_code, city, country, renter_id);
+
+                    } else { // if country is known, then we get country id
+
+                        int countryID = database.getCountryID(country);
+
+                        // insert renter with unknown zip code and known country (tables affected: renter, phone_numbers, address, zip)
+                        database.updateAddressZip(street, building, floor, door, zip_code, city, countryID, renter_id);
+
+                    }
+
+                }
+            break;
         }
-        //displayRenters();
-
     }
 
 }
