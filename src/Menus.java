@@ -43,9 +43,7 @@ public class Menus {
 
     //accessing the Car Menu
     public void carMenu() throws Exception {
-
         while (true) {
-
             System.out.println("**********************************");
             System.out.println("|             CARS               |");
             System.out.println("**********************************");
@@ -53,7 +51,9 @@ public class Menus {
             System.out.println("|   [2] Edit Car                 |");
             System.out.println("|   [3] Delete Car               |");
             System.out.println("|   [4] Display Cars             |");
-            System.out.println("|   [5] Return To Main Menu      |");
+            System.out.println("|   [5] Make Available           |");
+            System.out.println("|   [6] Make Unavailable         |");
+            System.out.println("|   [7] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
@@ -61,30 +61,40 @@ public class Menus {
 
             System.out.print("Select Option: ");
 
-            int selection = Input.checkInt(0, 5);
+            int selection = Input.checkInt(0, 7);
 
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    //cm.addCar();
+                    OurApp.getController().addCar();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    //cm.update();
+                    OurApp.getController().editCar();
                     pressAnyKey();
                     break;
                 case 3:
-                    //Main.getController().deleteRenter();
-                    //cm.deleteCar();
+                    OurApp.getController().deleteCar();
                     pressAnyKey();
                     break;
                 case 4:
-                    //Main.getController().displayRenters();
-                    //cm.displayCars();
+                    //String end = "2020-01-31";
+                    //String start = "2020-02-03";
+                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+                    //Date endDate = dateFormat.parse(end);
+                    //Date startDate = dateFormat.parse(start);
+                    //OurApp.getController().displayAvailableCarsWithinDateRange(startDate,endDate);
+                    OurApp.getController().displayCars();
                     pressAnyKey();
                     break;
                 case 5:
+                    OurApp.getController().makeAvailable();
+                    pressAnyKey();
+                    break;
+                case 6:
+                    OurApp.getController().makeUnavailable();
+                    pressAnyKey();
+                    break;
+                case 7:
                     System.out.println("\n");
                     Thread.sleep(300);
                     mainMenu();
@@ -96,6 +106,7 @@ public class Menus {
             }
         }
     }
+
 
     //accessing the Renters Menu
     public void renterMenu() throws Exception {
@@ -114,6 +125,7 @@ public class Menus {
             System.out.println("**********************************");
 
             RenterMethods rm = new RenterMethods();
+
             System.out.print("Select Option: ");
 
             int selection = Input.checkInt(0, 5);
@@ -161,32 +173,33 @@ public class Menus {
             System.out.println("|           CONTRACTS            |");
             System.out.println("**********************************");
             System.out.println("|   [1] Add Contract             |");
-            System.out.println("|   [2] End Contract            |");
+            System.out.println("|   [2] End Contract             |");
             System.out.println("|   [3] Delete Contract          |");
             System.out.println("|   [4] Display Contracts        |");
             System.out.println("|   [5] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
+            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
 
             int selection = Input.checkInt(0, 5);
 
             switch (selection) {
                 case 1:
+                    //Main.getController().addRenter();
                     OurApp.getController().addContract();
                     pressAnyKey();
                     OurApp.getController().initiateContractList();
-                    contractMenu();
                     break;
                 case 2:
+                    //Main.getController().editRenter();
                     OurApp.getController().endContract();
                     pressAnyKey();
-                    contractMenu();
                     break;
                 case 3:
+                    //Main.getController().deleteRenter();
                     OurApp.getController().deleteContract();
                     pressAnyKey();
-                    contractMenu();
                     break;
                 case 4:
                     displayContractMenu();
@@ -205,11 +218,9 @@ public class Menus {
     }
 
     public void displayContractMenu() throws Exception {
-
         while (true) {
-
             System.out.println("*****************************************");
-            System.out.println("|       DISPLAY CONTRACTS               |");
+            System.out.println("|           DISPLAY CONTRACTS           |");
             System.out.println("*****************************************");
             System.out.println("|   [1] Display Active Contracts        |");
             System.out.println("|   [2] Display Old Contracts           |");
@@ -220,11 +231,8 @@ public class Menus {
             System.out.println("|   [7] Return To Main Menu             |");
             System.out.println("|   [0] Close Program                   |");
             System.out.println("*****************************************");
-
             RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 7);
-
             switch (selection) {
                 case 1:
                     OurApp.getController().displayActiveContracts();
@@ -264,7 +272,6 @@ public class Menus {
                 case 0:
                     System.exit(0);
                     break;
-
             }
         }
     }

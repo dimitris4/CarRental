@@ -1,3 +1,6 @@
+//import javax.mail.*;
+//import javax.mail.internet.InternetAddress;
+//import javax.mail.internet.MimeMessage;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -14,18 +17,19 @@ import java.util.Scanner;
 import static java.sql.DriverManager.getConnection;
 
 public class ContractMethods {
+
     private static Database database = Database.instance;
 
     public void initiateContractList() throws SQLException {
         Connection myConn = dbConnect();
         Statement myStmt = myConn.createStatement();
         String query = "SELECT * " +
-                       "FROM Contract co " +
-                       "JOIN Car c ON co.car_registration_number = c.registration_number " +
-                       "JOIN Renter r ON r.renterid = co.renterid " +
-                       "JOIN Brand b ON b.brandID = c.brandID " +
-                       "JOIN Model m ON b.brandID = m.brandID " +
-                       "JOIN Rental_types rt ON rt.rental_typeID = c.rental_typeID ";
+                "FROM Contract co " +
+                "JOIN Car c ON co.car_registration_number = c.registration_number " +
+                "JOIN Renter r ON r.renterid = co.renterid " +
+                "JOIN Brand b ON b.brandID = c.brandID " +
+                "JOIN Model m ON b.brandID = m.brandID " +
+                "JOIN Rental_types rt ON rt.rental_typeID = c.rental_typeID ";
 
         ResultSet myRs = myStmt.executeQuery(query);
         while (myRs.next()) {
@@ -83,9 +87,9 @@ public class ContractMethods {
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
 
         for (int i = 0; i < database.getContracts().size(); i++){
-                if(database.getContracts().get(i).getEndDate().compareTo(date)>=0){
-                    System.out.println(database.getContracts().get(i));
-                }
+            if(database.getContracts().get(i).getEndDate().compareTo(date)>=0){
+                System.out.println(database.getContracts().get(i));
+            }
         }
         System.out.println("===========================================================================================================================================================================================");
     }
@@ -159,7 +163,9 @@ public class ContractMethods {
     public void addContract() throws Exception {
         Scanner input = new Scanner(System.in);
 
-        OurApp.getController().displayRenters();
+        RenterMethods r = new RenterMethods();
+        r.displayRenters();
+
         System.out.print("Enter renter ID: ");
         int id = input.nextInt();
         boolean isFound = false;
@@ -171,14 +177,6 @@ public class ContractMethods {
             }
         }
 
-        HashSet<String> carRegNo = OurApp.getController().displayCars(" WHERE is_available = 1");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
-        String registration_number = input.next();
-        while (!carRegNo.contains(registration_number) || registration_number.equals(0)) {
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
-            registration_number = input.next();
-        }
-
         System.out.print("Enter start date: ");
         String startDate = input.next();
         Date stDate = Date.valueOf(startDate);
@@ -186,6 +184,14 @@ public class ContractMethods {
         System.out.print("Enter end date: ");
         String endDate = input.next();
         Date eDate = Date.valueOf(endDate);
+
+        HashSet<String> carRegNo = OurApp.getController().displayAvailableCarsWithinDateRange(stDate, eDate);
+        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        String registration_number = input.next();
+        while (!carRegNo.contains(registration_number) || registration_number.equals(0)) {
+            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            registration_number = input.next();
+        }
 
         System.out.print("Enter max Km: ");
         int maxKm = Input.checkInt(1, 500);
@@ -202,7 +208,7 @@ public class ContractMethods {
         pst.setInt(6, actualKm);
         pst.executeUpdate();
         database.getContracts().clear();
-        OurApp.getController().makeUnavailable2(registration_number);
+        OurApp.getController().makeUnavailable(registration_number);
         OurApp.getController().initiateContractList();
 
         for (Contract contract : database.getContracts()) {
@@ -240,7 +246,7 @@ public class ContractMethods {
     public void endContract() throws SQLException{
         OurApp.getController().displayActiveContracts();
         System.out.println("Select the contract you want to end:");
-        Scanner input = new Scanner(System.in);
+        //Scanner input = new Scanner(System.in);
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
         int id = Input.checkInt(1, 5000);
         boolean isFound = false;
@@ -334,7 +340,6 @@ public class ContractMethods {
         String password = "kailua1234";
 
         Session session = Session.getInstance(properties, new Authenticator(){
-            @Override
             protected PasswordAuthentication getPasswordAuthentication(){
                 return new PasswordAuthentication(myAccountEmail, password);
             }
