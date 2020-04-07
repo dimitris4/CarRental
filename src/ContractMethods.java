@@ -100,11 +100,6 @@ public class ContractMethods {
 
             while (rs.next()) {
 
-                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
-                        rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7),
-                        rs.getString(8), rs.getString(9));
-
                 database.getRenterIDs().add(Integer.parseInt(rs.getString(1)));
             }
 
@@ -215,12 +210,12 @@ public class ContractMethods {
         }
 
         System.out.print("Enter start date: ");
-        String startDate = input.next();
-        Date stDate = Date.valueOf(startDate);
+        java.util.Date startDate = Input.insertDateWithoutTime();
+        Date stDate = new java.sql.Date(startDate.getTime());
 
         System.out.print("Enter end date: ");
-        String endDate = input.next();
-        Date eDate = Date.valueOf(endDate);
+        java.util.Date endDate = Input.insertDateWithoutTime();
+        Date eDate = new java.sql.Date(endDate.getTime());
 
         HashSet<String> carRegNo = OurApp.getController().displayAvailableCarsWithinDateRange(stDate, eDate);
         System.out.println("Insert registration number of a car you want to set as unavailable: ");
@@ -231,7 +226,7 @@ public class ContractMethods {
         }
 
         System.out.print("Enter max Km: ");
-        int maxKm = Input.checkInt(1, 500);
+        int maxKm = Input.checkInt(1, 5000);
 
         int actualKm = 0;
 
@@ -245,7 +240,6 @@ public class ContractMethods {
         pst.setInt(6, actualKm);
         pst.executeUpdate();
         database.getContracts().clear();
-        //OurApp.getController().makeUnavailable(registration_number);
         OurApp.getController().initiateContractList();
 
         for (Contract contract : database.getContracts()) {
@@ -273,9 +267,16 @@ public class ContractMethods {
                         "                                                                                                         \n" +
                         "      " + contract.getStartDate() + "                                                 \n" +
                         "    (Date)                                                                                              \n";
-                OurApp.getController().sendMail(contract.getRenter().getEmail(), myMessage);
+                System.out.println("Would you like to send the contract to the client? (y/n)");
+                String answer = input.next();
+                while (!answer.equalsIgnoreCase("y")&&!answer.equalsIgnoreCase("n")){
+                    System.out.println("Wrong input! Select y/n)");
+                    answer = input.next();
+                }
+                if (answer.equalsIgnoreCase("y")) {
+                    OurApp.getController().sendMail(contract.getRenter().getEmail(), myMessage);
+                } else { break;}
                 break;
-
             }
         }
     }
