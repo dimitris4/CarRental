@@ -1,10 +1,13 @@
 import java.sql.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Month;
 import java.util.*;
 import java.util.Date;
 
 import static java.sql.DriverManager.getConnection;
+import static java.util.Calendar.*;
 
 public class CarMethods {
 
@@ -70,8 +73,8 @@ public class CarMethods {
         int year = scanner.nextInt();
         //first car created in 1885 (i think) so it can't be less than 1885
         // can't be higher than current year
-        while(year<1885 || year>Calendar.getInstance().get(Calendar.YEAR)){
-            System.out.println("Invalid year value. Please insert value between 1885 -" + Calendar.getInstance().get(Calendar.YEAR) + ": ");
+        while(year<1885 || year>Calendar.getInstance().get(YEAR)){
+            System.out.println("Invalid year value. Please insert value between 1885 -" + Calendar.getInstance().get(YEAR) + ": ");
             year = scanner.nextInt();
         }
         System.out.println("Month: ");
@@ -364,15 +367,20 @@ public class CarMethods {
         return cars.contains(registration_number) || registration_number.equals("0");
     }
 
-    public void deleteCar() throws SQLException{
-        displayCars(null);
+    public void deleteCar() throws SQLException, ParseException {
+        String end = "2500-01-31";
+        String start = Calendar.getInstance().get(YEAR) + "-" + Calendar.getInstance().get(MONTH) + "-" + Calendar.getInstance().get(DAY_OF_MONTH) ;
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        Date endDate = dateFormat.parse(end);
+        Date startDate = dateFormat.parse(start);
+        HashSet <String> carsWoContract = displayAvailableCarsWithinDateRange(startDate,endDate); //cars without contract, from today till year 2500
         System.out.println("Insert registration number of a car you want to delete: ");
         String registration_number = scanner.next();
-        while (!inRNor0(registration_number)){
+        while (!(carsWoContract.contains(registration_number) || registration_number.equals("0"))){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(cars.contains(registration_number) && confirmation("delete")==1){
+        if(carsWoContract.contains(registration_number) && confirmation("delete")==1){
             update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been deleted from the database");
             for (int i=0;i< database.getCarList().size();i++) {
