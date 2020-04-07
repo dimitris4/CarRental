@@ -183,7 +183,7 @@ public class RenterMethods {
                     if (!countries.contains(country)) { // if country is unknown
 
                         // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
-                        database.addRenter(country, zip_code, city, street, building, floor, door, fname, lname, email,
+                        database.addRenter(country.toUpperCase(), zip_code, city, street, building, floor, door, fname, lname, email,
                                            licence, sqlDate, mobilePhone, homePhone);
 
                     } else { // if country is known, then we get country id
@@ -218,7 +218,8 @@ public class RenterMethods {
 
         System.out.print("Select renter ID: ");
         int renter_id = Input.checkInt(1,999999999);
-        while (!database.getRenterIDs().contains(renter_id)) {
+        ArrayList<Integer> a = database.getRenterIDs();
+        while (!a.contains(renter_id)) {
             System.out.print("Invalid ID. Try again: ");
             renter_id = Input.checkInt(1,999999999);
         }
@@ -240,13 +241,13 @@ public class RenterMethods {
     public void update() throws SQLException {
 
         displayRenters();
-
         System.out.print("\nSelect renter ID: ");
         int renter_id = Input.checkInt(1,999999999);
         while (!database.getRenterIDs().contains(renter_id)) {
             System.out.print("Invalid ID. Try again: ");
             renter_id = Input.checkInt(1,999999999);
         }
+        System.out.println("the renter id : " + renter_id);
 
         System.out.println("\n[1] Driver License Number     [2] Mobile Phone     [3] Home Phone     [4] Address");
         System.out.print("Select the field you want to update: ");
@@ -303,16 +304,16 @@ public class RenterMethods {
                 if (choice == 1) {
 
                     // known zip code...
-                    System.out.print("Type selected ZIP: ");
+                    System.out.print("Type ZIP: ");
                     zip_code = input.next();
-                    while (!zip_code.matches("[0-9]+") || !zips.contains(zip_code)) {
+                    while (!zips.contains(zip_code)) {
                         System.out.print("Invalid Input. Try Again: ");
                         zip_code = input.next();
                     }
 
                     int zipID = database.getZipID(zip_code);
-
-                    // update the address table only!!!
+                    System.out.println(zipID);
+                    // update the address table only
                     database.updateAddress(street, building, floor, door, zipID, renter_id);
 
                 } else {

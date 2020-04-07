@@ -60,7 +60,7 @@ public class CarMethods {
     public String setRegistrationNumber(){
         System.out.println("Registration number: ");
         String registration_number = scanner.next();
-        while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]")){
+        while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]+")){
             System.out.println("Invalid registration number. Please try again: ");
             registration_number = scanner.next();
         }

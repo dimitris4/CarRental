@@ -116,12 +116,15 @@ public class ContractMethods {
 
     }
 
-    public void displayActiveContracts(){
+    public void displayActiveContracts() throws SQLException {
 
         System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
         System.out.println("*******************************************************************************************************************************************************************************************");
 
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
+
+        database.getContracts().clear();
+        OurApp.getController().initiateContractList();
 
         for (int i = 0; i < database.getContracts().size(); i++){
             if(database.getContracts().get(i).getEndDate().compareTo(date)>=0){
@@ -131,11 +134,14 @@ public class ContractMethods {
         System.out.println("===========================================================================================================================================================================================");
     }
 
-    public void displayOldContracts() {
+    public void displayOldContracts() throws SQLException {
         System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
         System.out.println("********************************************************************************************************************************************************************************************");
 
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
+
+        database.getContracts().clear();
+        OurApp.getController().initiateContractList();
 
         for (int i = 0; i < database.getContracts().size(); i++){
             if(database.getContracts().get(i).getEndDate().compareTo(date)<0){
@@ -145,7 +151,7 @@ public class ContractMethods {
         System.out.println("===========================================================================================================================================================================================");
     }
 
-    public void searchContractsByStartDate() {
+    public void searchContractsByStartDate() throws SQLException {
 
         Scanner input = new Scanner(System.in);
         System.out.println("Enter the start date of the contracts you want to see:");
@@ -154,6 +160,8 @@ public class ContractMethods {
         System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
         System.out.println("********************************************************************************************************************************************************************************************");
 
+        database.getContracts().clear();
+        OurApp.getController().initiateContractList();
         for (int i = 0; i < database.getContracts().size(); i++){
             if(database.getContracts().get(i).getStartDate().compareTo(date)==0){
                 System.out.println(database.getContracts().get(i));
@@ -162,13 +170,15 @@ public class ContractMethods {
         System.out.println("===========================================================================================================================================================================================");
     }
 
-    public void searchContractsByEndDate() {
+    public void searchContractsByEndDate() throws SQLException {
         Scanner input = new Scanner(System.in);
         System.out.println("Enter the end date of the contracts you want to see:");
         String myDate = input.next();
         Date date = Date.valueOf(myDate);
         System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
         System.out.println("********************************************************************************************************************************************************************************************");
+        database.getContracts().clear();
+        OurApp.getController().initiateContractList();
         for (int i = 0; i < database.getContracts().size(); i++){
             if(database.getContracts().get(i).getEndDate().compareTo(date)==0){
                 System.out.println(database.getContracts().get(i));
@@ -245,7 +255,7 @@ public class ContractMethods {
         pst.setInt(6, actualKm);
         pst.executeUpdate();
         database.getContracts().clear();
-        OurApp.getController().makeUnavailable(registration_number);
+        //OurApp.getController().makeUnavailable(registration_number);
         OurApp.getController().initiateContractList();
 
         for (Contract contract : database.getContracts()) {

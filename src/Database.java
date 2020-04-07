@@ -1,3 +1,5 @@
+import java.io.StringBufferInputStream;
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.sql.Date;
 import java.text.ParseException;
@@ -156,31 +158,32 @@ public class Database {
             PreparedStatement pst2 = null;
             PreparedStatement pst3 = null;
 
-            String sql1 = "DELETE FROM contract WHERE renterID = ?";
+            // dont delete contract
+            // String sql1 = "DELETE FROM contract WHERE renterID = ?";
             String sql2 = "DELETE FROM phone_numbers WHERE renterID = ?";
             String sql3 = "DELETE FROM renter WHERE renterID = ?";
 
             try {
 
-                pst1 = myConn.prepareStatement(sql1);
+                //pst1 = myConn.prepareStatement(sql1);
 
                 pst2 = myConn.prepareStatement(sql2);
 
                 pst3 = myConn.prepareStatement(sql3);
 
-                pst1.setInt(1, renterID);
+                //pst1.setInt(1, renterID);
 
                 pst2.setInt(1, renterID);
 
                 pst3.setInt(1, renterID);
 
-                int rowsAffected1 = pst1.executeUpdate();
+                //int rowsAffected1 = pst1.executeUpdate();
 
                 int rowsAffected2 = pst2.executeUpdate();
 
                 int rowsAffected3 = pst3.executeUpdate();
 
-                System.out.println("Rows affected: " + rowsAffected1);
+                //System.out.println("Rows affected: " + rowsAffected1);
 
                 System.out.println("Rows affected: " + rowsAffected2);
 
@@ -194,7 +197,7 @@ public class Database {
 
             System.out.println("Delete complete.");
 
-            pst1.close();
+            //pst1.close();
 
             pst2.close();
 
@@ -208,6 +211,7 @@ public class Database {
 
         }
     }
+
 
     public ArrayList<Integer> findRemovableRenters() {
 
@@ -535,13 +539,11 @@ public class Database {
         int result = 0;
         try {
             Connection myConn = getConnection(url, user, password);
-            Statement myStmt = myConn.createStatement();
-            String sql = "SELECT zipID\n" +
-                    "FROM zip\n" +
-                    "WHERE zip = '" + zip_code + "'\n" +
-                    "LIMIT 1;";
-
-            ResultSet rs = myStmt.executeQuery(sql);
+            PreparedStatement getZipID = null;
+            String sql = "SELECT zipID FROM zip WHERE zip = ?";
+            getZipID = myConn.prepareStatement(sql);
+            getZipID.setString(1, zip_code);
+            ResultSet rs = getZipID.executeQuery();
             while (rs.next()) {
                 result = rs.getInt("zipID");
             }
@@ -552,21 +554,35 @@ public class Database {
         return result;
     }
 
-    public ArrayList<Integer> getRenterIDs() {
-        return renterIDs;
+
+
+    public ArrayList<Integer> getRenterIDs() throws SQLException {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getRenterID = null;
+            String sql = "SELECT renterID FROM renter";
+            getRenterID = myConn.prepareStatement(sql);
+            ResultSet rs = getRenterID.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getInt("renterID"));
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 
 
-    // update the address table only!!!
-    public void updateAddress(String street, int building, int floor, String door, int renter_id, int zipID) throws SQLException {
+    // select zip code from the list : update the address table only
+    public void updateAddress(String street, int building, int floor, String door, int zipID, int renter_id) throws SQLException {
+
+        System.out.println("Inside the updateAddress method!");
+        System.out.println("renter id : " + renter_id);
+        System.out.println("zipID : " + zipID);
         Connection myConn = getConnection(url, user, password);
-
-        PreparedStatement safeUpdate = null;
-        String safeUpadateString = "SET SQL_SAFE_UPDATES = 0";
-        safeUpdate = myConn.prepareStatement(safeUpadateString);
-        safeUpdate.execute();
-
 
         PreparedStatement updateAddress = null;
         String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?, zipID = ?\n" +
@@ -579,6 +595,8 @@ public class Database {
         updateAddress.setInt(5, zipID);
         updateAddress.setInt(6, renter_id);
         System.out.println("Update complete.");
+
+        updateAddress.executeUpdate();
 
         myConn.close();
     }
@@ -672,4 +690,5 @@ public class Database {
 
         myConn.close();
     }
+
 }
