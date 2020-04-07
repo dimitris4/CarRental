@@ -34,8 +34,8 @@ public class Controller {
 
     public void sendMail(String recipient, String myMessage) throws Exception { contractMethods.sendMail(recipient, myMessage); }
 
-    public void searchContractByStartDate() throws SQLException {contractMethods.searchContractsByStartDate();}
-    public void searchContractByEndDate() throws SQLException {contractMethods.searchContractsByEndDate();}
+    public void searchContractByStartDate() {contractMethods.searchContractsByStartDate();}
+    public void searchContractByEndDate() {contractMethods.searchContractsByEndDate();}
     public void searchContractsByRegNo() {contractMethods.searchContractsByRegNo();}
     public void deleteContract() throws SQLException {contractMethods.deleteContract();}
     public void addContract() throws Exception {contractMethods.addContract();}
