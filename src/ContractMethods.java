@@ -45,7 +45,6 @@ public class ContractMethods {
     }
 
     public void addContract() throws Exception {
-
         RenterMethods renterMethods = new RenterMethods();
         renterMethods.displayRenters();
 
@@ -70,7 +69,7 @@ public class ContractMethods {
         System.out.print("Select car registration number: ");
         String registration_number = input.next();
         while (!database.getCarRegistrationNumbers().contains(registration_number)) {
-            System.out.println("Wrong input. Try again: ");
+            System.out.print("Wrong input. Try again: ");
             registration_number = input.next();
         }
 

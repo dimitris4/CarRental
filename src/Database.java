@@ -596,7 +596,7 @@ public class Database {
 
     // update address, zip tables and country tables (unknown zip - unknown country)
     public void updateAddressZipCountry(String street, int building, int floor, String door, String zip_code,
-                                        String city, String country, int renter_id) throws SQLException {
+                                        String city, int countryID, int renter_id) throws SQLException {
 
             Connection myConn = getConnection(url, user, password);
 
@@ -607,23 +607,23 @@ public class Database {
 
             PreparedStatement updateAddress = null;
             PreparedStatement updateZip = null;
-            PreparedStatement updateCountry = null;
+            //PreparedStatement updateCountry = null;
 
             String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
                     "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
 
-            String updateZipString = "UPDATE zip SET zip = ?, city = ?\n" +
+            String updateZipString = "UPDATE zip SET zip = ?, city = ?, countryID = ?\n" +
                     "WHERE zipID = \n" +
                     "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
 
-            String updateCountryString = "UPDATE country SET NAME = ?\n" +
+            /*String updateCountryString = "UPDATE country SET NAME = ?\n" +
                     "WHERE countryID = (\n" +
                     "  SELECT countryID FROM (\n" +
                     "    SELECT countryID FROM country JOIN zip USING (countryID) \n" +
                     "    JOIN address USING (zipID)\n" +
                     "\tJOIN renter USING (addressID) WHERE renterID = ?\n" +
                     "  ) as t\n" +
-                    ");";
+                    ");";*/
 
             updateAddress = myConn.prepareStatement(updateAddressString);
             updateAddress.setString(1, street);
@@ -635,15 +635,16 @@ public class Database {
             updateZip = myConn.prepareStatement(updateZipString);
             updateZip.setString(1, zip_code);
             updateZip.setString(2, city);
-            updateZip.setInt(3, renter_id);
+            updateZip.setInt(3, countryID);
+            updateZip.setInt(4, renter_id);
 
-            updateCountry = myConn.prepareStatement(updateCountryString);
+            /*updateCountry = myConn.prepareStatement(updateCountryString);
             updateCountry.setString(1, country);
-            updateCountry.setInt(2, renter_id);
+            updateCountry.setInt(2, renter_id);*/
 
             updateAddress.executeUpdate();
             updateZip.executeUpdate();
-            updateCountry.executeUpdate();
+            //updateCountry.executeUpdate();
             System.out.println("Update complete.");
 
             myConn.close();
@@ -725,12 +726,17 @@ public class Database {
         preparedStatement.setDate(3, startDate);
         preparedStatement.setDate(4, endDate);
         ResultSet myRs = preparedStatement.executeQuery();
+        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Rental Type", "Registration Nr.", "Brand",
+                            "Model", "First Registration Date", "Odometer", "Fuel Type");
+        for (int i=0; i<160; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
         while (myRs.next()) {
             System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),
                     myRs.getString(2), myRs.getString(3), myRs.getString(4),
                     myRs.getString(5), myRs.getString(6), myRs.getString(7));
         }
-        System.out.println("Display available cars within date range complete.");
         myConn.close();
     }
 
@@ -800,6 +806,24 @@ public class Database {
             myConn.close();
         } catch (SQLException e) {
            e.printStackTrace();
+        }
+    }
+
+    public void addCountry(String country) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            String queryCountry = "INSERT INTO country (name) " +
+                    "VALUES (?)";
+            //create insert PreparedStatement
+            PreparedStatement addCountry;
+            addCountry = myConn.prepareStatement(queryCountry);
+            addCountry.setString(1, country);
+            addCountry.execute();
+            System.out.println("\n\nThe entry has been recorded.");
+            addCountry.close();
+            myConn.close();
+        } catch (SQLException exc) {
+            exc.printStackTrace();
         }
     }
 }

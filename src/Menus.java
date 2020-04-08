@@ -215,18 +215,18 @@ public class Menus {
 
     public void displayContractMenu() throws Exception {
         while (true) {
-            System.out.println("*****************************************");
-            System.out.println("|           DISPLAY CONTRACTS           |");
-            System.out.println("*****************************************");
-            System.out.println("|   [1] Display Active Contracts        |");
-            System.out.println("|   [2] Display Old Contracts           |");
-            System.out.println("|   [3] Search Contracts By Start Date  |");
-            System.out.println("|   [4] Search Contracts By End Date    |");
-            System.out.println("|   [5] Search Contracts By Reg. No     |");
-            System.out.println("|   [6] Return To Contract Menu         |");
-            System.out.println("|   [7] Return To Main Menu             |");
-            System.out.println("|   [0] Close Program                   |");
-            System.out.println("*****************************************");
+            System.out.println("***************************************");
+            System.out.println("|           DISPLAY CONTRACTS         |");
+            System.out.println("***************************************");
+            System.out.println("|   [1] Display Active Contracts      |");
+            System.out.println("|   [2] Display Old Contracts         |");
+            System.out.println("|   [3] Search by Start Date          |");
+            System.out.println("|   [4] Search by End Date            |");
+            System.out.println("|   [5] Search by Reg. No             |");
+            System.out.println("|   [6] Return To Contract Menu       |");
+            System.out.println("|   [7] Return To Main Menu           |");
+            System.out.println("|   [0] Close Program                 |");
+            System.out.println("***************************************");
             ContractMethods contractMethods = new ContractMethods();
             int selection = Input.checkInt(0, 7);
             switch (selection) {
