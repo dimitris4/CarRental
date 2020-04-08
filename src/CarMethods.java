@@ -453,7 +453,7 @@ public class CarMethods {
         "NOT IN (SELECT car_registration_number FROM contract)) AND c.is_available = 1";
         ResultSet myRs = myStmt.executeQuery(query);
         while (myRs.next()) { availableCars.add(myRs.getString(1));}
-        System.out.println(availableCars.toString());
+        //System.out.println(availableCars.toString());
         String query2 = "SELECT co.car_registration_number " + //selects cars that are't available during selected date
                 "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
                 "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
