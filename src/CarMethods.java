@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.Date;
 
 import static java.sql.DriverManager.getConnection;
+import static java.sql.DriverManager.registerDriver;
 import static java.util.Calendar.*;
 
 public class CarMethods {
@@ -428,45 +429,49 @@ public class CarMethods {
     }
 
     public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
-        if (startDate.compareTo(endDate) < 0){ //reverse the order if start>end
+        if (startDate.compareTo(endDate) > 0){ //reverse the order if start>end
             Date tempDate = startDate;
             startDate = endDate;
             endDate = tempDate;
         }
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-        String sDate = dateFormat.format(startDate);
-        String eDate = dateFormat.format(endDate);
+        //System.out.println(startDate.toString());
+        //System.out.println(endDate.toString());
+        String sDate = startDate.toString();
+        String eDate = endDate.toString();
+        //System.out.println(sDate);
+        //System.out.println(eDate);
         HashSet<String> availableCars =new HashSet<>();
+        HashSet<String> unavailableCars =new HashSet<>();
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
         Statement myStmt = (Statement) db.get(1);
-        String query = "SELECT c.registration_number, c.first_registration, c.odometer, f.fuel_type, CONCAT(b.name, ' '," +
-                " m.name), r.name, r.description " +
-                "FROM Car c " +
-                "LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " + //select all cars even
-                // without contract
-                "JOIN Brand b ON c.brandID = b.brandID JOIN Model m ON c.modelID = m.modelID " +
-                "JOIN Fuel f ON c.fuelID = f.fuelID JOIN rental_types r ON c.rental_typeID = r.rental_typeID" +
-                //where not(end date>start date   start date<end date) so car is available at that time (according to
-                // contracts)
-                // NOT IN - to select also cars without contract
-                " WHERE (!('" + eDate +"'>=co.start_time && '" + sDate + "'<=co.end_time) || c.registration_number NOT " +
-                "IN (SELECT car_registration_number FROM contract)) && c.is_available = 1";
+        String query = "SELECT DISTINCT c.registration_number " +
+        "FROM Car c LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " +
+        "WHERE (NOT('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time) || c.registration_number " +
+        "NOT IN (SELECT car_registration_number FROM contract)) AND c.is_available = 1";
         ResultSet myRs = myStmt.executeQuery(query);
-        if (myRs != null) {
-            System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
-                    "Fuel Type", "Model", "Rental Type", "Description");
-            for (int i = 0; i < 210; i++) {
-                System.out.print("-");
-            }
-            System.out.println();
-            while (myRs.next()) {
-                System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),myRs.getString(2),
-                        myRs.getString(3),myRs.getString(4),myRs.getString(5),myRs.getString(6),
-                        myRs.getString(7));
-                availableCars.add(myRs.getString(1));
-            }
+        while (myRs.next()) { availableCars.add(myRs.getString(1));}
+        //System.out.println(availableCars.toString());
+        //String query2 = "SELECT co.car_registration_number " +
+        //        "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
+        //        "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
+        //Statement myStmt2 = (Statement) db.get(1);
+        //ResultSet myRs2 = myStmt2.executeQuery(query2);
+        //System.out.println(myRs2.getFetchSize());
+        //while (myRs2.next()) { unavailableCars.add(myRs2.getString(1));}
+        //System.out.println(unavailableCars.toString());
+        String carReg = "";
+        //availableCars.removeAll(unavailableCars);
+        //System.out.println(availableCars.toString());
+        for (String regNumber: availableCars) {
+            carReg = carReg + "\"" + regNumber + " \",";
+            //availableCars.add(myRs.getString(1));
         }
+        if(carReg.length()!=0){
+            carReg =carReg.substring(0,carReg.length()-1);
+        }
+        //System.out.println(carReg);
+        displayCars("WHERE c.registration_number IN (" + carReg + ")");
         closeConnection(myConn,myStmt,myRs);
         return availableCars;
     }
