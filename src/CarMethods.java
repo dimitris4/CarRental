@@ -113,7 +113,7 @@ public class CarMethods {
         System.out.println("Enter 0 to add new option");
         System.out.println("Brand (ID number): ");
         int brand = scanner.nextInt();
-        while(brand<0 && brand>amount){
+        while(brand<0 || brand>amount){
             System.out.println("Invalid value. Please try again: ");
             brand = scanner.nextInt();
         }
@@ -263,7 +263,7 @@ public class CarMethods {
     }
 
     public int confirmation(String method){//will change it to fit with other menus later, just for functionality now
-        System.out.println("Are you sure you want to " + method + " this car?");
+        System.out.println("Are you sure you want to " + method);
         System.out.println("1. Yes");
         System.out.println("2. No");
         int output = scanner.nextInt();
@@ -375,13 +375,13 @@ public class CarMethods {
         Date endDate = dateFormat.parse(end);
         Date startDate = dateFormat.parse(start);
         HashSet <String> carsWoContract = displayAvailableCarsWithinDateRange(startDate,endDate); //cars without contract, from today till year 2500
-        System.out.println("Insert registration number of a car you want to delete: ");
+        System.out.println("Insert registration number of a car you want to delete or 0 to go back: ");
         String registration_number = scanner.next();
         while (!(carsWoContract.contains(registration_number) || registration_number.equals("0"))){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(carsWoContract.contains(registration_number) && confirmation("delete")==1){
+        if(carsWoContract.contains(registration_number) && confirmation("delete this car?")==1){
             update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been deleted from the database");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -445,23 +445,25 @@ public class CarMethods {
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
         Statement myStmt = (Statement) db.get(1);
-        String query = "SELECT DISTINCT c.registration_number " +
+        String query = "SELECT DISTINCT c.registration_number " + //selects all available cars within the date range
+                // however as more contracts exist for 1 car, it might be added to the lsit even if it's not
+                // available during that exact date
         "FROM Car c LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " +
         "WHERE (NOT('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time) || c.registration_number " +
         "NOT IN (SELECT car_registration_number FROM contract)) AND c.is_available = 1";
         ResultSet myRs = myStmt.executeQuery(query);
         while (myRs.next()) { availableCars.add(myRs.getString(1));}
-        //System.out.println(availableCars.toString());
-        //String query2 = "SELECT co.car_registration_number " +
-        //        "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
-        //        "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
-        //Statement myStmt2 = (Statement) db.get(1);
-        //ResultSet myRs2 = myStmt2.executeQuery(query2);
+        System.out.println(availableCars.toString());
+        String query2 = "SELECT co.car_registration_number " + //selects cars that are't available during selected date
+                "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
+                "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
+        Statement myStmt2 = (Statement) db.get(1);
+        ResultSet myRs2 = myStmt2.executeQuery(query2);
         //System.out.println(myRs2.getFetchSize());
-        //while (myRs2.next()) { unavailableCars.add(myRs2.getString(1));}
+        while (myRs2.next()) { unavailableCars.add(myRs2.getString(1));}
         //System.out.println(unavailableCars.toString());
         String carReg = "";
-        //availableCars.removeAll(unavailableCars);
+        availableCars.removeAll(unavailableCars); //substracts unavailable from available
         //System.out.println(availableCars.toString());
         for (String regNumber: availableCars) {
             carReg = carReg + "\"" + regNumber + " \",";
@@ -482,14 +484,14 @@ public class CarMethods {
 
     public void makeUnavailable() throws SQLException {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 1");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        System.out.println("Insert registration number of a car you want to set as unavailable or 0 to go back: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
             System.out.println(registration_number);
         }
-        if(cars.contains(registration_number) && confirmation("make unavailable")==1){
+        if(cars.contains(registration_number) && confirmation("make this car unavailable?")==1){
             update("UPDATE Car SET is_available=0 WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been made unavailable");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -505,15 +507,15 @@ public class CarMethods {
 
     public void makeAvailable() throws SQLException {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 0");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        System.out.println("Insert registration number of a car you want to set as available or 0 to go back:: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(cars.contains(registration_number) && confirmation("make available")==1){
+        if(cars.contains(registration_number) && confirmation("make this car available?")==1){
             update("UPDATE Car SET is_available=1 WHERE registration_number = '" + registration_number + "'");
-            System.out.println("Car has been made unavailable");
+            System.out.println("Car has been made available");
             for (int i=0;i< database.getCarList().size();i++) {
                 if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
                     database.getCarList().get(i).setAvailable(true);
@@ -526,7 +528,7 @@ public class CarMethods {
     }
 
     public void makeUnavailable(String registration_number) throws SQLException {
-        if(confirmation("make unavailable")==1){
+        if(confirmation("make this car unavailable?")==1){
             update("UPDATE Car SET is_available = 0 WHERE registration_number = '" + registration_number + "'");
             for (int i=0; i<database.getCarList().size(); i++) {
                 if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
