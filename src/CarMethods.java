@@ -370,11 +370,12 @@ public class CarMethods {
 
     public void deleteCar() throws SQLException, ParseException {
         String end = "2500-01-31";
-        String start = Calendar.getInstance().get(YEAR) + "-" + Calendar.getInstance().get(MONTH) + "-" + Calendar.getInstance().get(DAY_OF_MONTH) ;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        Date startDate = new Date();
         Date endDate = dateFormat.parse(end);
-        Date startDate = dateFormat.parse(start);
-        HashSet <String> carsWoContract = displayAvailableCarsWithinDateRange(startDate,endDate); //cars without contract, from today till year 2500
+        java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
+        java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+        HashSet <String> carsWoContract = displayAvailableCarsWithinDateRange(sqlStartDate, sqlEndDate); //cars without contract, from today till year 2500
         System.out.print("Insert registration number of a car you want to delete or 0 to go back: ");
         String registration_number = scanner.next();
         while (!(carsWoContract.contains(registration_number) || registration_number.equals("0"))){
@@ -429,7 +430,7 @@ public class CarMethods {
     }
 
     public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
-        if (startDate.compareTo(endDate) > 0){ //reverse the order if start>end
+        if (startDate.compareTo(endDate) > 0) { //reverse the order if start>end
             Date tempDate = startDate;
             startDate = endDate;
             endDate = tempDate;
