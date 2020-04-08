@@ -69,11 +69,11 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 2:
-                    OurApp.getController().editCar();
+                    //OurApp.getController().editCar();
                     pressAnyKey();
                     break;
                 case 3:
-                    OurApp.getController().deleteCar();
+                    //OurApp.getController().deleteCar();
                     pressAnyKey();
                     break;
                 case 4:
@@ -180,24 +180,21 @@ public class Menus {
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            ContractMethods contractMethods = new ContractMethods();
 
             int selection = Input.checkInt(0, 5);
 
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    OurApp.getController().addContract();
+                    contractMethods.addContract();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    OurApp.getController().endContract();
+                    contractMethods.endContract();
                     pressAnyKey();
                     break;
                 case 3:
-                    //Main.getController().deleteRenter();
-                    OurApp.getController().deleteContract();
+                    contractMethods.deleteContract();
                     pressAnyKey();
                     break;
                 case 4:
@@ -230,33 +227,28 @@ public class Menus {
             System.out.println("|   [7] Return To Main Menu             |");
             System.out.println("|   [0] Close Program                   |");
             System.out.println("*****************************************");
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            ContractMethods contractMethods = new ContractMethods();
             int selection = Input.checkInt(0, 7);
             switch (selection) {
                 case 1:
-                    OurApp.getController().displayActiveContracts();
+                    contractMethods.displayActiveContracts();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 2:
-                    OurApp.getController().displayOldContracts();
+                    contractMethods.displayOldContracts();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 3:
-                    OurApp.getController().searchContractByStartDate();
+                    contractMethods.searchContractsByStartDate();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 4:
-                    OurApp.getController().searchContractByEndDate();
+                    contractMethods.searchContractsByEndDate();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 5:
-                    OurApp.getController().searchContractsByRegNo();
+                    contractMethods.searchContractsByRegNo();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 6:
                     System.out.println("\n");

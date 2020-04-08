@@ -8,9 +8,9 @@ import java.util.Set;
 public class RenterMethods {
 
 
-    Scanner input = new Scanner(System.in);
+    private static Scanner input = new Scanner(System.in);
     private static Database database = Database.instance;
-    ArrayList<Renter> renters;
+    private static ArrayList<Renter> renters;
     private static Set<String> zips;
     private static Set<String> countries;
 

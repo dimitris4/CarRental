@@ -20,6 +20,7 @@ public class CarMethods {
     private static Scanner scanner = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
+
     public CarMethods() throws SQLException {//populate hashsets and arraylists form DB
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
@@ -368,7 +369,7 @@ public class CarMethods {
         return cars.contains(registration_number) || registration_number.equals("0");
     }
 
-    public void deleteCar() throws SQLException, ParseException {
+    /*public void deleteCar() throws SQLException, ParseException {
         String end = "2500-01-31";
         String start = Calendar.getInstance().get(YEAR) + "-" + Calendar.getInstance().get(MONTH) + "-" + Calendar.getInstance().get(DAY_OF_MONTH) ;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -394,7 +395,7 @@ public class CarMethods {
             System.out.println("Deletion cancelled.");
         }
         System.out.println("Returning to the menu.");
-    }
+    }*/
 
     public HashSet<String> displayCars(String condition) throws SQLException {
         HashSet<String> carRegNo = new HashSet<>();
@@ -428,53 +429,6 @@ public class CarMethods {
         return carRegNo;
     }
 
-    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
-        if (startDate.compareTo(endDate) > 0){ //reverse the order if start>end
-            Date tempDate = startDate;
-            startDate = endDate;
-            endDate = tempDate;
-        }
-        //System.out.println(startDate.toString());
-        //System.out.println(endDate.toString());
-        String sDate = startDate.toString();
-        String eDate = endDate.toString();
-        //System.out.println(sDate);
-        //System.out.println(eDate);
-        HashSet<String> availableCars =new HashSet<>();
-        HashSet<String> unavailableCars =new HashSet<>();
-        ArrayList<Object> db = connect();
-        Connection myConn = (Connection) db.get(0);
-        Statement myStmt = (Statement) db.get(1);
-        String query = "SELECT DISTINCT c.registration_number " +
-        "FROM Car c LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " +
-        "WHERE (NOT('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time) || c.registration_number " +
-        "NOT IN (SELECT car_registration_number FROM contract)) AND c.is_available = 1";
-        ResultSet myRs = myStmt.executeQuery(query);
-        while (myRs.next()) { availableCars.add(myRs.getString(1));}
-        //System.out.println(availableCars.toString());
-        //String query2 = "SELECT co.car_registration_number " +
-        //        "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
-        //        "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
-        //Statement myStmt2 = (Statement) db.get(1);
-        //ResultSet myRs2 = myStmt2.executeQuery(query2);
-        //System.out.println(myRs2.getFetchSize());
-        //while (myRs2.next()) { unavailableCars.add(myRs2.getString(1));}
-        //System.out.println(unavailableCars.toString());
-        String carReg = "";
-        //availableCars.removeAll(unavailableCars);
-        //System.out.println(availableCars.toString());
-        for (String regNumber: availableCars) {
-            carReg = carReg + "\"" + regNumber + " \",";
-            //availableCars.add(myRs.getString(1));
-        }
-        if(carReg.length()!=0){
-            carReg =carReg.substring(0,carReg.length()-1);
-        }
-        //System.out.println(carReg);
-        displayCars("WHERE c.registration_number IN (" + carReg + ")");
-        closeConnection(myConn,myStmt,myRs);
-        return availableCars;
-    }
 
     public void displayUnavailableCars() throws SQLException{
         displayCars("WHERE is_available = 0");
@@ -556,7 +510,7 @@ public class CarMethods {
         displayCars("WHERE registration_number = " + registrationNumber);
     }
 
-    public void editCar() throws SQLException {
+    /*public void editCar() throws SQLException {
         displayCars(null);
         System.out.println("Enter Registration Number of a car you want to edit or 0 to go back: ");
         String registration_number = scanner.next();
@@ -585,7 +539,7 @@ public class CarMethods {
             cars.remove(registration_number);
             cars.add(new_registration_number);
         }
-    }
+    }*/
 
     public ArrayList<Object> connect() {
         try {

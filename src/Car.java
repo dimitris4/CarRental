@@ -101,9 +101,7 @@ public class Car {
                 '}';
     }
 
-
-
-
-
-
+    public void updateOdometer(int km) {
+        this.odometer += km;
+    }
 }

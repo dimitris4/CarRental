@@ -1,17 +1,12 @@
 //import javax.mail.*;
 //import javax.mail.internet.InternetAddress;
 //import javax.mail.internet.MimeMessage;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 import static java.sql.DriverManager.getConnection;
@@ -19,339 +14,91 @@ import static java.sql.DriverManager.getConnection;
 public class ContractMethods {
 
     private static Database database = Database.instance;
+    private static ArrayList<Contract> contracts;
+    private static Scanner input = new Scanner(System.in);
 
-    public void initiateContractList() throws SQLException {
+
+    public ContractMethods() throws SQLException, ParseException {
+        contracts = initiateContractList();
+    }
+
+    public ArrayList<Contract> initiateContractList() throws SQLException, ParseException {
         Connection myConn = dbConnect();
         Statement myStmt = myConn.createStatement();
         String query = "SELECT * " +
-                "FROM Contract co " +
-                "JOIN Car c ON co.car_registration_number = c.registration_number " +
-                "JOIN Renter r ON r.renterid = co.renterid " +
-                "JOIN Brand b ON b.brandID = c.brandID " +
-                "JOIN Model m ON b.brandID = m.brandID " +
-                "JOIN Rental_types rt ON rt.rental_typeID = c.rental_typeID ";
+                       "FROM contract ";
 
         ResultSet myRs = myStmt.executeQuery(query);
+        ArrayList<Contract> contracts = new ArrayList<>();
         while (myRs.next()) {
-            Contract c1 = new Contract();
-            Car car = new Car();
-            Renter renter = new Renter();
-            CarType type = new CarType();
-            Model model = new Model();
-            Brand brand = new Brand();
-
-            //Parsing brand info into the car object
-            brand.setBrandID(myRs.getInt("b.brandID"));
-            brand.setName(myRs.getString("b.name"));
-            car.setBrand(brand);
-
-            //Parsing model info into the car object
-            model.setModelID(myRs.getInt("m.modelID"));
-            model.setName(myRs.getString("m.name"));
-            car.setModel(model);
-
-            //Parsing rental type info into the car object
-            type.setName(myRs.getString("rt.name"));
-            type.setDescription(myRs.getString("rt.description"));
-            car.setType(type);
-
-            //Parsing car info into the car object
-            car.setRegistration_number(myRs.getString("c.registration_number"));
-            car.setFirst_registration(myRs.getDate("c.first_registration"));
-            car.setOdometer(myRs.getInt("c.odometer"));
-
-            //Parsing renter info into the renter object
-            renter.setFirst_name(myRs.getString("r.first_name"));
-            renter.setLast_name(myRs.getString("r.last_name"));
-            renter.setDriverLicenseNumber(myRs.getString("r.driver_license_number"));
-            renter.setEmail(myRs.getString("r.email"));
-
-
-            c1.setRenter(renter);
-            c1.setContractID(myRs.getInt("co.contractID"));
-            c1.setCar(car);
-            Date start = myRs.getDate("co.start_time");
-            c1.setStartDate(start);
-            Date end = myRs.getDate("co.end_time");
-            c1.setEndDate(end);
-            database.getContracts().add(c1);
+            int contractID = myRs.getInt("contractID");
+            int renterID = myRs.getInt("renterID");
+            String registrationNumber = myRs.getString("car_registration_number");
+            java.util.Date start_time = new SimpleDateFormat("yyyy-MM-dd").parse(myRs.getString("start_time"));
+            java.util.Date end_time = new SimpleDateFormat("yyyy-MM-dd").parse(myRs.getString("end_time"));
+            int max_km = myRs.getInt("max_km");
+            int actual_km = myRs.getInt("actual_km");
+            contracts.add(new Contract(contractID, renterID, registrationNumber, start_time, end_time, max_km, actual_km));
         }
         myConn.close();
-    }
-
-    public void fillRenterIDs() {
-
-        try {
-
-            Connection myConn = dbConnect();
-
-            Statement myStmt = myConn.createStatement();
-
-            String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
-                    "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
-                    "       door, ' ', zip, ' ', city, ' ', country.name)\n" +
-                    "FROM renter \n" +
-                    "\tJOIN address USING (addressID)\n" +
-                    "    JOIN zip USING (zipID)\n" +
-                    "    JOIN country USING (countryID)\n" +
-                    "    JOIN phone_numbers USING (renterID);";
-
-            ResultSet rs = myStmt.executeQuery(sql);
-
-            while (rs.next()) {
-
-                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
-                        rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7),
-                        rs.getString(8), rs.getString(9));
-
-                database.getRenterIDs().add(Integer.parseInt(rs.getString(1)));
-            }
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-
-        }
-
-    }
-
-    public void displayActiveContracts(){
-
-        System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("*******************************************************************************************************************************************************************************************");
-
-        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getEndDate().compareTo(date)>=0){
-                System.out.println(database.getContracts().get(i));
-            }
-        }
-        System.out.println("===========================================================================================================================================================================================");
-    }
-
-    public void displayOldContracts() {
-        System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("********************************************************************************************************************************************************************************************");
-
-        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getEndDate().compareTo(date)<0){
-                System.out.println(database.getContracts().get(i));
-            }
-        }
-        System.out.println("===========================================================================================================================================================================================");
-    }
-
-    public void searchContractsByStartDate() {
-
-        Scanner input = new Scanner(System.in);
-        System.out.println("Enter the start date of the contracts you want to see:");
-        String myDate = input.next();
-        Date date = Date.valueOf(myDate);
-        System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("********************************************************************************************************************************************************************************************");
-
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getStartDate().compareTo(date)==0){
-                System.out.println(database.getContracts().get(i));
-            }
-        }
-        System.out.println("===========================================================================================================================================================================================");
-    }
-
-    public void searchContractsByEndDate() {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Enter the end date of the contracts you want to see:");
-        String myDate = input.next();
-        Date date = Date.valueOf(myDate);
-        System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("********************************************************************************************************************************************************************************************");
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getEndDate().compareTo(date)==0){
-                System.out.println(database.getContracts().get(i));
-            }
-        }
-        System.out.println("===========================================================================================================================================================================================");
-    }
-
-    public void searchContractsByRegNo() {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Enter the registration number you want to find:");
-        String regNo = input.next();
-
-        System.out.printf("%-20s%-20s%-20s%-40s%-40s%-20s%-20s%-20s\n", "Contract ID","Rental Type", "Registration No", "Brand/Model", "Renter's Name", "Driver License No", "Start Date", "End Date");
-        System.out.println("********************************************************************************************************************************************************************************************");
-        boolean isFound = false;
-        for (int i = 0; i < database.getContracts().size(); i++){
-            if(database.getContracts().get(i).getCar().getRegistration_number().equalsIgnoreCase(regNo)){
-                System.out.println(database.getContracts().get(i));
-                isFound = true;
-            }
-        }
-        if(!isFound){
-            System.out.println("NO RECORDS FOUND");
-        }
-        System.out.println("===========================================================================================================================================================================================");
+        return contracts;
     }
 
     public void addContract() throws Exception {
-        Scanner input = new Scanner(System.in);
 
-        RenterMethods r = new RenterMethods();
-        r.displayRenters();
+        RenterMethods renterMethods = new RenterMethods();
+        renterMethods.displayRenters();
 
-        System.out.print("Enter renter ID: ");
-        int id = input.nextInt();
-        boolean isFound = false;
-        while (!isFound) {
-            isFound = database.getRenterIDs().contains(id);
-            if (!isFound) {
-                System.out.println("Wrong ID. Try again:");
-                id = input.nextInt();
-            }
+        System.out.print("\nSelect renter ID: ");
+        int renter_id = Input.checkInt(1,999999999);
+        while (!database.getRenterIDs().contains(renter_id)) {
+            System.out.print("Invalid ID. Try again: ");
+            renter_id = Input.checkInt(1,999999999);
         }
 
         System.out.print("Enter start date: ");
-        String startDate = input.next();
-        Date stDate = Date.valueOf(startDate);
+        java.util.Date start_time = Input.insertDateWithoutTime();
+        java.sql.Date sqlDate = new java.sql.Date(start_time.getTime());
 
-        System.out.print("Enter end date: ");
-        String endDate = input.next();
-        Date eDate = Date.valueOf(endDate);
+        System.out.print("Enter start date: ");
+        java.util.Date end_time = Input.insertDateWithoutTime();
+        java.sql.Date sqlDate2 = new java.sql.Date(end_time.getTime());
 
-        HashSet<String> carRegNo = OurApp.getController().displayAvailableCarsWithinDateRange(stDate, eDate);
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        System.out.println("Available cars from " + formatDate(start_time) + " to " + formatDate(end_time) + ":\n");
+        database.displayAvailableCarsWithinDateRange(start_time, end_time);
+
+        System.out.print("Select car registration number: ");
         String registration_number = input.next();
-        while (!carRegNo.contains(registration_number) || registration_number.equals(0)) {
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+        while (!database.getCarRegistrationNumbers().contains(registration_number)) {
+            System.out.println("Wrong input. Try again: ");
             registration_number = input.next();
         }
 
         System.out.print("Enter max Km: ");
-        int maxKm = Input.checkInt(1, 500);
+        int maxKm = Input.checkInt(1, 10000);
 
         int actualKm = 0;
 
-        String sqlst = "INSERT INTO contract (contractID, renterID, car_registration_number, start_time, end_time, max_km, actual_km) VALUES (LAST_INSERT_ID(), ?, ?, ?, ?, ?, ?)";
+        String sqlst = "INSERT INTO contract (renterID, car_registration_number, start_time, end_time, max_km, actual_km) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement pst = dbConnect().prepareStatement(sqlst);
-        pst.setInt(1, id);
+        pst.setInt(1, renter_id);
         pst.setString(2, registration_number);
-        pst.setDate(3, stDate);
-        pst.setDate(4, eDate);
+        pst.setDate(3, sqlDate);
+        pst.setDate(4, sqlDate2);
         pst.setInt(5, maxKm);
         pst.setInt(6, actualKm);
         pst.executeUpdate();
-        database.getContracts().clear();
-        //OurApp.getController().makeUnavailable(registration_number);
-        OurApp.getController().initiateContractList();
 
-        for (Contract contract : database.getContracts()) {
-            if (contract.getCar().getRegistration_number().equals(registration_number) && contract.getStartDate().equals(stDate)) {
-
-                String myMessage = "This agreement is hereby made between " + contract.getRenter().getFirst_name() + " \n" +
-                        contract.getRenter().getLast_name() + " (hereafter referred to as \"the Renter\") and {John Kailua} (hereafter referred to as \"the Owner\"). \n" +
-                        "The Owner hereby agrees to rent the following vehicle to the Renter: {" + contract.getCar().getBrand().getName() + " " + contract.getCar().getModel().getName() + ", License Plate #" + contract.getCar().getRegistration_number() + "\n" +
-                        "The Renter will rent the car from " + contract.getStartDate() + " to " + contract.getEndDate() + ".\n" +
-                        "The Renter agrees to return the vehicle in its current condition (minus normal road wear-and-tear) to the Owner on the return date.\n" +
-                        "The Renter understands that the vehicle is for use only in Copenhagen and cannot be taken to other locations.\n" +
-                        "The Renter swears and attests that {he/she} has a legal, valid license to drive this type of vehicle in Denmark, and that there are no outstanding warrants against said license. \n" +
-                        "The Renter's driver's license is: {" + contract.getRenter().getDriverLicenseNumber() + "}. The Renter further swears and attests that {he/she} has insurance that will cover the operation of this vehicle.\n" +
-                        "The Renter agrees not to allow any other person to drive the vehicle, except for authorized drivers listed and approved here. \n" +
-                        "The Renter agrees to use the vehicle only for routine, legal purposes (personal or business). The Renter further agrees to follow all city, state, county, and government rules and restrictions regarding use and operation of the vehicle.\n" +
-                        "The Renter agrees to hold harmless, indemnify, and release the Owner for any damages, injuries, property loss, or death caused while the Renter operates this vehicle. The Renter will be held accountable for any damages or cleaning fees incurred while renting the vehicle.\n" +
-                        "The Renter has had the opportunity to inspect the vehicle before the renting term begins and confirms that it is in good operable condition.\n" +
-                        "The Owner swears and attests that the vehicle is in good working order and has no liens or encumbrances.\n" +
-                        "                                                                                                        \n" +
-                        "         " + contract.getRenter().getFirst_name() + " " + contract.getRenter().getLast_name() + "\n" +
-                        "            (Renter Signature)                                                                          \n" +
-                        "                                                                                                        \n" +
-                        "         John Kailua                                                                                        \n" +
-                        "     (Owner Signature)                                                                                   \n" +
-                        "                                                                                                         \n" +
-                        "      " + contract.getStartDate() + "                                                 \n" +
-                        "    (Date)                                                                                              \n";
-                OurApp.getController().sendMail(contract.getRenter().getEmail(), myMessage);
-                break;
-
-            }
-        }
+        Contract contract = new Contract();
+        contract.setRenterID(renter_id);
+        contract.setRegistrationNumber(registration_number);
+        contract.setStartDate(start_time);
+        contract.setEndDate(end_time);
+        contract.setMaxKm(maxKm);
+        contract.setActualKm(actualKm);
+        contracts.add(contract);
     }
 
-    public void endContract() throws SQLException{
-        OurApp.getController().displayActiveContracts();
-        System.out.println("Select the contract you want to end:");
-        //Scanner input = new Scanner(System.in);
-        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-        int id = Input.checkInt(1, 5000);
-        boolean isFound = false;
-        while(!isFound){
-            for(int i=0; i < database.getContracts().size(); i++) {
-                if(database.getContracts().get(i).getContractID() == id && database.getContracts().get(i).getEndDate().compareTo(date)>= 0){
-                    isFound = true;
-                    // Get today as a Calendar
-                    Calendar today = Calendar.getInstance();
-                    // Subtract 1 day
-                    today.add(Calendar.DATE, -1);
-                    // Make an SQL Date out of that
-                    java.sql.Date yesterday = new java.sql.Date(today.getTimeInMillis());
-                    database.getContracts().get(i).setEndDate(yesterday);
-                    System.out.println("Please enter actual kilometres:");
-                    int actualKms = Input.checkInt(1, 1000);
-                    int odometer = database.getContracts().get(i).getCar().getOdometer();
-                    int totalKms = actualKms + odometer;
-                    System.out.println("Total kms For this Car:" + totalKms);
-                    String sqlst1 = "UPDATE contract SET end_time = ?, actual_km = ? WHERE contractID = ?";
-                    String sqlst2 = "UPDATE car c, contract co SET c.is_available = 1, c.odometer = ? WHERE co.car_registration_number = c.registration_number AND co.contractID = ?";
-
-                    PreparedStatement pst = dbConnect().prepareStatement(sqlst1);
-                    PreparedStatement pst2 = dbConnect().prepareStatement(sqlst2);
-
-                    pst.setDate(1, yesterday);
-                    pst.setInt(2, actualKms);
-                    pst.setInt(3, id);
-
-                    pst2.setInt(1, totalKms);
-                    pst2.setInt(2, id);
-
-                    pst.executeUpdate();
-                    pst2.executeUpdate();
-                    dbConnect().close();
-                }
-            }
-            if(!isFound){
-                System.out.println("Wrong input. Contract not found. Try again:");
-                id = Input.checkInt(1, 5000);
-            }
-        }
-    }
-
-    public void deleteContract() throws SQLException {
-        displayOldContracts();
-        System.out.println("You can only delete inactive contracts! Please select contract ID:");
-        Scanner input = new Scanner(System.in);
-        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
-        int id = Input.checkInt(1, 5000);
-        boolean isFound = false;
-        while (!isFound) {
-            final int myID = id;
-            //Lambda expression returns true if found
-            isFound = database.getContracts().removeIf(n -> (n.getContractID() == myID) && (n.getEndDate().compareTo(date) < 0));
-            if (isFound) {
-                String delCont = "DELETE FROM contract WHERE renterID = ?";
-                PreparedStatement pst = dbConnect().prepareStatement(delCont);
-                pst.setInt(1, id);
-                pst.executeUpdate();
-                System.out.println("Delete complete.");
-                dbConnect().close();
-            } else {
-                System.out.println("No such contract found! Try again:");
-                id = Input.checkInt(1, 5000);
-            }
-        }
-    }
 
     public Connection dbConnect(){
         Connection myConn = null;
@@ -364,7 +111,166 @@ public class ContractMethods {
         return myConn;
     }
 
-    public static void sendMail(String recipient, String myMessage) throws Exception{
+    public String formatDate(java.util.Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        return sdf.format(date);
+    }
+
+
+    public void displayActiveContracts(){
+        System.out.println("ACTIVE CONTRACTS");
+        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
+                "Max Km", "Actual Km"));
+        for (int i=0; i<125; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        for (Contract contract : contracts) {
+            if(contract.getEndDate().compareTo(new java.sql.Date(new java.util.Date().getTime())) >= 0){
+                System.out.println(contract);
+            }
+        }
+        for (int i=0; i<125; i++) {
+            System.out.print("=");
+        }
+        System.out.println();
+    }
+
+
+    public void displayOldContracts() {
+        System.out.println("OLD CONTRACTS");
+        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
+                                        "Max Km", "Actual Km"));
+        for (int i=0; i<125; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        for (Contract contract : contracts) {
+            if(contract.getEndDate().compareTo(new java.sql.Date(new java.util.Date().getTime())) < 0){
+                System.out.println(contract);
+            }
+        }
+        for (int i=0; i<125; i++) {
+            System.out.print("=");
+        }
+        System.out.println();
+    }
+
+    public void searchContractsByStartDate() {
+        System.out.print("Enter the start date: ");
+        Date date = Input.insertDateWithoutTime();
+        System.out.println("SEARCH RESULTS");
+        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
+                                            "Max Km", "Actual Km"));
+        for (int i=0; i<125; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        for (Contract contract : contracts) {
+            if(contract.getStartDate().compareTo(date) == 0){
+                System.out.println(contract);
+            }
+        }
+        for (int i=0; i<125; i++) {
+            System.out.print("=");
+        }
+        System.out.println();
+    }
+
+    public void searchContractsByEndDate() {
+        System.out.print("Enter the end date: ");
+        Date date = Input.insertDateWithoutTime();
+        System.out.println("SEARCH RESULTS");
+        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
+                "Max Km", "Actual Km"));
+        for (int i=0; i<125; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        for (Contract contract : contracts) {
+            if(contract.getEndDate().compareTo(date) == 0){
+                System.out.println(contract);
+            }
+        }
+        for (int i=0; i<125; i++) {
+            System.out.print("=");
+        }
+        System.out.println();
+    }
+
+    public void searchContractsByRegNo() throws SQLException {
+        System.out.print("Enter the car's registration number: ");
+        String string = input.next();
+        while (!database.getCarRegistrationNumbers().contains(string)) {
+            System.out.print("Invalid registration number. Try again: ");
+            string = input.next();
+        }
+        System.out.println("SEARCH RESULTS");
+        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
+                "Max Km", "Actual Km"));
+        for (int i=0; i<125; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        for (Contract contract : contracts) {
+            if(contract.getRegistrationNumber().equals(string)){
+                System.out.println(contract);
+            }
+        }
+        for (int i=0; i<125; i++) {
+            System.out.print("=");
+        }
+        System.out.println();
+    }
+
+
+    public void endContract() throws SQLException {
+        displayActiveContracts();
+
+        System.out.print("Select contract ID: ");
+        int contractID = Input.checkInt(1, 999999999);
+        while (!database.getContractIDs().contains(contractID)) {
+            System.out.print("Invalid input. Try again: ");
+            contractID = Input.checkInt(1, 999999999);
+        }
+
+        for(Contract contract : contracts) {
+            if (contract.getContractID() == contractID) {
+
+                System.out.print("Enter actual km: ");
+                int actual_km = Input.checkInt(0, 999999999);
+
+                Date today = new Date();
+                contract.setEndDate(today);
+                java.sql.Date sqlDate = new java.sql.Date(today.getTime());
+
+                database.updateContract(actual_km, sqlDate, contractID);
+            }
+        }
+    }
+
+
+    public void deleteContract() throws SQLException {
+        displayOldContracts();
+        System.out.println("You can only delete old contracts! Please select contract ID:");
+        int contractID = Input.checkInt(1, 999999999);
+        while (!database.getContractIDs().contains(contractID)) {
+            System.out.print("Invalid contract ID. Try again: ");
+            contractID = Input.checkInt(1, 999999999);
+        }
+        for (Contract contract : contracts) {
+            if (contract.getContractID() == contractID && contract.getEndDate().compareTo(new Date()) < 0) {
+                database.removeContract(contractID);
+                contracts.remove(contract);
+                return;
+            }
+        }
+        System.out.println("\nThe selected contract cannot be deleted.");
+    }
+
+
+
+    /*public static void sendMail(String recipient, String myMessage) throws Exception{
         System.out.println("Preparing to send contract to client...");
         Properties properties = new Properties();
 
@@ -401,5 +307,7 @@ public class ContractMethods {
         return null;
     }
 
+
+*/
 
 }
