@@ -69,20 +69,14 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 2:
-                    //OurApp.getController().editCar();
+                    OurApp.getController().editCar();
                     pressAnyKey();
                     break;
                 case 3:
-                    //OurApp.getController().deleteCar();
+                    OurApp.getController().deleteCar();
                     pressAnyKey();
                     break;
                 case 4:
-                    //String end = "2020-01-31";
-                    //String start = "2020-02-03";
-                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-                    //Date endDate = dateFormat.parse(end);
-                    //Date startDate = dateFormat.parse(start);
-                    //OurApp.getController().displayAvailableCarsWithinDateRange(startDate,endDate);
                     OurApp.getController().displayCars();
                     pressAnyKey();
                     break;
@@ -182,6 +176,8 @@ public class Menus {
 
             ContractMethods contractMethods = new ContractMethods();
 
+            System.out.print("Select Option: ");
+
             int selection = Input.checkInt(0, 5);
 
             switch (selection) {
@@ -227,8 +223,13 @@ public class Menus {
             System.out.println("|   [7] Return To Main Menu           |");
             System.out.println("|   [0] Close Program                 |");
             System.out.println("***************************************");
+
             ContractMethods contractMethods = new ContractMethods();
+
+            System.out.print("Select Option: ");
+
             int selection = Input.checkInt(0, 7);
+
             switch (selection) {
                 case 1:
                     contractMethods.displayActiveContracts();

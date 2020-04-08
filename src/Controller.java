@@ -21,8 +21,8 @@ public class Controller {
     public void initiateCarList() throws SQLException {carMethods.initiateCarList();}
     public void displayCars() throws SQLException {carMethods.displayCars(null);}
     public void addCar() throws SQLException {carMethods.addCar();}
-    //public void deleteCar() throws SQLException, ParseException {carMethods.deleteCar();}
-    //public void editCar() throws SQLException {carMethods.editCar();}
+    public void deleteCar() throws SQLException, ParseException {carMethods.deleteCar();}
+    public void editCar() throws SQLException, ParseException {carMethods.editCar();}
     //public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException { return carMethods.displayAvailableCarsWithinDateRange(startDate,endDate); }
     public void makeUnavailable() throws SQLException {carMethods.makeUnavailable();}
     public void makeAvailable() throws SQLException {carMethods.makeAvailable();}

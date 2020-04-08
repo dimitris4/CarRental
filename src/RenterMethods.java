@@ -24,7 +24,7 @@ public class RenterMethods {
 
 
     public void displayRenters() {
-        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-30s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
                 "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
         for (int i = 0; i < 215; i++) {
             System.out.print("-");

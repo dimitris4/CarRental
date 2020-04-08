@@ -2,11 +2,15 @@
 //import javax.mail.internet.InternetAddress;
 //import javax.mail.internet.MimeMessage;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Scanner;
 
 import static java.sql.DriverManager.getConnection;
@@ -17,9 +21,12 @@ public class ContractMethods {
     private static ArrayList<Contract> contracts;
     private static Scanner input = new Scanner(System.in);
 
-
     public ContractMethods() throws SQLException, ParseException {
         contracts = initiateContractList();
+    }
+
+    public ArrayList<Contract> getContracts() {
+        return contracts;
     }
 
     public ArrayList<Contract> initiateContractList() throws SQLException, ParseException {
@@ -96,6 +103,34 @@ public class ContractMethods {
         contract.setMaxKm(maxKm);
         contract.setActualKm(actualKm);
         contracts.add(contract);
+        System.out.print("Do you want to send email to the customer? ([1] yes [0] no): ");
+        int choice = Input.checkInt(0,1);
+        if (choice == 1) {
+            String myMessage = "This agreement is hereby made between " + database.getRenterFirstName(renter_id) + " \n" +
+                    database.getRenterLastName(renter_id) + " (hereafter referred to as \"the Renter\") and {John Kailua} (hereafter referred to as \"the Owner\"). \n" +
+                    "The Owner hereby agrees to rent the following vehicle to the Renter: license plate: " + registration_number + "\n" +
+                    "The Renter will rent the car from " + contract.getStartDate() + " to " + contract.getEndDate() + ".\n" +
+                    "The Renter agrees to return the vehicle in its current condition (minus normal road wear-and-tear) to the Owner on the return date.\n" +
+                    "The Renter understands that the vehicle is for use only in Copenhagen and cannot be taken to other locations.\n" +
+                    "The Renter swears and attests that {he/she} has a legal, valid license to drive this type of vehicle in Denmark, and that there are no outstanding warrants against said license. \n" +
+                    "The Renter's driver's license is: {" + database.getRenterDriverLicese(renter_id) + "}. The Renter further swears and attests that {he/she} has insurance that will cover the operation of this vehicle.\n" +
+                    "The Renter agrees not to allow any other person to drive the vehicle, except for authorized drivers listed and approved here. \n" +
+                    "The Renter agrees to use the vehicle only for routine, legal purposes (personal or business). The Renter further agrees to follow all city, state, county, and government rules and restrictions regarding use and operation of the vehicle.\n" +
+                    "The Renter agrees to hold harmless, indemnify, and release the Owner for any damages, injuries, property loss, or death caused while the Renter operates this vehicle. The Renter will be held accountable for any damages or cleaning fees incurred while renting the vehicle.\n" +
+                    "The Renter has had the opportunity to inspect the vehicle before the renting term begins and confirms that it is in good operable condition.\n" +
+                    "The Owner swears and attests that the vehicle is in good working order and has no liens or encumbrances.\n" +
+                    " \n" +
+                    " " + database.getRenterFirstName(renter_id) + " " + database.getRenterLastName(renter_id) + "\n" +
+                    " (Renter Signature) \n" +
+                    " \n" +
+                    " John Kailua \n" +
+                    " (Owner Signature) \n" +
+                    " \n" +
+                    " " + contract.getStartDate() + " \n" +
+                    " (Date) \n";
+            String renterEmail = database.getEmail(renter_id);
+            sendMail(renterEmail, myMessage);
+        }
     }
 
 
@@ -269,7 +304,7 @@ public class ContractMethods {
 
 
 
-    /*public static void sendMail(String recipient, String myMessage) throws Exception{
+    public static void sendMail(String recipient, String myMessage) throws Exception{
         System.out.println("Preparing to send contract to client...");
         Properties properties = new Properties();
 
@@ -305,8 +340,4 @@ public class ContractMethods {
         }
         return null;
     }
-
-
-*/
-
 }

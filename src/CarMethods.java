@@ -20,7 +20,6 @@ public class CarMethods {
     private static Scanner scanner = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
-
     public CarMethods() throws SQLException {//populate hashsets and arraylists form DB
         ArrayList<Object> db = connect();
         Connection myConn = (Connection) db.get(0);
@@ -60,7 +59,7 @@ public class CarMethods {
     }
 
     public String setRegistrationNumber(){
-        System.out.println("Registration number: ");
+        System.out.print("Registration number: ");
         String registration_number = scanner.next();
         while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]+")){
             System.out.println("Invalid registration number. Please try again: ");
@@ -71,7 +70,7 @@ public class CarMethods {
 
     public String setFirstRegDate(){
         System.out.println("First registration date: ");
-        System.out.println("Year: ");
+        System.out.print("Year: ");
         int year = scanner.nextInt();
         //first car created in 1885 (i think) so it can't be less than 1885
         // can't be higher than current year
@@ -79,13 +78,13 @@ public class CarMethods {
             System.out.println("Invalid year value. Please insert value between 1885 -" + Calendar.getInstance().get(YEAR) + ": ");
             year = scanner.nextInt();
         }
-        System.out.println("Month: ");
+        System.out.print("Month: ");
         int month = scanner.nextInt();
         while(month<0 || month>12){
             System.out.println("Invalid month value. Please insert value between 1 - 12: ");
             month = scanner.nextInt();
         }
-        System.out.println("Day: ");
+        System.out.print("Day: ");
         int day = scanner.nextInt();
         while(dateCheck(year,month,day)){
             int leap=0;
@@ -99,10 +98,10 @@ public class CarMethods {
     }
 
     public int setOdometer(){
-        System.out.println("Odometer (amount of km): ");
+        System.out.print("Odometer (amount of km): ");
         int odometer = scanner.nextInt();
         while(odometer<0){
-            System.out.println("Invalid value. Please try again: ");
+            System.out.print("Invalid value. Please try again: ");
             odometer = scanner.nextInt();
         }
         return odometer;
@@ -112,17 +111,17 @@ public class CarMethods {
         int amount;
         amount = displayBrand();
         System.out.println("Enter 0 to add new option");
-        System.out.println("Brand (ID number): ");
+        System.out.print("Brand (ID number): ");
         int brand = scanner.nextInt();
-        while(brand<0 && brand>amount){
-            System.out.println("Invalid value. Please try again: ");
+        while(brand<0 || brand>amount){
+            System.out.print("Invalid value. Please try again: ");
             brand = scanner.nextInt();
         }
         if (brand==0){
-            System.out.println("Brand name: ");
+            System.out.print("Brand name: ");
             String brandName = scanner.next();
             while (brandName.length()>12){
-                System.out.println("Wrong input. Try again (max length 12): ");
+                System.out.print("Wrong input. Try again (max length 12): ");
                 brandName = scanner.next();
             }
             if (!brands.contains(brandName)){ //insert new brand name if doesn't exist
@@ -149,17 +148,17 @@ public class CarMethods {
     public int setModel(Connection myConn, int brand) throws SQLException {
         HashSet<Integer>brandModels = displayModel(brand);
         System.out.println("Enter 0 to add new option");
-        System.out.println("Model (ID number): ");
+        System.out.print("Model (ID number): ");
         int model = scanner.nextInt();
         while(!brandModels.contains(model) && model!=0){
             System.out.println("Invalid value. Please try again: ");
             model = scanner.nextInt();
         }
         if (model==0){
-            System.out.println("Model name: ");
+            System.out.print("Model name: ");
             String modelName = scanner.next();
             while (modelName.length()>12){
-                System.out.println("Wrong input. Try again (max length 12): ");
+                System.out.print("Wrong input. Try again (max length 12): ");
                 modelName = scanner.next();
             }
             if (!models.contains(modelName)) { //add new model name if it doesnt exist
@@ -187,17 +186,17 @@ public class CarMethods {
     public int setFuel(Connection myConn) throws SQLException {
         int amount = displayFuel();
         System.out.println("Enter 0 to add new option");
-        System.out.println("Fuel (ID number): ");
+        System.out.print("Fuel (ID number): ");
         int fuel = scanner.nextInt();
         while(fuel<0 && fuel>amount){
-            System.out.println("Invalid value. Please try again: ");
+            System.out.print("Invalid value. Please try again: ");
             fuel = scanner.nextInt();
         }
         if (fuel==0){
-            System.out.println("Fuel type: ");
+            System.out.print("Fuel type: ");
             String fuelType = scanner.next();
             while (fuelType.length()>11){
-                System.out.println("Wrong input. Try again (max length 11): ");
+                System.out.print("Wrong input. Try again (max length 11): ");
                 fuelType = scanner.next();
             }
             if (!fuels.contains(fuelType)){ //add new fuel type if it doesnt exist
@@ -223,10 +222,10 @@ public class CarMethods {
 
     public int setType() throws SQLException {
         displayType();
-        System.out.println("Type (ID number): ");
+        System.out.print("Type (ID number): ");
         int type = scanner.nextInt();
         while(type<0 || type>3){
-            System.out.println("Invalid value. Please try again: ");
+            System.out.print("Invalid value. Please try again: ");
             type = scanner.nextInt();
         }
         return type;
@@ -264,12 +263,12 @@ public class CarMethods {
     }
 
     public int confirmation(String method){//will change it to fit with other menus later, just for functionality now
-        System.out.println("Are you sure you want to " + method + " this car?");
+        System.out.println("Are you sure you want to " + method);
         System.out.println("1. Yes");
         System.out.println("2. No");
         int output = scanner.nextInt();
         while (output<1 || output>2) {
-            System.out.println("Wrong input. Try again: ");
+            System.out.print("Wrong input. Try again: ");
             output=scanner.nextInt();
         }
         return output;
@@ -369,20 +368,20 @@ public class CarMethods {
         return cars.contains(registration_number) || registration_number.equals("0");
     }
 
-    /*public void deleteCar() throws SQLException, ParseException {
+    public void deleteCar() throws SQLException, ParseException {
         String end = "2500-01-31";
         String start = Calendar.getInstance().get(YEAR) + "-" + Calendar.getInstance().get(MONTH) + "-" + Calendar.getInstance().get(DAY_OF_MONTH) ;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
         Date endDate = dateFormat.parse(end);
         Date startDate = dateFormat.parse(start);
         HashSet <String> carsWoContract = displayAvailableCarsWithinDateRange(startDate,endDate); //cars without contract, from today till year 2500
-        System.out.println("Insert registration number of a car you want to delete: ");
+        System.out.print("Insert registration number of a car you want to delete or 0 to go back: ");
         String registration_number = scanner.next();
         while (!(carsWoContract.contains(registration_number) || registration_number.equals("0"))){
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            System.out.print("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(carsWoContract.contains(registration_number) && confirmation("delete")==1){
+        if(carsWoContract.contains(registration_number) && confirmation("delete this car?")==1){
             update("DELETE FROM Car WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been deleted from the database");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -395,7 +394,7 @@ public class CarMethods {
             System.out.println("Deletion cancelled.");
         }
         System.out.println("Returning to the menu.");
-    }*/
+    }
 
     public HashSet<String> displayCars(String condition) throws SQLException {
         HashSet<String> carRegNo = new HashSet<>();
@@ -429,6 +428,53 @@ public class CarMethods {
         return carRegNo;
     }
 
+    public HashSet<String> displayAvailableCarsWithinDateRange(Date startDate, Date endDate) throws SQLException {
+        if (startDate.compareTo(endDate) > 0){ //reverse the order if start>end
+            Date tempDate = startDate;
+            startDate = endDate;
+            endDate = tempDate;
+        }
+
+        String sDate = startDate.toString();
+        String eDate = endDate.toString();
+
+        HashSet<String> availableCars =new HashSet<>();
+        HashSet<String> unavailableCars =new HashSet<>();
+        ArrayList<Object> db = connect();
+        Connection myConn = (Connection) db.get(0);
+        Statement myStmt = (Statement) db.get(1);
+        String query = "SELECT DISTINCT c.registration_number " + //selects all available cars within the date range
+                // however as more contracts exist for 1 car, it might be added to the lsit even if it's not
+                // available during that exact date
+                "FROM Car c LEFT JOIN  contract co ON c.registration_number = co.car_registration_number " +
+                "WHERE (NOT('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time) || c.registration_number " +
+                "NOT IN (SELECT car_registration_number FROM contract)) AND c.is_available = 1";
+        ResultSet myRs = myStmt.executeQuery(query);
+        while (myRs.next()) { availableCars.add(myRs.getString(1));}
+        //System.out.println(availableCars.toString());
+        String query2 = "SELECT co.car_registration_number " + //selects cars that are't available during selected date
+                "FROM Car c JOIN  contract co ON c.registration_number = co.car_registration_number " +
+                "WHERE ('" + eDate + "'>=co.start_time AND '" + sDate + "'<=co.end_time)";
+        Statement myStmt2 = (Statement) db.get(1);
+        ResultSet myRs2 = myStmt2.executeQuery(query2);
+        //System.out.println(myRs2.getFetchSize());
+        while (myRs2.next()) { unavailableCars.add(myRs2.getString(1));}
+        //System.out.println(unavailableCars.toString());
+        String carReg = "";
+        availableCars.removeAll(unavailableCars); //substracts unavailable from available
+        //System.out.println(availableCars.toString());
+        for (String regNumber: availableCars) {
+            carReg = carReg + "\"" + regNumber + " \",";
+            //availableCars.add(myRs.getString(1));
+        }
+        if(carReg.length()!=0){
+            carReg =carReg.substring(0,carReg.length()-1);
+        }
+        //System.out.println(carReg);
+        displayCars("WHERE c.registration_number IN (" + carReg + ")");
+        closeConnection(myConn,myStmt,myRs);
+        return availableCars;
+    }
 
     public void displayUnavailableCars() throws SQLException{
         displayCars("WHERE is_available = 0");
@@ -436,14 +482,14 @@ public class CarMethods {
 
     public void makeUnavailable() throws SQLException {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 1");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        System.out.print("Insert registration number of a car you want to set as unavailable or 0 to go back: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)){
             System.out.println("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
             System.out.println(registration_number);
         }
-        if(cars.contains(registration_number) && confirmation("make unavailable")==1){
+        if(cars.contains(registration_number) && confirmation("make this car unavailable?")==1){
             update("UPDATE Car SET is_available=0 WHERE registration_number = '" + registration_number + "'");
             System.out.println("Car has been made unavailable");
             for (int i=0;i< database.getCarList().size();i++) {
@@ -459,15 +505,15 @@ public class CarMethods {
 
     public void makeAvailable() throws SQLException {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 0");
-        System.out.println("Insert registration number of a car you want to set as unavailable: ");
+        System.out.print("Insert registration number of a car you want to set as available or 0 to go back:: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)){
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            System.out.print("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
-        if(cars.contains(registration_number) && confirmation("make available")==1){
+        if(cars.contains(registration_number) && confirmation("make this car available?")==1){
             update("UPDATE Car SET is_available=1 WHERE registration_number = '" + registration_number + "'");
-            System.out.println("Car has been made unavailable");
+            System.out.println("Car has been made available");
             for (int i=0;i< database.getCarList().size();i++) {
                 if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
                     database.getCarList().get(i).setAvailable(true);
@@ -480,7 +526,7 @@ public class CarMethods {
     }
 
     public void makeUnavailable(String registration_number) throws SQLException {
-        if(confirmation("make unavailable")==1){
+        if(confirmation("make this car unavailable?")==1){
             update("UPDATE Car SET is_available = 0 WHERE registration_number = '" + registration_number + "'");
             for (int i=0; i<database.getCarList().size(); i++) {
                 if (database.getCarList().get(i).getRegistration_number().equals(registration_number)){
@@ -510,12 +556,12 @@ public class CarMethods {
         displayCars("WHERE registration_number = " + registrationNumber);
     }
 
-    /*public void editCar() throws SQLException {
+    public void editCar() throws SQLException, ParseException {
         displayCars(null);
-        System.out.println("Enter Registration Number of a car you want to edit or 0 to go back: ");
+        System.out.print("Enter Registration Number of a car you want to edit or 0 to go back: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)) {
-            System.out.println("Wrong input. Enter 0 to go back or try again: ");
+            System.out.print("Wrong input. Enter 0 to go back or try again: ");
             registration_number = scanner.next();
         }
         String new_registration_number = "";
@@ -526,9 +572,10 @@ public class CarMethods {
             //update("UPDATE Contract SET car_registration_number = '" + new_registration_number + "' WHERE car_registration_number = '" + registration_number + "'");
             update("UPDATE Car SET registration_number = '" + new_registration_number + "' WHERE registration_number = '" + registration_number + "'");
             //change registration number in contracts
-            for (int i = 0; i < database.getContracts().size(); i++) {
-                if (database.getContracts().get(i).getCar().getRegistration_number().equals(registration_number)) {
-                    database.getContracts().get(i).getCar().setRegistration_number(new_registration_number);
+            ContractMethods contractMethods = new ContractMethods();
+            for (int i = 0; i < contractMethods.getContracts().size(); i++) {
+                if (contractMethods.getContracts().get(i).getRegistrationNumber().equals(registration_number)) {
+                    contractMethods.getContracts().get(i).setRegistrationNumber(new_registration_number);
                 }
             }
             for (CarInformation cari : database.getCarList()) {
@@ -539,7 +586,7 @@ public class CarMethods {
             cars.remove(registration_number);
             cars.add(new_registration_number);
         }
-    }*/
+    }
 
     public ArrayList<Object> connect() {
         try {

@@ -826,4 +826,80 @@ public class Database {
             exc.printStackTrace();
         }
     }
+
+    public String getEmail(int renter_id) {
+        String email = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getEmail = null;
+            String sql = "SELECT email FROM renter WHERE renterID = ?";
+            getEmail = myConn.prepareStatement(sql);
+            getEmail.setInt(1, renter_id);
+            ResultSet rs = getEmail.executeQuery();
+            while (rs.next()) {
+                email = rs.getString("email");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return email;
+    }
+
+    public String getRenterFirstName(int renter_id) {
+        String firstName = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getFirstName = null;
+            String sql = "SELECT first_name FROM renter WHERE renterID = ?";
+            getFirstName = myConn.prepareStatement(sql);
+            getFirstName.setInt(1, renter_id);
+            ResultSet rs = getFirstName.executeQuery();
+            while (rs.next()) {
+                firstName = rs.getString("first_name");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return firstName;
+    }
+
+    public String getRenterLastName(int renter_id) {
+        String lastName = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getLastName = null;
+            String sql = "SELECT last_name FROM renter WHERE renterID = ?";
+            getLastName = myConn.prepareStatement(sql);
+            getLastName.setInt(1, renter_id);
+            ResultSet rs = getLastName.executeQuery();
+            while (rs.next()) {
+                lastName = rs.getString("last_name");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastName;
+    }
+
+    public String getRenterDriverLicese(int renter_id) {
+        String driverLicense = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getDriverLicense = null;
+            String sql = "SELECT driver_license_number FROM renter WHERE renterID = ?";
+            getDriverLicense = myConn.prepareStatement(sql);
+            getDriverLicense.setInt(1, renter_id);
+            ResultSet rs = getDriverLicense.executeQuery();
+            while (rs.next()) {
+                driverLicense = rs.getString("driver_license");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return driverLicense;
+    }
 }
