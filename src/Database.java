@@ -911,4 +911,133 @@ public class Database {
         }
         return driverLicense;
     }
+
+    public void displayActiveContracts() {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement statement = null;
+            String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
+                                    "start_time, end_time, max_km, actual_km\n" +
+                                    "FROM contract LEFT JOIN renter USING (renterID)\n" +
+                                    "WHERE start_time >= curdate();";
+
+            statement = myConn.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), sdf.format(rs.getDate(6)),
+                        sdf.format(rs.getDate(7)), rs.getString(8), rs.getString(9));
+            }
+            statement.close();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayOldContracts() {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement statement = null;
+            String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
+                    "start_time, end_time, max_km, actual_km\n" +
+                    "FROM contract LEFT JOIN renter USING (renterID)\n" +
+                    "WHERE start_time < curdate();";
+
+            statement = myConn.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), sdf.format(rs.getDate(6)), sdf.format(rs.getDate(7)),
+                        rs.getString(8), rs.getString(9));
+            }
+            statement.close();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayContractsByStartDate(Date date) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement statement = null;
+            String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
+                    "start_time, end_time, max_km, actual_km\n" +
+                    "FROM contract LEFT JOIN renter USING (renterID)\n" +
+                    "WHERE start_time = ?;";
+
+            statement = myConn.prepareStatement(sql);
+            statement.setDate(1, date);
+            ResultSet rs = statement.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), sdf.format(rs.getDate(6)), sdf.format(rs.getDate(7)),
+                        rs.getString(8), rs.getString(9));
+            }
+            statement.close();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayContractsByEndDate(Date date) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement statement = null;
+            String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
+                    "start_time, end_time, max_km, actual_km\n" +
+                    "FROM contract LEFT JOIN renter USING (renterID)\n" +
+                    "WHERE end_time = ?;";
+
+            statement = myConn.prepareStatement(sql);
+            statement.setDate(1, date);
+            ResultSet rs = statement.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), sdf.format(rs.getString(6)), sdf.format(rs.getString(7)),
+                        rs.getString(8), rs.getString(9));
+            }
+            statement.close();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayContractsByEndDate(String registrationNumber) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement statement = null;
+            String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
+                    "start_time, end_time, max_km, actual_km\n" +
+                    "FROM contract LEFT JOIN renter USING (renterID)\n" +
+                    "WHERE car_registration_number = ?";
+
+            statement = myConn.prepareStatement(sql);
+            statement.setString(1, registrationNumber);
+            ResultSet rs = statement.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            while (rs.next()) {
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), sdf.format(rs.getDate(6)), sdf.format(rs.getDate(7)),
+                        rs.getString(8), rs.getString(9));
+            }
+            statement.close();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

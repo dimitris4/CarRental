@@ -170,20 +170,16 @@ public class ContractMethods {
     }
 
 
-    public void displayActiveContracts(){
+    public void displayActiveContracts() {
         System.out.println("ACTIVE CONTRACTS");
-        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
-                "Max Km", "Actual Km"));
-        for (int i=0; i<125; i++) {
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "ContractID", "Renter ID", "First Name",
+                            "Last Name", "Car Registration Number", "Start Date", "End Date", "Max Km", "Actual Km");
+        for (int i=0; i<210; i++) {
             System.out.print("*");
         }
         System.out.println();
-        for (Contract contract : contracts) {
-            if(contract.getEndDate().compareTo(new java.sql.Date(new java.util.Date().getTime())) >= 0){
-                System.out.println(contract);
-            }
-        }
-        for (int i=0; i<125; i++) {
+        database.displayActiveContracts();
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
@@ -192,18 +188,14 @@ public class ContractMethods {
 
     public void displayOldContracts() {
         System.out.println("OLD CONTRACTS");
-        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
-                                        "Max Km", "Actual Km"));
-        for (int i=0; i<125; i++) {
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "ContractID", "Renter ID", "First Name",
+                            "Last Name", "Car Registration Number", "Start Date", "End Date", "Max Km", "Actual Km");
+        for (int i=0; i<210; i++) {
             System.out.print("*");
         }
         System.out.println();
-        for (Contract contract : contracts) {
-            if(contract.getEndDate().compareTo(new java.sql.Date(new java.util.Date().getTime())) < 0){
-                System.out.println(contract);
-            }
-        }
-        for (int i=0; i<125; i++) {
+        database.displayOldContracts();
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
@@ -212,19 +204,16 @@ public class ContractMethods {
     public void searchContractsByStartDate() {
         System.out.print("Enter the start date: ");
         java.util.Date date = Input.insertDateWithoutTime();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         System.out.println("SEARCH RESULTS");
-        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
-                                            "Max Km", "Actual Km"));
-        for (int i=0; i<125; i++) {
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "ContractID", "Renter ID", "First Name",
+                "Last Name", "Car Registration Number", "Start Date", "End Date", "Max Km", "Actual Km");
+        for (int i=0; i<210; i++) {
             System.out.print("*");
         }
         System.out.println();
-        for (Contract contract : contracts) {
-            if(contract.getStartDate().compareTo(date) == 0){
-                System.out.println(contract);
-            }
-        }
-        for (int i=0; i<125; i++) {
+        database.displayContractsByStartDate(sqlDate);
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
@@ -233,19 +222,16 @@ public class ContractMethods {
     public void searchContractsByEndDate() {
         System.out.print("Enter the end date: ");
         java.util.Date date = Input.insertDateWithoutTime();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         System.out.println("SEARCH RESULTS");
-        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
-                "Max Km", "Actual Km"));
-        for (int i=0; i<125; i++) {
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "ContractID", "Renter ID", "First Name",
+                "Last Name", "Car Registration Number", "Start Date", "End Date", "Max Km", "Actual Km");
+        for (int i=0; i<210; i++) {
             System.out.print("*");
         }
         System.out.println();
-        for (Contract contract : contracts) {
-            if(contract.getEndDate().compareTo(date) == 0){
-                System.out.println(contract);
-            }
-        }
-        for (int i=0; i<125; i++) {
+        database.displayContractsByEndDate(sqlDate);
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
@@ -259,18 +245,14 @@ public class ContractMethods {
             string = input.next();
         }
         System.out.println("SEARCH RESULTS");
-        System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
-                "Max Km", "Actual Km"));
-        for (int i=0; i<125; i++) {
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "ContractID", "Renter ID", "First Name",
+                "Last Name", "Car Registration Number", "Start Date", "End Date", "Max Km", "Actual Km");
+        for (int i=0; i<210; i++) {
             System.out.print("*");
         }
         System.out.println();
-        for (Contract contract : contracts) {
-            if(contract.getRegistrationNumber().equals(string)){
-                System.out.println(contract);
-            }
-        }
-        for (int i=0; i<125; i++) {
+        database.displayContractsByEndDate(string);
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
