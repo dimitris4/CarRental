@@ -8,10 +8,7 @@ import javax.mail.internet.MimeMessage;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -64,13 +61,30 @@ public class ContractMethods {
 
         System.out.print("Enter start date: ");
         java.util.Date start_time = Input.insertDateWithoutTime();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(start_time);
+        int year = calendar.get(Calendar.YEAR);
+        while ((start_time.compareTo(Calendar.getInstance().getTime()) < 0) || (year > 9999)) {
+            System.out.print("The start date cannot be in the past. Try again: ");
+            start_time = Input.insertDateWithoutTime();
+            calendar.setTime(start_time);
+            year = calendar.get(Calendar.YEAR);
+        }
         java.sql.Date sqlDate = new java.sql.Date(start_time.getTime());
 
-        System.out.print("Enter start date: ");
+        System.out.print("Enter end date: ");
         java.util.Date end_time = Input.insertDateWithoutTime();
+        calendar.setTime(end_time);
+        year = calendar.get(Calendar.YEAR);
+        while (end_time.compareTo(start_time) < 0 || (year > 9999)) {
+            System.out.print("The end date cannot be older than the start date. Try again: ");
+            end_time = Input.insertDateWithoutTime();
+            calendar.setTime(end_time);
+            year = calendar.get(Calendar.YEAR);
+        }
         java.sql.Date sqlDate2 = new java.sql.Date(end_time.getTime());
 
-        System.out.println("Available cars from " + formatDate(start_time) + " to " + formatDate(end_time) + ":\n");
+        System.out.println("\n\nAvailable cars from " + formatDate(start_time) + " to " + formatDate(end_time) + ":\n");
         database.displayAvailableCarsWithinDateRange(start_time, end_time);
 
         System.out.print("Select car registration number: ");
@@ -113,7 +127,7 @@ public class ContractMethods {
                     "The Renter agrees to return the vehicle in its current condition (minus normal road wear-and-tear) to the Owner on the return date.\n" +
                     "The Renter understands that the vehicle is for use only in Copenhagen and cannot be taken to other locations.\n" +
                     "The Renter swears and attests that {he/she} has a legal, valid license to drive this type of vehicle in Denmark, and that there are no outstanding warrants against said license. \n" +
-                    "The Renter's driver's license is: {" + database.getRenterDriverLicese(renter_id) + "}. The Renter further swears and attests that {he/she} has insurance that will cover the operation of this vehicle.\n" +
+                    "The Renter's driver's license is: {" + database.getRenterDriverLicense(renter_id) + "}. The Renter further swears and attests that {he/she} has insurance that will cover the operation of this vehicle.\n" +
                     "The Renter agrees not to allow any other person to drive the vehicle, except for authorized drivers listed and approved here. \n" +
                     "The Renter agrees to use the vehicle only for routine, legal purposes (personal or business). The Renter further agrees to follow all city, state, county, and government rules and restrictions regarding use and operation of the vehicle.\n" +
                     "The Renter agrees to hold harmless, indemnify, and release the Owner for any damages, injuries, property loss, or death caused while the Renter operates this vehicle. The Renter will be held accountable for any damages or cleaning fees incurred while renting the vehicle.\n" +
@@ -192,7 +206,7 @@ public class ContractMethods {
 
     public void searchContractsByStartDate() {
         System.out.print("Enter the start date: ");
-        Date date = Input.insertDateWithoutTime();
+        java.util.Date date = Input.insertDateWithoutTime();
         System.out.println("SEARCH RESULTS");
         System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
                                             "Max Km", "Actual Km"));
@@ -213,7 +227,7 @@ public class ContractMethods {
 
     public void searchContractsByEndDate() {
         System.out.print("Enter the end date: ");
-        Date date = Input.insertDateWithoutTime();
+        java.util.Date date = Input.insertDateWithoutTime();
         System.out.println("SEARCH RESULTS");
         System.out.println(String.format("%-25s %-25s %-25s %-25s %-25s", "Contract ID", "Start Date", "End Date",
                 "Max Km", "Actual Km"));
@@ -274,7 +288,7 @@ public class ContractMethods {
                 System.out.print("Enter actual km: ");
                 int actual_km = Input.checkInt(0, 999999999);
 
-                Date today = new Date();
+                java.util.Date today = Calendar.getInstance().getTime();
                 contract.setEndDate(today);
                 java.sql.Date sqlDate = new java.sql.Date(today.getTime());
 
@@ -293,7 +307,7 @@ public class ContractMethods {
             contractID = Input.checkInt(1, 999999999);
         }
         for (Contract contract : contracts) {
-            if (contract.getContractID() == contractID && contract.getEndDate().compareTo(new Date()) < 0) {
+            if (contract.getContractID() == contractID && contract.getEndDate().compareTo(Calendar.getInstance().getTime()) < 0) {
                 database.removeContract(contractID);
                 contracts.remove(contract);
                 return;

@@ -706,18 +706,21 @@ public class Database {
     public void displayAvailableCarsWithinDateRange(java.util.Date start_time, java.util.Date end_time) throws SQLException {
         Connection myConn = getConnection(url, user, password);
         PreparedStatement preparedStatement = null;
-        String sql = "select distinct rental_types.name, registration_number, brand.name, model.name, first_registration, odometer, fuel.fuel_type\n" +
-                    "from car left join contract ON car.registration_number = contract.car_registration_number\n" +
-                    "\t\t inner join brand using (brandID)\n" +
-                    "         inner join model using (modelID)\n" +
-                    "         inner join fuel using (fuelID)\n" +
-                    "         inner join rental_types USING (rental_typeID)\n" +
-                    "where car.registration_number not in \n" +
-                    "\n" +
-                    "\t(select car.registration_number\n" +
-                    "\tfrom car left join contract ON car.registration_number = contract.car_registration_number\n" +
-                    "\twhere start_time between ? and ? AND end_time between DATE_SUB(?, INTERVAL 1 DAY) and ?)\n" +
-                    "order by rental_types.name;";
+        String sql = "select distinct rental_types.name, registration_number, brand.name, model.name, " +
+                "                     first_registration, odometer, fuel.fuel_type\n" +
+                     "from car left join contract ON car.registration_number = contract.car_registration_number\n" +
+                     "\t\t inner join brand using (brandID)\n" +
+                 "         inner join model using (modelID)\n" +
+                     "\t\t inner join fuel using (fuelID)\n" +
+                 "         inner join rental_types USING (rental_typeID)\n" +
+                     "where car.registration_number not in\n" +
+                            "\t(select car.registration_number\n" +
+                            "\t from car left join contract ON car.registration_number = contract.car_registration_number\n" +
+                          "     where (start_time <= ? AND end_time >= ?) \n" +
+                                    "\t\t\tOR (start_time >= ? AND end_time <= ?) \n" +
+                                    "\t\t\tOR (start_time >= ? AND end_time >= ? AND start_time <= ?) \n" +
+                                    "\t\t\tOR (start_time <= ? AND end_time <= ? AND end_time >= ?))\n" +
+                      "order by rental_types.name;";
         preparedStatement = myConn.prepareStatement(sql);
         java.sql.Date startDate = new java.sql.Date(start_time.getTime());
         java.sql.Date endDate = new java.sql.Date(end_time.getTime());
@@ -725,6 +728,12 @@ public class Database {
         preparedStatement.setDate(2, endDate);
         preparedStatement.setDate(3, startDate);
         preparedStatement.setDate(4, endDate);
+        preparedStatement.setDate(5, startDate);
+        preparedStatement.setDate(6, endDate);
+        preparedStatement.setDate(7, endDate);
+        preparedStatement.setDate(8, startDate);
+        preparedStatement.setDate(9, endDate);
+        preparedStatement.setDate(10, startDate);
         ResultSet myRs = preparedStatement.executeQuery();
         System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Rental Type", "Registration Nr.", "Brand",
                             "Model", "First Registration Date", "Odometer", "Fuel Type");
@@ -884,7 +893,7 @@ public class Database {
         return lastName;
     }
 
-    public String getRenterDriverLicese(int renter_id) {
+    public String getRenterDriverLicense(int renter_id) {
         String driverLicense = "";
         try {
             Connection myConn = getConnection(url, user, password);
@@ -894,7 +903,7 @@ public class Database {
             getDriverLicense.setInt(1, renter_id);
             ResultSet rs = getDriverLicense.executeQuery();
             while (rs.next()) {
-                driverLicense = rs.getString("driver_license");
+                driverLicense = rs.getString("driver_license_number");
             }
             myConn.close();
         } catch (SQLException e) {
