@@ -1,20 +1,20 @@
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Contract {
     private int contractID;
-    private Renter renter;
-    private Car car;
+    private int renterID;
+    private String registrationNumber;
     private Date startDate;
     private Date endDate;
     private int maxKm;
     private int actualKm;
 
 
-
-    public Contract(int contractID, Renter renter, Car car, Date startDate, Date endDate, int maxKm, int actualKm) {
+    public Contract(int contractID, int renterID, String registrationNumber, Date startDate, Date endDate, int maxKm, int actualKm) {
         this.contractID = contractID;
-        this.renter = renter;
-        this.car = car;
+        this.renterID = renterID;
+        this.registrationNumber = registrationNumber;
         this.startDate = startDate;
         this.endDate = endDate;
         this.maxKm = maxKm;
@@ -27,12 +27,12 @@ public class Contract {
 
     public void setContractID(int contractID) { this.contractID = contractID; }
 
-    public Renter getRenter() {
-        return renter;
+    public int getRenterID() {
+        return renterID;
     }
 
-    public Car getCar() {
-        return car;
+    public String getRegistrationNumber() {
+        return registrationNumber;
     }
 
     public Date getStartDate() {
@@ -51,12 +51,12 @@ public class Contract {
         return actualKm;
     }
 
-    public void setRenter(Renter renter) {
-        this.renter = renter;
+    public void setRenterID(int renterID) {
+        this.renterID = renterID;
     }
 
-    public void setCar(Car car) {
-        this.car = car;
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
     }
 
     public void setStartDate(Date startDate) {
@@ -76,6 +76,13 @@ public class Contract {
     }
 
     public String toString() {
-        return String.format("%-20d%-20s%-20s%-40s%-40s%-20s%-20s%-20s", this.contractID, this.car.getType().getName(), this.car.getRegistration_number(), this.car.getBrand().getName() + " " + this.car.getModel().getName(), this.renter.getFirst_name() + " " + this.renter.getLast_name(), this.renter.getDriverLicenseNumber(), this.startDate, this.endDate);
+        return String.format("%-25s %-25s %-25s %-25s %-25s", getContractID(),
+                formatDate(getStartDate()), formatDate(getEndDate()), getMaxKm(), getActualKm());
     }
+
+    public String formatDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        return sdf.format(date);
+    }
+
 }

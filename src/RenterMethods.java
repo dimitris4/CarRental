@@ -8,9 +8,9 @@ import java.util.Set;
 public class RenterMethods {
 
 
-    Scanner input = new Scanner(System.in);
+    private static Scanner input = new Scanner(System.in);
     private static Database database = Database.instance;
-    ArrayList<Renter> renters;
+    private static ArrayList<Renter> renters;
     private static Set<String> zips;
     private static Set<String> countries;
 
@@ -24,7 +24,7 @@ public class RenterMethods {
 
 
     public void displayRenters() {
-        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-30s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
                 "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
         for (int i = 0; i < 215; i++) {
             System.out.print("-");
@@ -301,9 +301,7 @@ public class RenterMethods {
                 String city = "";
                 String country = "";
 
-                if (choice == 1) {
-
-                    // known zip code...
+                if (choice == 1) {  // known zip code...
                     System.out.print("Type ZIP: ");
                     zip_code = input.next();
                     while (!zips.contains(zip_code)) {
@@ -337,15 +335,18 @@ public class RenterMethods {
                     country = Input.isCountryName();
 
                     if (!countries.contains(country)) { // if country is unknown
-
-                        // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
-                        database.updateAddressZipCountry(street, building, floor, door, zip_code, city, country, renter_id);
+                        // insert new country to the countries table
+                        database.addCountry(country);
+                        // get country id
+                        int countryID = database.getCountryID(country);
+                        // insert renter with unknown zip code and unknown country (tables affected: renter, address, zip, country)
+                        database.updateAddressZipCountry(street, building, floor, door, zip_code, city, countryID, renter_id);
 
                     } else { // if country is known, then we get country id
 
                         int countryID = database.getCountryID(country);
 
-                        // insert renter with unknown zip code and known country (tables affected: renter, phone_numbers, address, zip)
+                        // insert renter with unknown zip code and known country (tables affected: renter, address, zip)
                         database.updateAddressZip(street, building, floor, door, zip_code, city, countryID, renter_id);
 
                     }

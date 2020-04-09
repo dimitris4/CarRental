@@ -86,7 +86,7 @@ public class Renter {
 
 
     public String toString() {
-        return String.format("%-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s %-25s", getRenterID(), getFirst_name(),
+        return String.format("%-15s %-25s %-25s %-25s %-25s %-30s %-25s %-25s %-25s", getRenterID(), getFirst_name(),
                 getLast_name(), getTelephone().getMobile_phone_number(), getTelephone().getHome_phone_number(),
                 getEmail(), getDriverLicenseNumber(), formatDate(getSinceDate()), getAddress().getStreetName() + " " +
                 getAddress().getBuilding() + " " + getAddress().getFloor() + " " + getAddress().getDoor() + " " +

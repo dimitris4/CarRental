@@ -77,12 +77,6 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 4:
-                    //String end = "2020-01-31";
-                    //String start = "2020-02-03";
-                    //DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-                    //Date endDate = dateFormat.parse(end);
-                    //Date startDate = dateFormat.parse(start);
-                    //OurApp.getController().displayAvailableCarsWithinDateRange(startDate,endDate);
                     OurApp.getController().displayCars();
                     pressAnyKey();
                     break;
@@ -180,24 +174,23 @@ public class Menus {
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
 
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            ContractMethods contractMethods = new ContractMethods();
+
+            System.out.print("Select Option: ");
 
             int selection = Input.checkInt(0, 5);
 
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    OurApp.getController().addContract();
+                    contractMethods.addContract();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    OurApp.getController().endContract();
+                    contractMethods.endContract();
                     pressAnyKey();
                     break;
                 case 3:
-                    //Main.getController().deleteRenter();
-                    OurApp.getController().deleteContract();
+                    contractMethods.deleteContract();
                     pressAnyKey();
                     break;
                 case 4:
@@ -218,45 +211,45 @@ public class Menus {
 
     public void displayContractMenu() throws Exception {
         while (true) {
-            System.out.println("*****************************************");
-            System.out.println("|           DISPLAY CONTRACTS           |");
-            System.out.println("*****************************************");
-            System.out.println("|   [1] Display Active Contracts        |");
-            System.out.println("|   [2] Display Old Contracts           |");
-            System.out.println("|   [3] Search Contracts By Start Date  |");
-            System.out.println("|   [4] Search Contracts By End Date    |");
-            System.out.println("|   [5] Search Contracts By Reg. No     |");
-            System.out.println("|   [6] Return To Contract Menu         |");
-            System.out.println("|   [7] Return To Main Menu             |");
-            System.out.println("|   [0] Close Program                   |");
-            System.out.println("*****************************************");
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
+            System.out.println("***************************************");
+            System.out.println("|           DISPLAY CONTRACTS         |");
+            System.out.println("***************************************");
+            System.out.println("|   [1] Display Active Contracts      |");
+            System.out.println("|   [2] Display Old Contracts         |");
+            System.out.println("|   [3] Search by Start Date          |");
+            System.out.println("|   [4] Search by End Date            |");
+            System.out.println("|   [5] Search by Reg. No             |");
+            System.out.println("|   [6] Return To Contract Menu       |");
+            System.out.println("|   [7] Return To Main Menu           |");
+            System.out.println("|   [0] Close Program                 |");
+            System.out.println("***************************************");
+
+            ContractMethods contractMethods = new ContractMethods();
+
+            System.out.print("Select Option: ");
+
             int selection = Input.checkInt(0, 7);
+
             switch (selection) {
                 case 1:
-                    OurApp.getController().displayActiveContracts();
+                    contractMethods.displayActiveContracts();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 2:
-                    OurApp.getController().displayOldContracts();
+                    contractMethods.displayOldContracts();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 3:
-                    OurApp.getController().searchContractByStartDate();
+                    contractMethods.searchContractsByStartDate();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 4:
-                    OurApp.getController().searchContractByEndDate();
+                    contractMethods.searchContractsByEndDate();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 5:
-                    OurApp.getController().searchContractsByRegNo();
+                    contractMethods.searchContractsByRegNo();
                     pressAnyKey();
-                    displayContractMenu();
                     break;
                 case 6:
                     System.out.println("\n");

@@ -1,5 +1,3 @@
-import java.io.StringBufferInputStream;
-import java.nio.charset.Charset;
 import java.sql.*;
 import java.sql.Date;
 import java.text.ParseException;
@@ -17,21 +15,16 @@ public class Database {
 
     // Ilias (ContractMethods)
 
-    private static ArrayList<Contract> contracts = new ArrayList<>();
+    private static ArrayList<String> contracts = new ArrayList<String>();
     private static ArrayList<CarInformation> carList = new ArrayList<>();
     private static ArrayList<Integer> renterIDs = new ArrayList<>();
 
     public Database(){
-        contracts = new ArrayList<Contract>();
+        contracts = new ArrayList<String>();
         renterIDs = new ArrayList<Integer>();
     }
 
-    public ArrayList<Contract> getContracts() {
-        return contracts;
-    }
-    public void setContracts(ArrayList<Contract> contracts) {
-        this.contracts = contracts;
-    }
+
 
     public ArrayList<CarInformation> getCarList(){return carList;}
     public void setCarList(ArrayList<CarInformation> carList){this.carList = carList;}
@@ -603,7 +596,7 @@ public class Database {
 
     // update address, zip tables and country tables (unknown zip - unknown country)
     public void updateAddressZipCountry(String street, int building, int floor, String door, String zip_code,
-                                        String city, String country, int renter_id) throws SQLException {
+                                        String city, int countryID, int renter_id) throws SQLException {
 
             Connection myConn = getConnection(url, user, password);
 
@@ -614,23 +607,23 @@ public class Database {
 
             PreparedStatement updateAddress = null;
             PreparedStatement updateZip = null;
-            PreparedStatement updateCountry = null;
+            //PreparedStatement updateCountry = null;
 
             String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
                     "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
 
-            String updateZipString = "UPDATE zip SET zip = ?, city = ?\n" +
+            String updateZipString = "UPDATE zip SET zip = ?, city = ?, countryID = ?\n" +
                     "WHERE zipID = \n" +
                     "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
 
-            String updateCountryString = "UPDATE country SET NAME = ?\n" +
+            /*String updateCountryString = "UPDATE country SET NAME = ?\n" +
                     "WHERE countryID = (\n" +
                     "  SELECT countryID FROM (\n" +
                     "    SELECT countryID FROM country JOIN zip USING (countryID) \n" +
                     "    JOIN address USING (zipID)\n" +
                     "\tJOIN renter USING (addressID) WHERE renterID = ?\n" +
                     "  ) as t\n" +
-                    ");";
+                    ");";*/
 
             updateAddress = myConn.prepareStatement(updateAddressString);
             updateAddress.setString(1, street);
@@ -642,15 +635,16 @@ public class Database {
             updateZip = myConn.prepareStatement(updateZipString);
             updateZip.setString(1, zip_code);
             updateZip.setString(2, city);
-            updateZip.setInt(3, renter_id);
+            updateZip.setInt(3, countryID);
+            updateZip.setInt(4, renter_id);
 
-            updateCountry = myConn.prepareStatement(updateCountryString);
+            /*updateCountry = myConn.prepareStatement(updateCountryString);
             updateCountry.setString(1, country);
-            updateCountry.setInt(2, renter_id);
+            updateCountry.setInt(2, renter_id);*/
 
             updateAddress.executeUpdate();
             updateZip.executeUpdate();
-            updateCountry.executeUpdate();
+            //updateCountry.executeUpdate();
             System.out.println("Update complete.");
 
             myConn.close();
@@ -691,4 +685,230 @@ public class Database {
         myConn.close();
     }
 
+    public ArrayList<String> getCarRegistrationNumbers() throws SQLException {
+        ArrayList<String> result = new ArrayList<String>();
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getRegistrationNumbers = null;
+            String sql = "SELECT registration_number FROM car";
+            getRegistrationNumbers = myConn.prepareStatement(sql);
+            ResultSet rs = getRegistrationNumbers.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("registration_number"));
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public void displayAvailableCarsWithinDateRange(java.util.Date start_time, java.util.Date end_time) throws SQLException {
+        Connection myConn = getConnection(url, user, password);
+        PreparedStatement preparedStatement = null;
+        String sql = "select distinct rental_types.name, registration_number, brand.name, model.name, " +
+                "                     first_registration, odometer, fuel.fuel_type\n" +
+                     "from car left join contract ON car.registration_number = contract.car_registration_number\n" +
+                     "\t\t inner join brand using (brandID)\n" +
+                 "         inner join model using (modelID)\n" +
+                     "\t\t inner join fuel using (fuelID)\n" +
+                 "         inner join rental_types USING (rental_typeID)\n" +
+                     "where car.registration_number not in\n" +
+                            "\t(select car.registration_number\n" +
+                            "\t from car left join contract ON car.registration_number = contract.car_registration_number\n" +
+                          "     where (start_time <= ? AND end_time >= ?) \n" +
+                                    "\t\t\tOR (start_time >= ? AND end_time <= ?) \n" +
+                                    "\t\t\tOR (start_time >= ? AND end_time >= ? AND start_time <= ?) \n" +
+                                    "\t\t\tOR (start_time <= ? AND end_time <= ? AND end_time >= ?))\n" +
+                      "order by rental_types.name;";
+        preparedStatement = myConn.prepareStatement(sql);
+        java.sql.Date startDate = new java.sql.Date(start_time.getTime());
+        java.sql.Date endDate = new java.sql.Date(end_time.getTime());
+        preparedStatement.setDate(1, startDate);
+        preparedStatement.setDate(2, endDate);
+        preparedStatement.setDate(3, startDate);
+        preparedStatement.setDate(4, endDate);
+        preparedStatement.setDate(5, startDate);
+        preparedStatement.setDate(6, endDate);
+        preparedStatement.setDate(7, endDate);
+        preparedStatement.setDate(8, startDate);
+        preparedStatement.setDate(9, endDate);
+        preparedStatement.setDate(10, startDate);
+        ResultSet myRs = preparedStatement.executeQuery();
+        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Rental Type", "Registration Nr.", "Brand",
+                            "Model", "First Registration Date", "Odometer", "Fuel Type");
+        for (int i=0; i<160; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+        while (myRs.next()) {
+            System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),
+                    myRs.getString(2), myRs.getString(3), myRs.getString(4),
+                    myRs.getString(5), myRs.getString(6), myRs.getString(7));
+        }
+        myConn.close();
+    }
+
+    public ArrayList<Integer> getContractIDs() {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getContractIDs = null;
+            String sql = "SELECT contractID FROM contract";
+            getContractIDs = myConn.prepareStatement(sql);
+            ResultSet rs = getContractIDs.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getInt("contractID"));
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public void updateContract(int actual_km, Date today, int contractID) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement updateContract = null;
+            PreparedStatement updateCar = null;
+
+            String updateContractString = "UPDATE contract SET end_time = ?, actual_km = ? WHERE contractID = ?";
+
+            String updateCarString = "UPDATE car SET odometer = odometer + ?\n" +
+                                     "WHERE car.registration_number =\n" +
+                                    "(SELECT car_registration_number FROM contract WHERE contractID = ?)";
+
+            PreparedStatement pst = myConn.prepareStatement(updateContractString);
+            PreparedStatement pst2 = myConn.prepareStatement(updateCarString);
+            pst.setDate(1, today);
+            pst.setInt(2, actual_km);
+            pst.setInt(3, contractID);
+
+            pst2.setInt(1, actual_km);
+            pst2.setInt(2, contractID);
+
+            pst.executeUpdate();
+            pst2.executeUpdate();
+            myConn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeContract(int contractID) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement deleteContract = null;
+            String sql = "DELETE FROM contract WHERE contractID = ?";
+            try {
+                deleteContract = myConn.prepareStatement(sql);
+                deleteContract.setInt(1, contractID);
+                int rowsAffected = deleteContract.executeUpdate();
+                System.out.println("Rows affected: " + rowsAffected);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Delete complete.");
+            deleteContract.close();
+            myConn.close();
+        } catch (SQLException e) {
+           e.printStackTrace();
+        }
+    }
+
+    public void addCountry(String country) {
+        try {
+            Connection myConn = getConnection(url, user, password);
+            String queryCountry = "INSERT INTO country (name) " +
+                    "VALUES (?)";
+            //create insert PreparedStatement
+            PreparedStatement addCountry;
+            addCountry = myConn.prepareStatement(queryCountry);
+            addCountry.setString(1, country);
+            addCountry.execute();
+            System.out.println("\n\nThe entry has been recorded.");
+            addCountry.close();
+            myConn.close();
+        } catch (SQLException exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    public String getEmail(int renter_id) {
+        String email = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getEmail = null;
+            String sql = "SELECT email FROM renter WHERE renterID = ?";
+            getEmail = myConn.prepareStatement(sql);
+            getEmail.setInt(1, renter_id);
+            ResultSet rs = getEmail.executeQuery();
+            while (rs.next()) {
+                email = rs.getString("email");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return email;
+    }
+
+    public String getRenterFirstName(int renter_id) {
+        String firstName = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getFirstName = null;
+            String sql = "SELECT first_name FROM renter WHERE renterID = ?";
+            getFirstName = myConn.prepareStatement(sql);
+            getFirstName.setInt(1, renter_id);
+            ResultSet rs = getFirstName.executeQuery();
+            while (rs.next()) {
+                firstName = rs.getString("first_name");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return firstName;
+    }
+
+    public String getRenterLastName(int renter_id) {
+        String lastName = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getLastName = null;
+            String sql = "SELECT last_name FROM renter WHERE renterID = ?";
+            getLastName = myConn.prepareStatement(sql);
+            getLastName.setInt(1, renter_id);
+            ResultSet rs = getLastName.executeQuery();
+            while (rs.next()) {
+                lastName = rs.getString("last_name");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastName;
+    }
+
+    public String getRenterDriverLicense(int renter_id) {
+        String driverLicense = "";
+        try {
+            Connection myConn = getConnection(url, user, password);
+            PreparedStatement getDriverLicense = null;
+            String sql = "SELECT driver_license_number FROM renter WHERE renterID = ?";
+            getDriverLicense = myConn.prepareStatement(sql);
+            getDriverLicense.setInt(1, renter_id);
+            ResultSet rs = getDriverLicense.executeQuery();
+            while (rs.next()) {
+                driverLicense = rs.getString("driver_license_number");
+            }
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return driverLicense;
+    }
 }
