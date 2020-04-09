@@ -1,40 +1,18 @@
 import java.sql.*;
-import java.sql.Date;
 import java.text.ParseException;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import static java.sql.DriverManager.getConnection;
 
 public class Database {
-    static final public Database instance = new Database();
 
+    static final public Database instance = new Database();
     String url = "jdbc:mysql://localhost:3306/kailua";
     String user = "dimk";
     String password = "dimk1234!";
-
-    // Ilias (ContractMethods)
-
-    private static ArrayList<String> contracts = new ArrayList<String>();
     private static ArrayList<CarInformation> carList = new ArrayList<>();
-    private static ArrayList<Integer> renterIDs = new ArrayList<>();
-
-    public Database(){
-        contracts = new ArrayList<String>();
-        renterIDs = new ArrayList<Integer>();
-    }
-
-
-
-    public ArrayList<CarInformation> getCarList(){return carList;}
-    public void setCarList(ArrayList<CarInformation> carList){this.carList = carList;}
-
-    public void setRenterIDs(ArrayList<Integer> renterIDs) { this.renterIDs = renterIDs; }
-
-
-
-
-    // Karolina, Dimitrios (RenterMethods)
 
     public ArrayList<Renter> loadRenters() {
         ArrayList<Renter> renters = new ArrayList<>();
@@ -42,8 +20,8 @@ public class Database {
             Connection myConn = getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
-                    "\t   driver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, ' ', \n" +
-                    "       door, ' ', zip, ' ', city, ' ', country.name)\n" +
+                    "\t   driver_license_number, since_data, street, building, floor, \n" +
+                    "       door, zip, city, country.name\n" +
                     "FROM renter \n" +
                     "\tJOIN address USING (addressID)\n" +
                     "    JOIN zip USING (zipID)\n" +
@@ -59,15 +37,13 @@ public class Database {
                 String email = rs.getString(6);
                 String driver_license_number = rs.getString(7);
                 java.util.Date since_data = new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString(8));
-                String full_address = rs.getString(9);
-                String[] parts = full_address.split(" ");
-                String street = parts[0];
-                int building = Integer.parseInt(parts[1]);
-                int floor = Integer.parseInt(parts[2]);
-                String door = parts[3];
-                String zip = parts[4];
-                String city = parts[5];
-                String country = parts[6];
+                String street = rs.getString(9);
+                int building = rs.getInt(10);
+                int floor = rs.getInt(11);
+                String door = rs.getString(12);
+                String zip = rs.getString(13);
+                String city = rs.getString(14);
+                String country = rs.getString(15);
                 Address address = new Address(street, building, floor, door, zip, city, country);
                 Telephone telephone = new Telephone(mobile_phone_number, home_phone_number);
                 Renter renter = new Renter(renterID, first_name, last_name, telephone, address, email, driver_license_number, since_data);
@@ -79,6 +55,8 @@ public class Database {
         }
         return renters;
     }
+
+    public ArrayList<CarInformation> getCarList(){return carList;}
 
     public void addRenter(String country, String zip_code, String city, String street, int building, int floor, String door,
                           String fname, String lname, String email, String licence, Date sinceDate, String mobilePhone,
@@ -135,9 +113,7 @@ public class Database {
             preparedStmt.execute();
 
             System.out.println("\n\nThe entry has been recorded.");
-
             myConn.close();
-
         } catch (SQLException exc) {
             exc.printStackTrace();
         }
@@ -146,70 +122,66 @@ public class Database {
     public void removeRenter(int renterID) {
         try {
             Connection myConn = getConnection(url, user, password);
-
             PreparedStatement pst1 = null;
             PreparedStatement pst2 = null;
             PreparedStatement pst3 = null;
-
-            // dont delete contract
-            // String sql1 = "DELETE FROM contract WHERE renterID = ?";
+            String sql1 = "DELETE FROM address WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?)";
             String sql2 = "DELETE FROM phone_numbers WHERE renterID = ?";
             String sql3 = "DELETE FROM renter WHERE renterID = ?";
-
             try {
-
-                //pst1 = myConn.prepareStatement(sql1);
-
+                pst1 = myConn.prepareStatement(sql1);
                 pst2 = myConn.prepareStatement(sql2);
-
                 pst3 = myConn.prepareStatement(sql3);
 
-                //pst1.setInt(1, renterID);
-
+                pst1.setInt(1, renterID);
                 pst2.setInt(1, renterID);
-
                 pst3.setInt(1, renterID);
+                disableForeignKeyChecks(myConn);
 
-                //int rowsAffected1 = pst1.executeUpdate();
-
+                int rowsAffected1 = pst1.executeUpdate();
                 int rowsAffected2 = pst2.executeUpdate();
-
                 int rowsAffected3 = pst3.executeUpdate();
-
-                //System.out.println("Rows affected: " + rowsAffected1);
-
+                System.out.println("Rows affected: " + rowsAffected1);
                 System.out.println("Rows affected: " + rowsAffected2);
-
                 System.out.println("Rows affected: " + rowsAffected3);
-
             } catch (SQLException e) {
-
                 e.printStackTrace();
-
             }
-
             System.out.println("Delete complete.");
-
-            //pst1.close();
-
+            enableForeignKeyChecks(myConn);
+            pst1.close();
             pst2.close();
-
             pst3.close();
-
             myConn.close();
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
     }
 
+    private void disableForeignKeyChecks(Connection myConn) {
+        try {
+            PreparedStatement safeUpdate = null;
+            String safeUpadateString = "SET FOREIGN_KEY_CHECKS=0;";
+            safeUpdate = myConn.prepareStatement(safeUpadateString);
+            safeUpdate.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enableForeignKeyChecks(Connection myConn) {
+        try {
+            PreparedStatement safeUpdate = null;
+            String safeUpadateString = "SET FOREIGN_KEY_CHECKS=1;";
+            safeUpdate = myConn.prepareStatement(safeUpadateString);
+            safeUpdate.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ArrayList<Integer> findRemovableRenters() {
-
         ArrayList<Integer> result = new ArrayList<>();
-
         try {
             Connection myConn = getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
@@ -227,21 +199,15 @@ public class Database {
                 result.add(renterID);
             }
             myConn.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //System.out.println(result);
         return result;
     }
 
-
-
     public void updateLicense(String newDriverLicenseNumber, int renter_id) {
-
         try {
             Connection myConn = getConnection(url, user, password);
-
             PreparedStatement updateDriverLicenseNumber = null;
 
             String updateDriverLicenseString = "UPDATE renter\n" +
@@ -249,88 +215,56 @@ public class Database {
                         "WHERE renterID = ?;";
 
             updateDriverLicenseNumber = myConn.prepareStatement(updateDriverLicenseString);
-
             updateDriverLicenseNumber.setString(1, newDriverLicenseNumber);
-
             updateDriverLicenseNumber.setInt(2, renter_id);
-
             updateDriverLicenseNumber.executeUpdate();
-
             System.out.println("Update complete.");
-
             myConn.close();
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
     }
 
     public void updateMobilePhone(String newMobilePhone, int renter_id) {
         try {
             Connection myConn = getConnection(url, user, password);
-
             PreparedStatement updateMobilePhone = null;
             String updateMobilePhoneString = "UPDATE phone_numbers \n" +
                     "SET mobile_phone_number = ?" +
                     "where renterID = ?";
             updateMobilePhone = myConn.prepareStatement(updateMobilePhoneString);
-
             updateMobilePhone.setString(1, newMobilePhone);
-
             updateMobilePhone.setInt(2, renter_id);
-
             updateMobilePhone.executeUpdate();
-
             System.out.println("Update complete.");
-
             myConn.close();
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
     }
 
     public void updateHomePhone(String newHomePhone, int renter_id) {
         try {
             Connection myConn = getConnection(url, user, password);
-
             PreparedStatement updateHomePhone = null;
-
             String updateHomePhoneString = "UPDATE phone_numbers \n" +
                     "SET home_phone_number = ?" +
                     "where renterID = ?";
             updateHomePhone = myConn.prepareStatement(updateHomePhoneString);
-
             updateHomePhone.setString(1, newHomePhone);
-
             updateHomePhone.setInt(2, renter_id);
-
             updateHomePhone.executeUpdate();
-
             System.out.println("Update complete.");
-
             myConn.close();
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
     }
 
-
-
     public HashSet<String> loadZips() {
-
         HashSet<String> zips = new HashSet<>();
-
         try {
             Connection myConn = getConnection(url, user, password);
-
             Statement myStmt = myConn.createStatement();
             ResultSet myRs = myStmt.executeQuery("SELECT zip FROM zip");;
             while(myRs.next()) {
@@ -340,50 +274,38 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return zips;
-
     }
 
     public HashSet<String> loadCountries() {
-
         HashSet<String> countries = new HashSet<>();
-
         try {
             Connection myConn = getConnection(url, user, password);
-
             Statement myStmt = myConn.createStatement();
             ResultSet myRs = myStmt.executeQuery("SELECT name FROM country");
             while(myRs.next()) {
                 countries.add(myRs.getString("name"));
             }
-
             myRs.close();
             myStmt.close();
             myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return countries;
-
     }
-
 
     // insert renter with known zip code (tables affected: renter, phone_numbers, address)
     public void addRenter(String fname, String lname, String mobilePhone, String homePhone, String email,
                           String licence, Date sqlDate, String street, int building, int floor, String door,
                           int zipID) {
-
         try {
             Connection myConn = getConnection(url, user, password);
 
             String query = "INSERT INTO address (street, building, floor, door, zipID) " +
                     "VALUES (?, ?, ?, ?, ?)";
-
             String queryRenter = "INSERT INTO renter (first_name, last_name, email, driver_license_number, since_data, " +
                     "addressID)" + " VALUES (?, ?, ?, ?, ?, LAST_INSERT_ID())";
-
             String queryPhoneNumbers = "INSERT INTO phone_numbers (renterID, mobile_phone_number, home_phone_number) " +
                     "VALUES (LAST_INSERT_ID(), ?, ?)";
 
@@ -411,19 +333,13 @@ public class Database {
 
             myConn.close();
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
     }
-
-
 
     public void addRenter(String zip_code, String city, String street, int building, int floor, String door,
                           String fname, String lname, String email, String licence, Date sinceDate,
                           String mobilePhone, String homePhone, int countryID) {
-
         try {
             Connection myConn = getConnection(url, user, password);
 
@@ -468,24 +384,15 @@ public class Database {
             preparedStmt.execute();
 
             myConn.close();
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
     }
 
-
-
     public int getCountryID(String country) {
-
         int countryID = 0;
-
         try {
             Connection myConn = getConnection(url, user, password);
-
             Statement myStmt = myConn.createStatement();
 
             String sql = "SELECT countryID\n" +
@@ -501,7 +408,6 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return countryID;
     }
 
@@ -547,8 +453,6 @@ public class Database {
         return result;
     }
 
-
-
     public ArrayList<Integer> getRenterIDs() throws SQLException {
         ArrayList<Integer> result = new ArrayList<Integer>();
         try {
@@ -567,11 +471,8 @@ public class Database {
         return result;
     }
 
-
-
     // select zip code from the list : update the address table only
     public void updateAddress(String street, int building, int floor, String door, int zipID, int renter_id) throws SQLException {
-
         System.out.println("Inside the updateAddress method!");
         System.out.println("renter id : " + renter_id);
         System.out.println("zipID : " + zipID);
@@ -597,7 +498,6 @@ public class Database {
     // update address, zip tables and country tables (unknown zip - unknown country)
     public void updateAddressZipCountry(String street, int building, int floor, String door, String zip_code,
                                         String city, int countryID, int renter_id) throws SQLException {
-
             Connection myConn = getConnection(url, user, password);
 
             PreparedStatement safeUpdate = null;
@@ -607,7 +507,6 @@ public class Database {
 
             PreparedStatement updateAddress = null;
             PreparedStatement updateZip = null;
-            //PreparedStatement updateCountry = null;
 
             String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
                     "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
@@ -615,15 +514,6 @@ public class Database {
             String updateZipString = "UPDATE zip SET zip = ?, city = ?, countryID = ?\n" +
                     "WHERE zipID = \n" +
                     "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
-
-            /*String updateCountryString = "UPDATE country SET NAME = ?\n" +
-                    "WHERE countryID = (\n" +
-                    "  SELECT countryID FROM (\n" +
-                    "    SELECT countryID FROM country JOIN zip USING (countryID) \n" +
-                    "    JOIN address USING (zipID)\n" +
-                    "\tJOIN renter USING (addressID) WHERE renterID = ?\n" +
-                    "  ) as t\n" +
-                    ");";*/
 
             updateAddress = myConn.prepareStatement(updateAddressString);
             updateAddress.setString(1, street);
@@ -638,15 +528,9 @@ public class Database {
             updateZip.setInt(3, countryID);
             updateZip.setInt(4, renter_id);
 
-            /*updateCountry = myConn.prepareStatement(updateCountryString);
-            updateCountry.setString(1, country);
-            updateCountry.setInt(2, renter_id);*/
-
             updateAddress.executeUpdate();
             updateZip.executeUpdate();
-            //updateCountry.executeUpdate();
             System.out.println("Update complete.");
-
             myConn.close();
     }
 
@@ -703,7 +587,7 @@ public class Database {
         return result;
     }
 
-    public void displayAvailableCarsWithinDateRange(java.util.Date start_time, java.util.Date end_time) throws SQLException {
+    public void displayAvailableCarsWithinDateRange(java.util.Date start_time, java.util.Date end_time) throws Exception {
         Connection myConn = getConnection(url, user, password);
         PreparedStatement preparedStatement = null;
         String sql = "select distinct rental_types.name, registration_number, brand.name, model.name, " +
@@ -713,7 +597,7 @@ public class Database {
                  "         inner join model using (modelID)\n" +
                      "\t\t inner join fuel using (fuelID)\n" +
                  "         inner join rental_types USING (rental_typeID)\n" +
-                     "where car.registration_number not in\n" +
+                     "where car.is_available = 1 AND car.registration_number not in\n" +
                             "\t(select car.registration_number\n" +
                             "\t from car left join contract ON car.registration_number = contract.car_registration_number\n" +
                           "     where (start_time <= ? AND end_time >= ?) \n" +
@@ -741,10 +625,23 @@ public class Database {
             System.out.print("*");
         }
         System.out.println();
-        while (myRs.next()) {
-            System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),
-                    myRs.getString(2), myRs.getString(3), myRs.getString(4),
-                    myRs.getString(5), myRs.getString(6), myRs.getString(7));
+        if (myRs.next() == false) {
+            System.out.println("\nWe are sorry, there are no cars available on the given dates. :(");
+            System.out.print("Enter [1] to try other dates or [0] to go back to menu: ");
+            int i = Input.checkInt(0,1);
+            if (i==1) {
+                ContractMethods contractMethods = new ContractMethods();
+                contractMethods.addContract();
+            } else {
+                Menus menus = new Menus();
+                menus.contractMenu();
+            }
+        } else {
+            do {
+                System.out.printf("%-15s %-25s %-25s %-25s %-25s %-25s %-25s\n", myRs.getString(1),
+                        myRs.getString(2), myRs.getString(3), myRs.getString(4),
+                        myRs.getString(5), myRs.getString(6), myRs.getString(7));
+            } while (myRs.next());
         }
         myConn.close();
     }
@@ -944,7 +841,7 @@ public class Database {
             String sql = "SELECT contractID, renterID, first_name, last_name, car_registration_number, " +
                     "start_time, end_time, max_km, actual_km\n" +
                     "FROM contract LEFT JOIN renter USING (renterID)\n" +
-                    "WHERE start_time < curdate();";
+                    "WHERE end_time < curdate() || actual_km != 0;";
 
             statement = myConn.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();

@@ -59,8 +59,8 @@ public class CarMethods {
     public String setRegistrationNumber(){
         System.out.print("Registration number: ");
         String registration_number = scanner.next();
-        while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]+")){
-            System.out.println("Invalid registration number. Please try again: ");
+        while(cars.contains(registration_number) || !registration_number.matches("[a-zA-Z0-9]{1,10}+")){
+            System.out.print("Invalid registration number. Please try again: ");
             registration_number = scanner.next();
         }
         return registration_number;
@@ -508,7 +508,7 @@ public class CarMethods {
 
     public void makeAvailable() throws SQLException {
         HashSet<String> carRegNo = displayCars("WHERE is_available = 0");
-        System.out.print("Insert registration number of a car you want to set as available or 0 to go back:: ");
+        System.out.print("Insert registration number of a car you want to set as available or 0 to go back: ");
         String registration_number = scanner.next();
         while (!inRNor0(registration_number)){
             System.out.print("Wrong input. Enter 0 to go back or try again: ");

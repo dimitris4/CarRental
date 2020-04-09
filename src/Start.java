@@ -14,7 +14,7 @@ public class Start {
         //Printing the Logo
         AsciiArt.printLogo4();
 
-        System.out.println("*************************** ***************");
+        System.out.println("*******************************************");
         System.out.println("|             KAILUA CAR RENTAL           |");
         System.out.println("|               LOGIN SCREEN              |");
         System.out.println("*******************************************\n");

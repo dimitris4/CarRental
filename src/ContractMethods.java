@@ -152,7 +152,6 @@ public class ContractMethods {
         }
     }
 
-
     public Connection dbConnect(){
         Connection myConn = null;
         try {
@@ -258,36 +257,30 @@ public class ContractMethods {
         System.out.println();
     }
 
-
     public void endContract() throws SQLException {
         displayActiveContracts();
-
         System.out.print("Select contract ID: ");
         int contractID = Input.checkInt(1, 999999999);
         while (!database.getContractIDs().contains(contractID)) {
             System.out.print("Invalid input. Try again: ");
             contractID = Input.checkInt(1, 999999999);
         }
-
         for(Contract contract : contracts) {
             if (contract.getContractID() == contractID) {
-
                 System.out.print("Enter actual km: ");
                 int actual_km = Input.checkInt(0, 999999999);
-
                 java.util.Date today = Calendar.getInstance().getTime();
                 contract.setEndDate(today);
                 java.sql.Date sqlDate = new java.sql.Date(today.getTime());
-
                 database.updateContract(actual_km, sqlDate, contractID);
             }
         }
     }
 
-
     public void deleteContract() throws SQLException {
         displayOldContracts();
-        System.out.println("You can only delete old contracts! Please select contract ID:");
+        System.out.println("You can only delete old contracts!");
+        System.out.print("Please select contract ID: ");
         int contractID = Input.checkInt(1, 999999999);
         while (!database.getContractIDs().contains(contractID)) {
             System.out.print("Invalid contract ID. Try again: ");
@@ -302,8 +295,6 @@ public class ContractMethods {
         }
         System.out.println("\nThe selected contract cannot be deleted.");
     }
-
-
 
     public static void sendMail(String recipient, String myMessage) throws Exception{
         System.out.println("Preparing to send contract to client...");
