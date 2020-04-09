@@ -2,13 +2,11 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Month;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 import static java.sql.DriverManager.getConnection;
-import static java.sql.DriverManager.registerDriver;
-import static java.util.Calendar.*;
+import static java.util.Calendar.YEAR;
 
 public class CarMethods {
 
@@ -470,9 +468,11 @@ public class CarMethods {
         }
         if(carReg.length()!=0){
             carReg =carReg.substring(0,carReg.length()-1);
+            displayCars("WHERE c.registration_number IN (" + carReg + ")");
+        } else {
+            System.out.println("No cars to delete.");
         }
         //System.out.println(carReg);
-        displayCars("WHERE c.registration_number IN (" + carReg + ")");
         closeConnection(myConn,myStmt,myRs);
         return availableCars;
     }

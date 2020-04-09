@@ -6,8 +6,10 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.*;
 
 import static java.sql.DriverManager.getConnection;
@@ -64,7 +66,10 @@ public class ContractMethods {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(start_time);
         int year = calendar.get(Calendar.YEAR);
-        while ((start_time.compareTo(Calendar.getInstance().getTime()) < 0) || (year > 9999)) {
+        DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        Date today = new Date();
+        Date todayWithZeroTime = formatter.parse(formatter.format(today));
+        while ((start_time.compareTo(todayWithZeroTime) < 0) || (year > 9999)) {
             System.out.print("The start date cannot be in the past. Try again: ");
             start_time = Input.insertDateWithoutTime();
             calendar.setTime(start_time);
