@@ -145,7 +145,6 @@ public class RenterMethods {
                 }
 
                 int zipID = database.getZipID(zip_code);
-
                 ArrayList<String> arrayList = database.getCityCountryName(zip_code);
                 city = arrayList.get(0);
                 country = arrayList.get(1);
@@ -163,8 +162,9 @@ public class RenterMethods {
                     System.out.print("Invalid Input. Try Again: ");
                     zip_code = input.next();
                 }
-                input.nextLine();
+                zips.add(zip_code);
 
+                input.nextLine();
                 System.out.print("City: ");
                 city = input.nextLine();
                 while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
@@ -176,19 +176,16 @@ public class RenterMethods {
                 country = Input.capitalizeWord(country);
 
                 if (!countries.contains(country)) { // if country is unknown
-
+                    countries.add(country);
                     // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
                     database.addRenter(country, zip_code, city, street, building, floor, door, fname, lname, email,
                                        licence, sqlDate, mobilePhone, homePhone);
 
                 } else { // if country is known, then we get country id
-
                     int countryID = database.getCountryID(country);
-
                     // insert renter with unknown zip code and known country (tables affected: renter, phone_numbers, address, zip)
                     database.addRenter(zip_code, city, street, building, floor, door, fname, lname, email, licence,
                                        sqlDate, mobilePhone, homePhone, countryID);
-
                 }
                 break;
             default:

@@ -135,7 +135,7 @@ class Input {
 
     }
 
-    public static String capitalizeWord(String str){
+    public static String capitalizeWord(String str) {
         String[] words = str.split("\\s+");
         String result = "";
         for (int i = 0; i < words.length; i++) {
@@ -143,7 +143,7 @@ class Input {
             if(words[i].length() <= 2) {
                 word = word.toUpperCase();
             } else {
-                word = word.substring(0, 1).toUpperCase() + word.substring(1);
+                word = word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
             }
             result += word + " ";
         }
