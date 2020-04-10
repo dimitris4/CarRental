@@ -930,8 +930,8 @@ public class Database {
             Connection myConn = getConnection(url, user, password);
             PreparedStatement statement = null;
             String sql = "SELECT renterID, first_name, last_name, mobile_phone_number, home_phone_number, email,\n" +
-                            "\t\tdriver_license_number, since_data, CONCAT(street, ' ', building, ' ', floor, \n" +
-                           " ' ', door, ' ', zip, ' ', city, ' ', country.name)\n" +
+                            "\t\tdriver_license_number, since_data, street, building, floor, \n" +
+                           "     door, zip, city, country.name\n" +
                          "FROM renter INNER JOIN phone_numbers USING (renterID)\n" +
                                      "INNER JOIN address USING (addressID)\n" +
                                      "INNER JOIN zip USING (zipID)\n" +
@@ -940,11 +940,15 @@ public class Database {
             ResultSet rs = statement.executeQuery();
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             while (rs.next()) {
-                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
+                System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-15s %-25s\n", rs.getString(1),
                         rs.getString(2).substring(0,1).toUpperCase() + rs.getString(2).substring(1).toLowerCase(),
                         rs.getString(3).substring(0,1).toUpperCase() + rs.getString(3).substring(1).toLowerCase(),
                         rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7),
-                        sdf.format(rs.getDate(8)), rs.getString(9));
+                        sdf.format(rs.getDate(8)), rs.getString(9).substring(0,1).toUpperCase() +
+                        rs.getString(9).substring(1).toLowerCase() + rs.getString(10) + " " +
+                        rs.getString(11) + rs.getString(12) + rs.getString(13) + " " +
+                        rs.getString(14).substring(0,1).toUpperCase() + rs.getString(14).substring(1).toLowerCase() + " " +
+                        rs.getString(15).substring(0,1).toUpperCase() + rs.getString(15).substring(1).toLowerCase());
             }
             statement.close();
             myConn.close();

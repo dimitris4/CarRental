@@ -22,14 +22,14 @@ public class RenterMethods {
     public void displayRenters() {
         System.out.println();
         System.out.println("RENTERS");
-        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-15s %-25s\n", "Renter ID", "First Name", "Last Name",
                 "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
-        for (int i=0; i<210; i++) {
+        for (int i=0; i<230; i++) {
             System.out.print("*");
         }
         System.out.println();
         database.displayRenters();
-        for (int i=0; i<210; i++) {
+        for (int i=0; i<230; i++) {
             System.out.print("=");
         }
         System.out.println();

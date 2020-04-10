@@ -410,8 +410,8 @@ public class CarMethods {
         if (myRs != null) {
             System.out.printf("%-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Registration Number", "First Registration", "Odometer (km)",
                     "Fuel Type", "Model", "Rental Type", "Description");
-            for (int i = 0; i < 210; i++) {
-                System.out.print("-");
+            for (int i = 0; i < 230; i++) {
+                System.out.print("*");
             }
             System.out.println();
             while (myRs.next()) {
@@ -420,6 +420,10 @@ public class CarMethods {
                         myRs.getString(7));
                 carRegNo.add(myRs.getString(1));
             }
+            for (int i = 0; i < 230; i++) {
+                System.out.print("=");
+            }
+            System.out.println();
         }
         closeConnection(myConn,myStmt,myRs);
         return carRegNo;
