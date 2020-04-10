@@ -941,8 +941,9 @@ public class Database {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             while (rs.next()) {
                 System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", rs.getString(1),
-                        rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getString(5), rs.getString(6), rs.getString(7),
+                        rs.getString(2).substring(0,1).toUpperCase() + rs.getString(2).substring(1).toLowerCase(),
+                        rs.getString(3).substring(0,1).toUpperCase() + rs.getString(3).substring(1).toLowerCase(),
+                        rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7),
                         sdf.format(rs.getDate(8)), rs.getString(9));
             }
             statement.close();
