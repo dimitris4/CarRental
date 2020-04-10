@@ -53,14 +53,13 @@ public class ContractMethods {
     public void addContract() throws Exception {
         RenterMethods renterMethods = new RenterMethods();
         renterMethods.displayRenters();
-
-        System.out.print("\nSelect renter ID: ");
+        System.out.println("Adding new contract...");
+        System.out.print("Select renter ID: ");
         int renter_id = Input.checkInt(1,999999999);
         while (!database.getRenterIDs().contains(renter_id)) {
             System.out.print("Invalid ID. Try again: ");
             renter_id = Input.checkInt(1,999999999);
         }
-
         System.out.print("Enter start date: ");
         java.util.Date start_time = Input.insertDateWithoutTime();
         Calendar calendar = new GregorianCalendar();
@@ -150,6 +149,7 @@ public class ContractMethods {
             String renterEmail = database.getEmail(renter_id);
             sendMail(renterEmail, myMessage);
         }
+        System.out.println("The contract has been added.");
     }
 
     public Connection dbConnect(){

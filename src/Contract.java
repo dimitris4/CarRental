@@ -2,6 +2,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Contract {
+
     private int contractID;
     private int renterID;
     private String registrationNumber;
@@ -9,7 +10,6 @@ public class Contract {
     private Date endDate;
     private int maxKm;
     private int actualKm;
-
 
     public Contract(int contractID, int renterID, String registrationNumber, Date startDate, Date endDate, int maxKm, int actualKm) {
         this.contractID = contractID;
@@ -84,5 +84,4 @@ public class Contract {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         return sdf.format(date);
     }
-
 }

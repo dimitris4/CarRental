@@ -1,5 +1,4 @@
 public class Address {
-
     private String streetName;
     private int building;
     private int floor;
@@ -42,45 +41,8 @@ public class Address {
         return door;
     }
 
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
-
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public String getCountry() {
         return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setBuilding(int building) {
-        this.building = building;
-    }
-
-    public void setFloor(int floor) {
-        this.floor = floor;
-    }
-
-    public void setDoor(String door) {
-        this.door = door;
-    }
-
-    public String toString() {
-        return "Address{" +
-                "streetName='" + streetName + '\'' +
-                ", building=" + building +
-                ", zip='" + zip + '\'' +
-                ", city='" + city + '\'' +
-                '}';
     }
 }
 

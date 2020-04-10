@@ -140,7 +140,6 @@ public class CarInformation {
         this.description = description;
     }
 
-    @Override
     public String toString() {
         return "Car{" +
                 "registration_number='" + registration_number + '\'' +
@@ -158,5 +157,4 @@ public class CarInformation {
                 ", description='" + description + '\'' +
                 '}';
     }
-
 }

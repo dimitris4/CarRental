@@ -111,8 +111,7 @@ public class Database {
             preparedStmt.setString (1, mobilePhone);
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
-
-            System.out.println("\n\nThe entry has been recorded.");
+            System.out.println("\nThe renter has been added.");
             myConn.close();
         } catch (SQLException exc) {
             exc.printStackTrace();
@@ -330,7 +329,7 @@ public class Database {
             preparedStmt.setString (1, mobilePhone);
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
-
+            System.out.println("\nThe renter has been added.");
             myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -382,7 +381,7 @@ public class Database {
             preparedStmt.setString (1, mobilePhone);
             preparedStmt.setString(2, homePhone);
             preparedStmt.execute();
-
+            System.out.println("\nThe renter has been added.");
             myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -473,11 +472,9 @@ public class Database {
 
     // select zip code from the list : update the address table only
     public void updateAddress(String street, int building, int floor, String door, int zipID, int renter_id) throws SQLException {
-        System.out.println("Inside the updateAddress method!");
         System.out.println("renter id : " + renter_id);
         System.out.println("zipID : " + zipID);
         Connection myConn = getConnection(url, user, password);
-
         PreparedStatement updateAddress = null;
         String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?, zipID = ?\n" +
                 "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);";
@@ -489,9 +486,7 @@ public class Database {
         updateAddress.setInt(5, zipID);
         updateAddress.setInt(6, renter_id);
         System.out.println("Update complete.");
-
         updateAddress.executeUpdate();
-
         myConn.close();
     }
 
@@ -499,7 +494,6 @@ public class Database {
     public void updateAddressZipCountry(String street, int building, int floor, String door, String zip_code,
                                         String city, int countryID, int renter_id) throws SQLException {
             Connection myConn = getConnection(url, user, password);
-
             PreparedStatement safeUpdate = null;
             String safeUpadateString = "SET SQL_SAFE_UPDATES = 0";
             safeUpdate = myConn.prepareStatement(safeUpadateString);
@@ -507,14 +501,12 @@ public class Database {
 
             PreparedStatement updateAddress = null;
             PreparedStatement updateZip = null;
-
             String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
                     "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
 
             String updateZipString = "UPDATE zip SET zip = ?, city = ?, countryID = ?\n" +
                     "WHERE zipID = \n" +
                     "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
-
             updateAddress = myConn.prepareStatement(updateAddressString);
             updateAddress.setString(1, street);
             updateAddress.setInt(2, building);
@@ -527,7 +519,6 @@ public class Database {
             updateZip.setString(2, city);
             updateZip.setInt(3, countryID);
             updateZip.setInt(4, renter_id);
-
             updateAddress.executeUpdate();
             updateZip.executeUpdate();
             System.out.println("Update complete.");
@@ -541,14 +532,12 @@ public class Database {
 
         PreparedStatement updateAddress = null;
         PreparedStatement updateZip = null;
-
         String updateAddressString = "UPDATE address SET street = ?, building = ?, floor = ?, door = ?\n" +
                 "WHERE addressID = (SELECT addressID FROM renter WHERE renterID = ?);\n";
 
         String updateZipString = "UPDATE zip SET zip = ?, city = ?, countryID = ?\n" +
                 "WHERE zipID = \n" +
                 "\t(SELECT zipID FROM address JOIN renter USING (addressID) WHERE renterID = ?);";
-
         updateAddress = myConn.prepareStatement(updateAddressString);
         updateAddress.setString(1, street);
         updateAddress.setInt(2, building);
@@ -565,7 +554,6 @@ public class Database {
         updateAddress.executeUpdate();
         updateZip.executeUpdate();
         System.out.println("Update complete.");
-
         myConn.close();
     }
 
@@ -687,8 +675,8 @@ public class Database {
 
             pst.executeUpdate();
             pst2.executeUpdate();
+            System.out.println("Update complete.");
             myConn.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -725,7 +713,7 @@ public class Database {
             addCountry = myConn.prepareStatement(queryCountry);
             addCountry.setString(1, country);
             addCountry.execute();
-            System.out.println("\n\nThe entry has been recorded.");
+            System.out.println("\nThe country has been added.");
             addCountry.close();
             myConn.close();
         } catch (SQLException exc) {
@@ -936,5 +924,4 @@ public class Database {
             e.printStackTrace();
         }
     }
-
 }

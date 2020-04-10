@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Scanner;
 import java.util.Set;
 
-
 public class RenterMethods {
 
     private static Scanner input = new Scanner(System.in);
@@ -209,7 +208,7 @@ public class RenterMethods {
 
     public void remove() throws SQLException {
         displayRenters();
-        System.out.println("\n*The program allows you to delete only renters who do not have any contract at the moment.*");
+        System.out.println("\n*The program allows you to delete only renters who do not have any active contract at the moment.*");
         System.out.print("Select renter ID: ");
         int renter_id = Input.checkInt(1,999999999);
         ArrayList<Integer> a = database.getRenterIDs();
@@ -230,8 +229,6 @@ public class RenterMethods {
         }
     }
 
-
-
     public void update() throws SQLException {
         displayRenters();
         System.out.print("\nSelect renter ID: ");
@@ -240,8 +237,6 @@ public class RenterMethods {
             System.out.print("Invalid ID. Try again: ");
             renter_id = Input.checkInt(1,999999999);
         }
-        System.out.println("the renter id : " + renter_id);
-
         System.out.println("\n[1] Driver License Number     [2] Mobile Phone     [3] Home Phone     [4] Address");
         System.out.print("Select the field you want to update: ");
         int field = Input.checkInt(1,4);
@@ -301,14 +296,10 @@ public class RenterMethods {
                         System.out.print("Invalid Input. Try Again: ");
                         zip_code = input.next();
                     }
-
                     int zipID = database.getZipID(zip_code);
-                    System.out.println(zipID);
                     // update the address table only
                     database.updateAddress(street, building, floor, door, zipID, renter_id);
-
                 } else {
-
                     // unknown zip code...
                     System.out.print("Type new zip code: ");
                     zip_code = input.next();
@@ -317,16 +308,13 @@ public class RenterMethods {
                         zip_code = input.next();
                     }
                     input.nextLine();
-
                     System.out.print("City: ");
                     city = input.nextLine();
                     while (!city.matches("[a-zA-Z_]+(\\s)?([a-zA-Z_]+)?")) {
                         System.out.println("Invalid City. Try Again: ");
                         city = input.nextLine();
                     }
-
                     country = Input.isCountryName();
-
                     if (!countries.contains(country)) { // if country is unknown
                         // insert new country to the countries table
                         database.addCountry(country);
@@ -334,11 +322,8 @@ public class RenterMethods {
                         int countryID = database.getCountryID(country);
                         // insert renter with unknown zip code and unknown country (tables affected: renter, address, zip, country)
                         database.updateAddressZipCountry(street, building, floor, door, zip_code, city, countryID, renter_id);
-
                     } else { // if country is known, then we get country id
-
                         int countryID = database.getCountryID(country);
-
                         // insert renter with unknown zip code and known country (tables affected: renter, address, zip)
                         database.updateAddressZip(street, building, floor, door, zip_code, city, countryID, renter_id);
                     }

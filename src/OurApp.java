@@ -3,8 +3,6 @@ public class OurApp {
     private static Controller controller;
 
     public static void main(String[] args) throws Exception {
-
-
         //creating a controller object
         controller = new Controller();
         //Our first login menu is called
@@ -15,5 +13,4 @@ public class OurApp {
     public static Controller getController() {
         return controller;
     }
-
 }

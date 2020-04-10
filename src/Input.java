@@ -8,7 +8,6 @@ class Input {
     static Scanner in = new Scanner(System.in);
     private static ArrayList<Integer>months = new ArrayList<>(Arrays.asList(31,28,31,30,31,30,31,31,30,31,30,31));
 
-
     public static Date insertDateWithoutTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         Scanner console = new Scanner(System.in);
@@ -27,8 +26,6 @@ class Input {
         }
         return date;
     }
-
-
 
     public static Date setDate(){
         System.out.println("Driver since (please type the date): ");
@@ -71,8 +68,6 @@ class Input {
         return sdate;
     }
 
-
-
     public static boolean checkDate(int year, int month, int day){
         return (day<0 || ( month==2 && year%4==0 && day>29) || (((month==2 && year%4!=0) || (month!=2)) && day>months.get(month-1)));
     }
@@ -113,7 +108,6 @@ class Input {
         }
         return email;
     }
-
 
     public static String isCountryName() {
 
@@ -157,6 +151,4 @@ class Input {
 
         return  countryNames.contains(country.toLowerCase());
     }
-
-
 }

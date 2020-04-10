@@ -2,12 +2,8 @@ import java.util.Scanner;
 
 public class Menus {
 
-    Scanner scanner = new Scanner(System.in);
-
     public void mainMenu() throws Exception {
-
         while (true) {
-
             System.out.println("**********************************");
             System.out.println("|           MAIN MENU            |");
             System.out.println("**********************************");
@@ -16,11 +12,7 @@ public class Menus {
             System.out.println("|   [3] Contracts                |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
-
-            RenterMethods rm = new RenterMethods();System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 3);
-
             switch (selection) {
                 case 1:
                     carMenu();
@@ -33,15 +25,13 @@ public class Menus {
                     pressAnyKey();
                     break;
                 case 0:
+                    AsciiArt.printLogo3();
                     System.exit(0);
                     break;
-
             }
         }
     }
 
-
-    //accessing the Car Menu
     public void carMenu() throws Exception {
         while (true) {
             System.out.println("**********************************");
@@ -56,13 +46,8 @@ public class Menus {
             System.out.println("|   [7] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
-
-            CarMethods cm = new CarMethods();
-
             System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 7);
-
             switch (selection) {
                 case 1:
                     OurApp.getController().addCar();
@@ -94,19 +79,15 @@ public class Menus {
                     mainMenu();
                     break;
                 case 0:
+                    AsciiArt.printLogo3();
                     System.exit(0);
                     break;
-
             }
         }
     }
 
-
-    //accessing the Renters Menu
     public void renterMenu() throws Exception {
-
         while (true) {
-
             System.out.println("**********************************");
             System.out.println("|            RENTERS             |");
             System.out.println("**********************************");
@@ -117,32 +98,23 @@ public class Menus {
             System.out.println("|   [5] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
-
-            RenterMethods rm = new RenterMethods();
-
             System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 5);
-
             switch (selection) {
                 case 1:
-                    //Main.getController().addRenter();
-                    rm.add();
+                    OurApp.getController().addRenter();
                     pressAnyKey();
                     break;
                 case 2:
-                    //Main.getController().editRenter();
-                    rm.update();
+                    OurApp.getController().editRenter();
                     pressAnyKey();
                     break;
                 case 3:
-                    //Main.getController().deleteRenter();
-                    rm.remove();
+                    OurApp.getController().deleteRenter();
                     pressAnyKey();
                     break;
                 case 4:
-                    //Main.getController().displayRenters();
-                    rm.displayRenters();
+                    OurApp.getController().displayRenters();
                     pressAnyKey();
                     break;
                 case 5:
@@ -151,18 +123,15 @@ public class Menus {
                     mainMenu();
                     break;
                 case 0:
+                    AsciiArt.printLogo3();
                     System.exit(0);
                     break;
-
             }
         }
     }
 
-    //accessing the Contracts Menu
     public void contractMenu() throws Exception {
-
         while (true) {
-
             System.out.println("**********************************");
             System.out.println("|           CONTRACTS            |");
             System.out.println("**********************************");
@@ -173,24 +142,19 @@ public class Menus {
             System.out.println("|   [5] Return To Main Menu      |");
             System.out.println("|   [0] Close Program            |");
             System.out.println("**********************************");
-
-            ContractMethods contractMethods = new ContractMethods();
-
             System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 5);
-
             switch (selection) {
                 case 1:
-                    contractMethods.addContract();
+                    OurApp.getController().addContract();
                     pressAnyKey();
                     break;
                 case 2:
-                    contractMethods.endContract();
+                    OurApp.getController().endContract();
                     pressAnyKey();
                     break;
                 case 3:
-                    contractMethods.deleteContract();
+                    OurApp.getController().deleteContract();
                     pressAnyKey();
                     break;
                 case 4:
@@ -202,9 +166,9 @@ public class Menus {
                     mainMenu();
                     break;
                 case 0:
+                    AsciiArt.printLogo3();
                     System.exit(0);
                     break;
-
             }
         }
     }
@@ -223,32 +187,27 @@ public class Menus {
             System.out.println("|   [7] Return To Main Menu           |");
             System.out.println("|   [0] Close Program                 |");
             System.out.println("***************************************");
-
-            ContractMethods contractMethods = new ContractMethods();
-
             System.out.print("Select Option: ");
-
             int selection = Input.checkInt(0, 7);
-
             switch (selection) {
                 case 1:
-                    contractMethods.displayActiveContracts();
+                    OurApp.getController().displayActiveContracts();
                     pressAnyKey();
                     break;
                 case 2:
-                    contractMethods.displayOldContracts();
+                    OurApp.getController().displayOldContracts();
                     pressAnyKey();
                     break;
                 case 3:
-                    contractMethods.searchContractsByStartDate();
+                    OurApp.getController().searchByStartDate();
                     pressAnyKey();
                     break;
                 case 4:
-                    contractMethods.searchContractsByEndDate();
+                    OurApp.getController().searchByEndDate();
                     pressAnyKey();
                     break;
                 case 5:
-                    contractMethods.searchContractsByRegNo();
+                    OurApp.getController().searchByRegNumber();
                     pressAnyKey();
                     break;
                 case 6:
@@ -262,16 +221,16 @@ public class Menus {
                     mainMenu();
                     break;
                 case 0:
+                    AsciiArt.printLogo3();
                     System.exit(0);
                     break;
             }
         }
     }
 
-    void pressAnyKey() {
+    public void pressAnyKey() {
         System.out.println("Press any key to continue: ");
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();
     }
-
 }

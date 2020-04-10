@@ -4,12 +4,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
-
 import static java.sql.DriverManager.getConnection;
 import static java.util.Calendar.YEAR;
 
 public class CarMethods {
-
     private static Database database = Database.instance;
     private static Set<String> cars= new HashSet<>();
     private static Set<String> brands= new HashSet<>();
