@@ -21,16 +21,15 @@ public class RenterMethods {
 
     public void displayRenters() {
         System.out.println();
-        System.out.printf("%-15s %-25s %-25s %-25s %-25s %-30s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
+        System.out.println("RENTERS");
+        System.out.printf("%-15s %-15s %-25s %-25s %-25s %-25s %-25s %-25s %-25s\n", "Renter ID", "First Name", "Last Name",
                 "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address");
-        for (int i = 0; i < 255; i++) {
-            System.out.print("-");
+        for (int i=0; i<210; i++) {
+            System.out.print("*");
         }
         System.out.println();
-        for (Renter renter : renters) {
-            System.out.println(renter);
-        }
-        for (int i = 0; i < 255; i++) {
+        database.displayRenters();
+        for (int i=0; i<210; i++) {
             System.out.print("=");
         }
         System.out.println();
@@ -132,7 +131,6 @@ public class RenterMethods {
         System.out.print("Select the option: ");
         int field = Input.checkInt(1,2);
         String zip_code = "";
-        //int zipID;
         String city = "";
         String country = "";
 
@@ -192,18 +190,14 @@ public class RenterMethods {
                                        sqlDate, mobilePhone, homePhone, countryID);
 
                 }
-
                 break;
-
             default:
-
                 break;
-
         }
         Address address = new Address(street, building, floor, door, zip_code, city, country);
         renter.setAddresses(address);
         renters.add(renter);
-    }  // end of add method
+    }
 
 
     public void remove() throws SQLException {
@@ -245,19 +239,16 @@ public class RenterMethods {
                 System.out.print("Enter new driver license number: ");
                 String newDriverLicenseNumber = input.next();
                 database.updateLicense(newDriverLicenseNumber, renter_id);
-                //displayRenters();
                 break;
             case 2:
                 System.out.print("Enter new mobile phone number: ");
                 String newMobilePhone = input.next();
                 database.updateMobilePhone(newMobilePhone, renter_id);
-                //displayRenters();
                 break;
             case 3:
                 System.out.print("Enter new home phone number: ");
                 String newHomePhone = input.next();
                 database.updateHomePhone(newHomePhone, renter_id);
-                //displayRenters();
                 break;
             case 4:
                 System.out.print("Street Name: ");
