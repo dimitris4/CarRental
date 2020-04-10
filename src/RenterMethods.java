@@ -53,21 +53,23 @@ public class RenterMethods {
     public void add() {
         Renter renter = new Renter();
         //prompt for the user input
-        System.out.print("First name: ");
+        System.out.print("First name: ");   // first name can be only one word
         String fname = input.next();
         while (!fname.matches("[a-zA-Z_]+")) {
             System.out.print("Invalid First Name. Try Again: ");
             fname = input.next();
         }
-        renter.setFirst_name(fname.substring(0,1).toUpperCase() + fname.substring(1).toLowerCase());
+        fname = Input.capitalizeWord(fname);  // converts the first letter to uppercase
+        renter.setFirst_name(fname);
 
         System.out.print("Last name: ");
         String lname = input.next();
-        while(!lname.matches("[a-zA-Z_]+")){
+        while(!lname.matches("[a-zA-Z_]+")) {  // last name can be only one word
             System.out.println("Invalid Last Name. Try Again: ");
             lname = input.next();
         }
-        renter.setLast_name(lname.substring(0,1).toUpperCase() + lname.substring(1).toLowerCase());
+        lname = Input.capitalizeWord(lname);
+        renter.setLast_name(lname);
 
         System.out.print("Mobile Phone (start with country code): ");
         String mobilePhone = input.next();
@@ -78,10 +80,10 @@ public class RenterMethods {
         input.nextLine();
 
         System.out.print("Home Phone (start with country code) or [0] to skip: ");
-        String homePhone = input.nextLine();
+        String homePhone = input.next();
         while(!homePhone.equals("0") && !homePhone.matches("[0-9]{6,12}$")){
             System.out.print("Invalid Phone number. Try Again: ");
-            homePhone = input.nextLine();
+            homePhone = input.next();
         }
         if (homePhone.equals("0")){ homePhone = null; }
         Telephone tel = new Telephone(mobilePhone, homePhone);
@@ -93,25 +95,22 @@ public class RenterMethods {
 
         System.out.print("Driver Licence Number: ");
         String licence = "";
-        licence = input.nextLine();
+        licence = input.next();
         renter.setDriverLicenseNumber(licence);
 
         // the object gets java Date and the database gets sql Date type
         java.util.Date sinceDate = Input.setDate();
         renter.setSinceDate(sinceDate);
-
         java.sql.Date sqlDate = new java.sql.Date(sinceDate.getTime());
 
-
         System.out.println("\n**** CLIENT ADDRESS ****\n");
-
         System.out.print("Street Name: ");
         String street = input.next();
         while (!street.matches("[a-zA-Z_]+")) {
             System.out.print("Invalid Street Name. Try Again: ");
             street = input.next();
         }
-        street = (street.substring(0,1).toUpperCase() + street.substring(1).toLowerCase());
+        street = Input.capitalizeWord(street);
 
         System.out.print("Street Number: ");
         int building = Input.checkInt(1,5000);
@@ -172,13 +171,14 @@ public class RenterMethods {
                     System.out.println("Invalid City. Try Again: ");
                     city = input.nextLine();
                 }
-
+                city = Input.capitalizeWord(city);
                 country = Input.isCountryName();
+                country = Input.capitalizeWord(country);
 
                 if (!countries.contains(country)) { // if country is unknown
 
                     // insert renter with unknown zip code and unknown country (tables affected: renter, phone_numbers, address, zip, country)
-                    database.addRenter(country.toUpperCase(), zip_code, city, street, building, floor, door, fname, lname, email,
+                    database.addRenter(country, zip_code, city, street, building, floor, door, fname, lname, email,
                                        licence, sqlDate, mobilePhone, homePhone);
 
                 } else { // if country is known, then we get country id

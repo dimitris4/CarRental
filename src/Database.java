@@ -941,13 +941,11 @@ public class Database {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             while (rs.next()) {
                 System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-25s\n", rs.getString(1),
-                        rs.getString(2).substring(0,1).toUpperCase() + rs.getString(2).substring(1).toLowerCase(),
-                        rs.getString(3).substring(0,1).toUpperCase() + rs.getString(3).substring(1).toLowerCase(),
-                        rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7),
-                        sdf.format(rs.getDate(8)), rs.getString(9).substring(0,1).toUpperCase() +
-                        rs.getString(9).substring(1).toLowerCase() +  " " + rs.getString(10) + " " +
+                        rs.getString(2), rs.getString(3), rs.getString(4),
+                        rs.getString(5), rs.getString(6), rs.getString(7),
+                        sdf.format(rs.getDate(8)), rs.getString(9) + " " + rs.getString(10) + " " +
                         rs.getString(11) + " " + rs.getString(12) + " " + rs.getString(13) + " " +
-                        Input.capitalizeWord(rs.getString(14)) + " " + Input.capitalizeWord(rs.getString(15)));
+                        rs.getString(14) + " " + rs.getString(15));
             }
             statement.close();
             myConn.close();

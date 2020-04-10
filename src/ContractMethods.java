@@ -308,8 +308,8 @@ public class ContractMethods {
         String myAccountEmail = "kailuacarrental@gmail.com";
         String password = "kailua1234";
 
-        Session session = Session.getInstance(properties, new Authenticator(){
-            protected PasswordAuthentication getPasswordAuthentication(){
+        Session session = Session.getInstance(properties, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(myAccountEmail, password);
             }
         });

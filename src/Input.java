@@ -135,30 +135,18 @@ class Input {
 
     }
 
-    public static boolean isCountryName(String country) {
-        String[] countryCodes = Locale.getISOCountries();
-        ArrayList<String> countryNames = new ArrayList<String>();
-        for (String countryCode : countryCodes) {
-            Locale obj = new Locale("", countryCode);
-            countryNames.add(obj.getDisplayCountry().toLowerCase());
-        }
-        return  countryNames.contains(country.toLowerCase());
-    }
-
     public static String capitalizeWord(String str){
-        String words[] = str.split("\\s");
-        String capitalizeWord = "";
-        for (int i = 0; i < words.length; i++){
-            if(i != 0 && words[i].length() == 2) {
-                String first = words[i].substring(0, 2);
-                String afterFirst = words[i].substring(2);
-                capitalizeWord += first.toUpperCase() + afterFirst.toLowerCase() + " ";
-            }else {
-                String first = words[i].substring(0,1);
-                String afterFirst = words[i].substring(1);
-                capitalizeWord += first.toUpperCase() + afterFirst.toLowerCase() + " ";
+        String[] words = str.split("\\s+");
+        String result = "";
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if(words[i].length() <= 2) {
+                word = word.toUpperCase();
+            } else {
+                word = word.substring(0, 1).toUpperCase() + word.substring(1);
             }
+            result += word + " ";
         }
-        return capitalizeWord.trim();
+        return result.trim();
     }
 }
