@@ -22,7 +22,7 @@ public class RenterMethods {
     public void displayRenters() {
         System.out.println();
         System.out.println("RENTERS");
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-25s\n", "Renter ID", "First Name", "Last Name",
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-30s %-20s %-20s %-25s\n", "Renter ID", "First Name", "Last Name",
                 "Mobile Phone", "Home Phone", "Email", "Driver License", "Since", "Address (Street, Number, Floor, Door, Zip, City, Country)");
         for (int i=0; i<235; i++) {
             System.out.print("*");

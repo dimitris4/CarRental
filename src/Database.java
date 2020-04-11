@@ -940,7 +940,7 @@ public class Database {
             ResultSet rs = statement.executeQuery();
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             while (rs.next()) {
-                System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-25s\n", rs.getString(1),
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s %-30s %-20s %-20s %-25s\n", rs.getString(1),
                         rs.getString(2), rs.getString(3), rs.getString(4),
                         rs.getString(5), rs.getString(6), rs.getString(7),
                         sdf.format(rs.getDate(8)), rs.getString(9) + " " + rs.getString(10) + " " +
