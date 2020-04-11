@@ -295,6 +295,7 @@ public class RenterMethods {
                         System.out.print("Invalid Input. Try Again: ");
                         zip_code = input.next();
                     }
+                    zips.add(zip_code);
                     input.nextLine();
                     System.out.print("City: ");
                     city = input.nextLine();
